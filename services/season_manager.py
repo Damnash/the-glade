@@ -110,7 +110,7 @@ def reset_players_state():
     cur.execute("DELETE FROM duels")
     cur.execute("DELETE FROM steal_cooldowns")
     cur.execute("DELETE FROM active_combats")
-    cur.execute("DELETE FROM maze_moves")
+    cur.execute("DELETE FROM maze_runs")
     cur.execute("DELETE FROM items_on_ground")
 
     # Очистить кланы

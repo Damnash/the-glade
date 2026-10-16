@@ -72,9 +72,9 @@ def die_in_maze(user_id: int, lang: str = "ru") -> dict:
     from services.achievements import award_points
     award_points(user_id, "death", field="deaths")
 
-    # 3. Отменяем активный переход
-    from services.maze_moves import cancel_move
-    cancel_move(user_id)
+    # 3. Завершаем вылазку (если была)
+    from services.maze_runs import end_run
+    end_run(user_id)
 
     # 4. Выпадают ключи
     from services.keys import drop_all_keys_on_death

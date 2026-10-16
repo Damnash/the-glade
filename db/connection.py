@@ -298,17 +298,6 @@ def init_db():
             ON player_quests(user_id, status)
     """)
 
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS maze_moves (
-            user_id INTEGER PRIMARY KEY,
-            from_section TEXT,
-            to_section TEXT,
-            layer INTEGER,
-            started_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            ends_at TIMESTAMP
-        )
-    """)
-
     # ============ maze_runs (v1) ============
     # Запись на вылазку в Лабиринт: один run = одна вылазка.
     # Переходы мгновенные, но таймер ends_at ограничивает время в Лабиринте.
@@ -493,6 +482,9 @@ def init_db():
     """)
 
     cur.execute("CREATE INDEX IF NOT EXISTS idx_log_user ON player_log(user_id, created_at DESC)")
+
+    # Migration v0.2 → v1: удалить устаревшую таблицу maze_moves
+    cur.execute("DROP TABLE IF EXISTS maze_moves")
 
     cur.execute("""
         CREATE TABLE IF NOT EXISTS story_quests (
