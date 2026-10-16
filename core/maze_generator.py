@@ -90,33 +90,57 @@ def generate_layer(layer_number: int, seed: int | None = None,
 
 def _generate_wing_graph(sections: dict, wing_sections: list, wing: str,
                           wing_size: int = WING_SIZE):
-    """Growing Tree алгоритм для крыла."""
-    start = wing_sections[0]
-    visited = {start}
-    active = [start]
+    """
+    Генерация графа крыла по правилам «колец».
+    
+    Правила:
+      1. Цепочка вперёд: ring k → ring k+1 (обязательно).
+      2. Обратные рёбра: ring k → ring k-1 (создаёт циклы).
+      3. Внутри кольца: соседние секции одного кольца связаны с шансом.
+      4. Рёбра «дальше 2 колец» запрещены.
+      5. Шанс горизонтальных связей между крыльями — отдельно.
+    """
+    import random as _r
+    from collections import defaultdict
 
-    while active:
-        current = random.choice(active)
-        sid = current
-
-        neighbors = [s for s in wing_sections if s != sid and s not in visited]
-
-        if not neighbors:
-            active.remove(current)
+    # Группируем секции по кольцу
+    # wing_sections = [f"{prefix}{wing}{r}" for r in range(1, wing_size+1)]
+    # ring_map[ring] = section_id
+    ring_map = {}
+    for sid in wing_sections:
+        # sid = "L1_N5" → ring = 5
+        try:
+            ring = int(sid.split(wing)[-1])
+        except (ValueError, IndexError):
             continue
+        ring_map[ring] = sid
 
-        next_section = random.choice(neighbors)
-        _add_edge(sections, sid, next_section)
+    rings = sorted(ring_map.keys())  # [1, 2, 3, ..., 30]
 
-        visited.add(next_section)
-        active.append(next_section)
+    # === 1. Цепочка вперёд (обязательно) ===
+    for k in range(len(rings) - 1):
+        a = ring_map[rings[k]]
+        b = ring_map[rings[k + 1]]
+        _add_edge(sections, a, b)
 
-    # Дополнительные связи для циклов
-    extra_edges = max(1, wing_size // 2)
-    for _ in range(extra_edges):
-        a = random.choice(wing_sections)
-        b = random.choice(wing_sections)
-        if a != b and not _are_connected(sections, a, b):
+    # === 2. Обратные рёбра (создают циклы) ===
+    for k in range(1, len(rings) - 1):
+        # с шансом 40% добавить ребро в предыдущее кольцо
+        # (кроме крайних)
+        if _r.random() < 0.4:
+            a = ring_map[rings[k]]
+            b = ring_map[rings[k - 1]]
+            _add_edge(sections, a, b)
+
+    # === 3. Соседи внутри кольца: (ring, ring+1) — горизонтальные ===
+    # Реализуется в отдельной функции ниже, на уровне всего слоя.
+
+    # === 4. Небольшая доля «дальних» рёбер (для интриги) ===
+    # Но только соседние-через-одно (ring k ↔ ring k+2) с очень низким шансом.
+    for k in range(len(rings) - 2):
+        if _r.random() < 0.05:  # 5%
+            a = ring_map[rings[k]]
+            b = ring_map[rings[k + 2]]
             _add_edge(sections, a, b)
 
 
@@ -132,21 +156,64 @@ def _are_connected(sections: dict, a: str, b: str) -> bool:
 
 
 def _add_cycles(sections: dict, cycles_ratio: float = 0.20):
-    all_sections = list(sections.keys())
+    """
+    Добавляет циклы (рёбра внутри одного кольца и между соседними).
+    Не создаёт «паразитных» дальних рёбер.
+    """
+    import random as _r
+
+    # Группируем секции по (wing, ring)
+    by_wing_ring = {}
+    for sid, spec in sections.items():
+        if spec.get("type") == "center":
+            continue
+        wing = spec["wing"]
+        ring = spec["ring"]
+        by_wing_ring.setdefault((wing, ring), []).append(sid)
+
+    all_sections = [sid for sid, s in sections.items() if s.get("type") != "center"]
     target_cycles = max(2, int(len(all_sections) * cycles_ratio))
 
     added = 0
     attempts = 0
-    while added < target_cycles and attempts < 200:
-        attempts += 1
-        a = random.choice(all_sections)
-        b = random.choice(all_sections)
+    max_attempts = target_cycles * 10
 
-        if a == b:
+    while added < target_cycles and attempts < max_attempts:
+        attempts += 1
+        a = _r.choice(all_sections)
+        spec_a = sections[a]
+        wing_a = spec_a["wing"]
+        ring_a = spec_a["ring"]
+
+        # Кандидаты: то же кольцо, другого крыла (например, N5 ↔ S5)
+        # или соседнее кольцо в том же крыле (N5 ↔ N6)
+        candidates = []
+
+        # Соседние кольца в том же крыле
+        for delta in (-1, 1):
+            r2 = ring_a + delta
+            if r2 >= 1:
+                key = (wing_a, r2)
+                for sid in by_wing_ring.get(key, []):
+                    if sid != a and sid not in spec_a["exits"]:
+                        candidates.append(sid)
+
+        # То же кольцо, разные крылья
+        for wing_b in ("N", "S", "W", "E"):
+            if wing_b == wing_a:
+                continue
+            key = (wing_b, ring_a)
+            for sid in by_wing_ring.get(key, []):
+                if sid != a and sid not in spec_a["exits"]:
+                    candidates.append(sid)
+
+        if not candidates:
             continue
-        if _are_connected(sections, a, b):
-            continue
-        if len(sections[a]["exits"]) >= MAX_EXITS_PER_SECTION:
+
+        b = _r.choice(candidates)
+
+        # Проверка лимитов
+        if len(spec_a["exits"]) >= MAX_EXITS_PER_SECTION:
             continue
         if len(sections[b]["exits"]) >= MAX_EXITS_PER_SECTION:
             continue
@@ -156,23 +223,123 @@ def _add_cycles(sections: dict, cycles_ratio: float = 0.20):
 
 
 def _ensure_dead_ends(sections: dict, min_count: int = 8):
-    dead_ends = [sid for sid, s in sections.items() if len(s["exits"]) == 1]
+    """
+    Создаёт тупики БЕЗОПАСНО:
+      - удаляет только рёбра, соединяющие секции ОДНОГО крыла
+      - НЕ удаляет рёбра между кольцами (не рвёт цепочку)
+      - удаляет симметрично
+      - проверяет связность после каждого удаления
+    """
+    import random as _r
+    from collections import deque
 
-    while len(dead_ends) < min_count:
-        candidates = [
-            sid for sid, s in sections.items()
-            if len(s["exits"]) >= 3 and s["ring"] != 1
-        ]
+    def count_dead_ends():
+        return sum(1 for s in sections.values() if len(s["exits"]) == 1)
+
+    def is_connected(start, target, skip_edge=None):
+        """BFS от start до target. skip_edge = (a, b) — игнорировать это ребро."""
+        if start not in sections or target not in sections:
+            return False
+        queue = deque([start])
+        visited = {start}
+        while queue:
+            node = queue.popleft()
+            for nxt in sections[node]["exits"]:
+                # Пропускаем указанное ребро
+                if skip_edge:
+                    a, b = skip_edge
+                    if (node == a and nxt == b) or (node == b and nxt == a):
+                        continue
+                if nxt == target:
+                    return True
+                if nxt not in visited:
+                    visited.add(nxt)
+                    queue.append(nxt)
+        return False
+
+    # Проверяем связность «вход→центр» для всех крыльев
+    center = None
+    entrances = {}
+    for sid, spec in sections.items():
+        if spec.get("type") == "center":
+            center = sid
+        if spec.get("ring") == 1:
+            wing = spec["wing"]
+            if wing not in entrances:
+                entrances[wing] = sid
+
+    def all_connected():
+        if not center:
+            return True
+        for wing, entry in entrances.items():
+            if not is_connected(entry, center):
+                return False
+        return True
+
+    if not all_connected():
+        return  # Изначально не связно — не наша забота
+
+    attempts = 0
+    max_attempts = 200
+
+    while count_dead_ends() < min_count and attempts < max_attempts:
+        attempts += 1
+
+        # Кандидаты: секции с >=3 рёбрами, ring != 1
+        candidates = []
+        for sid, spec in sections.items():
+            if spec.get("type") == "center":
+                continue
+            if len(spec["exits"]) < 3:
+                continue
+            if spec["ring"] == 1:
+                continue
+            candidates.append(sid)
+
         if not candidates:
             break
 
-        sid = random.choice(candidates)
-        target = random.choice(sections[sid]["exits"])
-        sections[sid]["exits"].remove(target)
+        sid = _r.choice(candidates)
+        spec = sections[sid]
+        wing = spec["wing"]
+
+        # Ищем ребро, которое соединяет секции ОДНОГО крыла
+        # (не между кольцами)
+        removable = []
+        for target in spec["exits"]:
+            target_spec = sections.get(target)
+            if not target_spec:
+                continue
+            if target_spec.get("type") == "center":
+                continue
+            if target_spec.get("wing") != wing:
+                continue
+            # Кольца должны совпадать или быть рядом
+            ring_diff = abs(spec["ring"] - target_spec["ring"])
+            if ring_diff > 2:
+                continue
+            removable.append(target)
+
+        if not removable:
+            continue
+
+        target = _r.choice(removable)
+
+        # Проверяем, что после удаления связность сохранится
+        if not is_connected(sid, target, skip_edge=(sid, target)):
+            continue  # Удаление разорвало бы граф
+
+        # Удаляем симметрично
+        if target in sections[sid]["exits"]:
+            sections[sid]["exits"].remove(target)
         if sid in sections[target]["exits"]:
             sections[target]["exits"].remove(sid)
 
-        dead_ends = [s for s, v in sections.items() if len(v["exits"]) == 1]
+        # Проверяем глобальную связность
+        if not all_connected():
+            # Откат
+            _add_edge(sections, sid, target)
+            continue
 
 
 def _classify_sections(sections: dict):
