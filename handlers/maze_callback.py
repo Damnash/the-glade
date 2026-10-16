@@ -24,24 +24,34 @@ def format_problems(problems: dict, lang: str) -> str:
     return "\n".join(lines)
 
 
-def enter_anyway_keyboard(lang: str) -> InlineKeyboardMarkup:
+def enter_anyway_keyboard(lang: str, session: str = "") -> InlineKeyboardMarkup:
+    s = ":" + session if session else ""
     return InlineKeyboardMarkup(inline_keyboard=[[
         InlineKeyboardButton(
             text=t("maze.btn_enter_anyway", lang),
-            callback_data="raid:enter_force",
+            callback_data="raid:enter_force" + s,
         ),
         InlineKeyboardButton(
             text=t("nav.back", lang),
-            callback_data="nav:back",
+            callback_data="nav:back" + s,
         ),
     ]])
 
 
 async def on_enter(callback: CallbackQuery):
     """Проверка снаряжения перед входом."""
+    from core.bot_helpers import check_session
+
     user_id = callback.from_user.id
     player = get_player(user_id)
+    if not player:
+        return
+
     lang = player["language"]
+
+    if not check_session(user_id, callback.data):
+        await callback.answer(t("log.stale", lang), show_alert=True)
+        return
 
     problems = check_gear(user_id)
     if "error" in problems:
@@ -53,10 +63,15 @@ async def on_enter(callback: CallbackQuery):
         text += format_problems(problems, lang)
         text += "\n\n" + t("maze.enter_anyway", lang)
 
+        session = player.get("current_session", "")
+        kb = enter_anyway_keyboard(lang, session)
+
         try:
-            await callback.message.edit_text(text, reply_markup=enter_anyway_keyboard(lang))
-        except Exception:
-            await callback.message.answer(text, reply_markup=enter_anyway_keyboard(lang))
+            await callback.message.edit_text(text, reply_markup=kb)
+        except Exception as e:
+            err = str(e).lower()
+            if "message is not modified" not in err:
+                await callback.message.answer(text, reply_markup=kb)
         await callback.answer()
         return
 
@@ -64,9 +79,19 @@ async def on_enter(callback: CallbackQuery):
 
 
 async def on_enter_force(callback: CallbackQuery):
+    from core.bot_helpers import check_session
+
     user_id = callback.from_user.id
     player = get_player(user_id)
+    if not player:
+        return
+
     lang = player["language"]
+
+    if not check_session(user_id, callback.data):
+        await callback.answer(t("log.stale", lang), show_alert=True)
+        return
+
     await _do_enter(callback, user_id, lang)
 
 
@@ -96,12 +121,14 @@ async def _do_enter(callback: CallbackQuery, user_id: int, lang: str):
         "maze_section": section_id,
     })
 
-    # Запускаем вылазку с таймером
-    from services.maze_runs import start_run, MazeRunError
+    # Запускаем вылазку с таймером.
+    # Если уже есть активная — заменяем новой.
+    from services.maze_runs import start_run, end_run, MazeRunError
+    end_run(user_id)
     try:
         start_run(user_id, layer=1, entry_section=section_id)
     except MazeRunError:
-        # Уже в вылазке — игнорируем
+        # Что-то совсем странное — игнорируем
         pass
 
     await _show_section(callback, user_id, 1, section_id)

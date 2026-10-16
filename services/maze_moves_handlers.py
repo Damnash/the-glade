@@ -56,8 +56,22 @@ async def on_go(callback: CallbackQuery):
 
     if not result["ok"]:
         reason = result["reason"]
+
+        # Recovery: если maze_runs нет, а игрок "в Лабиринте" —
+        # принудительно вытаскиваем в Глэйд через try_exit_run.
+        if reason == "no_run":
+            from services.maze_runs import try_exit_run
+            exit_result = try_exit_run(user_id)
+            if exit_result.get("ok"):
+                await callback.answer(t("maze.returned_short", lang))
+                from handlers.nav_callback import show_main
+                await show_main(callback)
+                return
+            # если не удалось — общий popup
+            await callback.answer(t("maze.no_run", lang), show_alert=True)
+            return
+
         key_map = {
-            "no_run": "maze.no_run",
             "no_layer": "maze.no_layer",
             "no_section": "maze.no_section",
             "not_adjacent": "maze.not_adjacent",

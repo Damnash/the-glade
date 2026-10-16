@@ -232,17 +232,47 @@ def move_in_run(user_id: int, to_section: str) -> dict:
     }
 
 
+def _gate_from_section(section_id: str) -> str:
+    """Определить ворота Глэййда по ID секции (L1_N1 → north_gates)."""
+    wing_to_gate = {
+        "N": "north_gates",
+        "S": "south_gates",
+        "W": "west_gates",
+        "E": "east_gates",
+    }
+    if not section_id:
+        return "center"
+    try:
+        parts = section_id.split("_")
+        wing = parts[1][0]
+        return wing_to_gate.get(wing, "center")
+    except (IndexError, ValueError):
+        return "center"
+
+
 def try_exit_run(user_id: int) -> dict:
     """
     Попытка выйти из Лабиринта.
     Разрешено только если current_section == entry_section.
-    
+
     Возвращает:
       {"ok": True, "gate": str} — если вышли
       {"ok": False, "reason": str, "depth": int} — если нет
     """
     run = get_run(user_id)
+
     if not run:
+        # Recovery: если maze_runs нет, но игрок "в Лабиринте" —
+        # принудительно вытаскиваем его в Глэйд.
+        player = get_player(user_id)
+        if player and player.get("maze_layer", 0) > 0:
+            gate = _gate_from_section(player.get("maze_section") or "")
+            update_player_fields(user_id, {
+                "location": gate,
+                "maze_layer": 0,
+                "maze_section": None,
+            })
+            return {"ok": True, "gate": gate, "recovered": True}
         return {"ok": False, "reason": "no_run"}
 
     current = run["current_section"]
@@ -256,29 +286,9 @@ def try_exit_run(user_id: int) -> dict:
             "current_section": current,
         }
 
-    # Определяем ворота по entry_section: L1_N1 → N → north_gates
-    wing_to_gate = {
-        "N": "north_gates",
-        "S": "south_gates",
-        "W": "west_gates",
-        "E": "east_gates",
-    }
-    wing = None
-    for w, gate in wing_to_gate.items():
-        if f"_{w}1" in entry or f"_{w}0" in entry:
-            wing = w
-            break
-
-    # Fallback: парсим entry_section
-    if not wing:
-        try:
-            parts = entry.split("_")
-            wing = parts[1][0]
-        except (IndexError, ValueError):
-            return {"ok": False, "reason": "unknown_entry"}
-
-    gate = wing_to_gate.get(wing)
-    if not gate:
+    # Определяем ворота по entry_section
+    gate = _gate_from_section(entry)
+    if gate == "center" and entry != "L1_C":
         return {"ok": False, "reason": "unknown_entry"}
 
     # Обновляем игрока

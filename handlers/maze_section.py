@@ -174,10 +174,12 @@ async def _render(callback, player, lang, season, section, layer, section_id):
         ])
 
     # Кнопка "К воротам" — всегда. Проверка внутри on_exit.
+    # Session передаём, иначе check_session отклонит кнопку.
+    _s = ":" + player.get("current_session", "") if player.get("current_session") else ""
     rows.append([
         InlineKeyboardButton(
             text=t("maze.btn_exit_to_glade", lang),
-            callback_data="maze:exit",
+            callback_data="maze:exit" + _s,
         )
     ])
 
