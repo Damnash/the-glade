@@ -7,6 +7,35 @@ from core.maze_current import get_current_season
 from db.maze_map import get_section
 from db.players import get_player
 
+def _get_run_info_text(user_id: int, lang: str) -> str:
+    """
+    Возвращает строку с таймером и глубиной вылазки.
+    Пустая строка, если игрок не в вылазке.
+    """
+    from core.i18n import t
+    from core.time_utils import humanize_seconds
+    from services.maze_runs import get_run, check_timer
+
+    run = get_run(user_id)
+    if not run:
+        return ""
+
+    timer = check_timer(user_id)
+    seconds_left = timer.get("seconds_left", 0)
+
+    time_str = humanize_seconds(seconds_left, lang)
+    timer_line = t("maze.run_timer_line", lang, time=time_str)
+
+    depth = run.get("depth", 0)
+    depth_line = t("maze.run_depth_line", lang, depth=depth)
+
+    if depth > 0:
+        return_suffix = t("maze.run_depth_return", lang, depth=depth)
+        depth_line += return_suffix
+
+    return f"{timer_line}\n{depth_line}"
+
+
 
 async def show_section(callback, user_id: int, layer: int, section_id: str):
     """Показать секцию Лабиринта."""
@@ -93,7 +122,14 @@ async def _render(callback, player, lang, season, section, layer, section_id):
     if ground_lines:
         ground_text = "\n\n📦 <b>" + t("ground.on_floor", lang) + "</b>\n" + "\n".join(ground_lines)
 
-    text = "🌀 <b>" + section["name"] + "</b>\n\n" + desc + "\n\n" + stats + ground_text
+    text = "🌀 <b>" + section["name"] + "</b>\n\n" + desc + "\n\n" + stats
+
+    # Run info (таймер + глубина)
+    run_info = _get_run_info_text(callback.from_user.id, lang)
+    if run_info:
+        text += "\n\n" + run_info
+
+    text += ground_text
 
     rows = [
         [
@@ -137,13 +173,13 @@ async def _render(callback, player, lang, season, section, layer, section_id):
             )
         ])
 
-    if section["ring"] == 1:
-        rows.append([
-            InlineKeyboardButton(
-                text=t("maze.btn_exit_to_glade", lang),
-                callback_data="maze:exit",
-            )
-        ])
+    # Кнопка "К воротам" — всегда. Проверка внутри on_exit.
+    rows.append([
+        InlineKeyboardButton(
+            text=t("maze.btn_exit_to_glade", lang),
+            callback_data="maze:exit",
+        )
+    ])
 
     kb = InlineKeyboardMarkup(inline_keyboard=rows)
 
@@ -207,7 +243,14 @@ def render_section_for_message(player: dict, lang: str, session: str = ""):
     if ground_lines:
         ground_text = "\n\n📦 <b>" + t("ground.on_floor", lang) + "</b>\n" + "\n".join(ground_lines)
 
-    text = "🌀 <b>" + section["name"] + "</b>\n\n" + desc + "\n\n" + stats + ground_text
+    text = "🌀 <b>" + section["name"] + "</b>\n\n" + desc + "\n\n" + stats
+
+    # Run info (таймер + глубина)
+    run_info = _get_run_info_text(player["user_id"], lang)
+    if run_info:
+        text += "\n\n" + run_info
+
+    text += ground_text
 
     rows = [
         [
@@ -241,10 +284,10 @@ def render_section_for_message(player: dict, lang: str, session: str = ""):
             )
         ])
 
-    if section["ring"] == 1:
-        rows.append([
-            InlineKeyboardButton(text=t("maze.btn_exit_to_glade", lang),
-                                  callback_data="maze:exit" + s)
-        ])
+    # Кнопка "К воротам" — всегда
+    rows.append([
+        InlineKeyboardButton(text=t("maze.btn_exit_to_glade", lang),
+                              callback_data="maze:exit" + s)
+    ])
 
     return (text, InlineKeyboardMarkup(inline_keyboard=rows))

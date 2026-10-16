@@ -1200,5 +1200,9 @@
   "maze.timer_expired": "Ворота закрылись. Ты не успел вернуться.",
   "maze.move_error": "Нельзя пройти туда.",
   "maze.exit_not_at_entry": "Ты не у входа. Глубина: {depth}.",
-  "maze.exit_error": "Сейчас нельзя выйти."
+  "maze.exit_error": "Сейчас нельзя выйти.",
+  "maze.run_timer_line": "⏳ Осталось: {time}",
+  "maze.run_depth_line": "📏 Глубина: {depth}",
+  "maze.run_depth_return": " (≈{depth} до входа)",
+  "maze.run_header": "🌀 ВЫЛАЗКА"
 }

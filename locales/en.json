@@ -1178,5 +1178,9 @@
   "maze.timer_expired": "The gates closed. You did not return in time.",
   "maze.move_error": "Cannot move there.",
   "maze.exit_not_at_entry": "You are not at the entrance. Depth: {depth}.",
-  "maze.exit_error": "Cannot exit now."
+  "maze.exit_error": "Cannot exit now.",
+  "maze.run_timer_line": "⏳ Time left: {time}",
+  "maze.run_depth_line": "📏 Depth: {depth}",
+  "maze.run_depth_return": " (≈{depth} to return)",
+  "maze.run_header": "🌀 RUN"
 }
