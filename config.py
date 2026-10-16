@@ -9,7 +9,11 @@ BOT_TOKEN = os.getenv("BOT_TOKEN")
 if not BOT_TOKEN:
     raise ValueError("BOT_TOKEN not set in .env")
 
-DB_PATH = "data/game.db"
+# Путь к БД. По умолчанию — data/game.db (живая).
+# Переопределяется через переменную окружения GLADE_DB.
+# Пример: GLADE_DB=data/game_test.db python bot.py
+DB_PATH = os.getenv("GLADE_DB", "data/game.db")
+
 DEFAULT_LANG = "en"
 SUPPORTED_LANGS = ["en", "ru"]
 
