@@ -309,6 +309,26 @@ def init_db():
         )
     """)
 
+    # ============ maze_runs (v1) ============
+    # Запись на вылазку в Лабиринт: один run = одна вылазка.
+    # Переходы мгновенные, но таймер ends_at ограничивает время в Лабиринте.
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS maze_runs (
+            user_id INTEGER PRIMARY KEY,
+            layer INTEGER NOT NULL,
+            current_section TEXT NOT NULL,
+            entry_section TEXT NOT NULL,
+            depth INTEGER DEFAULT 0,
+            started_at TIMESTAMP NOT NULL,
+            ends_at TIMESTAMP NOT NULL
+        )
+    """)
+
+    cur.execute("""
+        CREATE INDEX IF NOT EXISTS idx_maze_runs_ends
+            ON maze_runs(ends_at)
+    """)
+
     cur.execute("""
         CREATE TABLE IF NOT EXISTS clans (
             clan_id INTEGER PRIMARY KEY AUTOINCREMENT,
