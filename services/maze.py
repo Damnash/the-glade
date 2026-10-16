@@ -53,6 +53,9 @@ def enter_maze(user_id: int, gate: str) -> str:
     """
     Вход в Лабиринт.
     Возвращает ID секции в НОВОМ формате (L1_W1).
+
+    Списание еды/воды здесь больше НЕ происходит.
+    Еда/вода тратятся только за переход (см. services/survival.py).
     """
     from core.maze_current import get_current_season
     from db.maze_map import load_layer, save_layer
@@ -76,11 +79,8 @@ def enter_maze(user_id: int, gate: str) -> str:
 
     tier = get_tier_config()
 
-    # Списание ресурсов
-    to_remove = {
-        "food": min(player["food"], tier["food"]),
-        "water": min(player["water"], tier["water"]),
-    }
+    # Списываем только расходники из инвентаря (факелы, верёвки).
+    # Еда/вода — НЕ списываются (они тратятся за переход).
     for item, need in [
         ("torch", tier["torches"]),
         ("rope", tier["rope"]),
@@ -89,21 +89,9 @@ def enter_maze(user_id: int, gate: str) -> str:
             from db.inventory import get_inventory
             inv = {i["item_key"]: i["quantity"] for i in get_inventory(user_id)}
             have = inv.get(item, 0)
-            to_remove[item] = min(have, need)
-
-    new_food = player["food"] - to_remove["food"]
-    new_water = player["water"] - to_remove["water"]
-
-    updates = {
-        "food": new_food,
-        "water": new_water,
-    }
-
-    for item, qty in to_remove.items():
-        if item in ("food", "water"):
-            continue
-        if qty > 0:
-            remove_item(user_id, item, qty)
+            to_remove = min(have, need)
+            if to_remove > 0:
+                remove_item(user_id, item, to_remove)
 
     # === Секция в НОВОМ формате ===
     season = get_current_season()
@@ -121,9 +109,7 @@ def enter_maze(user_id: int, gate: str) -> str:
     wing = wing_map[gate]
     section_id = f"L1_{wing}1"
 
-    updates["location"] = section_id
-
-    update_player_fields(user_id, updates)
+    update_player_fields(user_id, {"location": section_id})
 
     # Story tracking
     try:
