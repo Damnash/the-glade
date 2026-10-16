@@ -1,6 +1,31 @@
+# Секреты
 .env
+*.env
+
+# База данных
 data/*.db
+data/*.db-journal
+data/*.db-wal
+data/*.db-shm
+
+# Бэкапы
+backups/
+*.tar.gz
+*.zip
+
+# Python
 __pycache__/
-*.pyc
+*.py[cod]
+*.egg-info/
 .venv/
 venv/
+env/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Логи
+*.log
