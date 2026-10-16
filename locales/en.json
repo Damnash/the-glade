@@ -1170,5 +1170,13 @@
   "aliases.item.bandage": [
     "bandage",
     "band"
-  ]
+  ],
+  "maze.no_run": "You are not in a run.",
+  "maze.no_layer": "Maze layer not found.",
+  "maze.no_section": "Section does not exist.",
+  "maze.not_adjacent": "You cannot go there.",
+  "maze.timer_expired": "The gates closed. You did not return in time.",
+  "maze.move_error": "Cannot move there.",
+  "maze.exit_not_at_entry": "You are not at the entrance. Depth: {depth}.",
+  "maze.exit_error": "Cannot exit now."
 }

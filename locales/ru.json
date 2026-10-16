@@ -1192,5 +1192,13 @@
     "бинт",
     "bandage",
     "band"
-  ]
+  ],
+  "maze.no_run": "Ты не в вылазке.",
+  "maze.no_layer": "Слой Лабиринта не найден.",
+  "maze.no_section": "Такой секции нет.",
+  "maze.not_adjacent": "Туда нельзя пройти.",
+  "maze.timer_expired": "Ворота закрылись. Ты не успел вернуться.",
+  "maze.move_error": "Нельзя пройти туда.",
+  "maze.exit_not_at_entry": "Ты не у входа. Глубина: {depth}.",
+  "maze.exit_error": "Сейчас нельзя выйти."
 }
