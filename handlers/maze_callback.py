@@ -96,6 +96,14 @@ async def _do_enter(callback: CallbackQuery, user_id: int, lang: str):
         "maze_section": section_id,
     })
 
+    # Запускаем вылазку с таймером
+    from services.maze_runs import start_run, MazeRunError
+    try:
+        start_run(user_id, layer=1, entry_section=section_id)
+    except MazeRunError:
+        # Уже в вылазке — игнорируем
+        pass
+
     await _show_section(callback, user_id, 1, section_id)
 
 
@@ -237,28 +245,6 @@ async def on_pickup_ground(callback):
     await _show_section(callback, user_id, layer, section_id)
 
 
-# ============ Алиасы на handlers/maze_moves_handlers ============
-
-async def on_go(callback):
-    from services.maze_moves_handlers import on_go as _on_go
-    await _on_go(callback)
-
-
-async def on_check_move(callback):
-    from services.maze_moves_handlers import on_check_move as _on_check_move
-    await _on_check_move(callback)
-
-
-# ============ Алиасы на handlers/maze_moves_handlers ============
-
-async def on_go(callback):
-    from services.maze_moves_handlers import on_go as _on_go
-    await _on_go(callback)
-
-
-async def on_check_move(callback):
-    from services.maze_moves_handlers import on_check_move as _on_check_move
-    await _on_check_move(callback)
 
 
 # ============ Компас и лечение ============
