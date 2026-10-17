@@ -260,6 +260,13 @@ def give_victory_rewards(user_id: int, monster_type: str) -> dict:
     award_points(user_id, "kill_griever", field="griever_kills")
     check_hunter(user_id)
 
+    # Daily quest progress
+    try:
+        from services.daily_quests import add_progress
+        add_progress(user_id, "kill_griever", 1)
+    except Exception:
+        pass
+
     # Story tracking
     try:
         from services.story import track_event

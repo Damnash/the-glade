@@ -223,6 +223,13 @@ def move_in_run(user_id: int, to_section: str) -> dict:
     # Синхронизируем maze_section у игрока
     update_player_fields(user_id, {"maze_section": to_section})
 
+    # Daily quest progress
+    try:
+        from services.daily_quests import add_progress
+        add_progress(user_id, "visit_sections", 1)
+    except Exception:
+        pass
+
     return {
         "ok": True,
         "current_section": to_section,
@@ -300,6 +307,13 @@ def try_exit_run(user_id: int) -> dict:
 
     # Удаляем run
     end_run(user_id)
+
+    # Daily quest progress
+    try:
+        from services.daily_quests import add_progress
+        add_progress(user_id, "return_alive", 1)
+    except Exception:
+        pass
 
     return {"ok": True, "gate": gate}
 

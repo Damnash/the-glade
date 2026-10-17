@@ -47,6 +47,13 @@ def try_find_fragment(user_id: int, section_id: str, layer: int) -> bool:
     mark_discovered(season, layer, section_id, user_id)
     log_fragment_find(season, user_id, section_id)
 
+    # Daily quest progress
+    try:
+        from services.daily_quests import add_progress
+        add_progress(user_id, "find_fragments", 1)
+    except Exception:
+        pass
+
     # Story tracking
     try:
         from services.story import track_event
