@@ -1183,5 +1183,7 @@
   "maze.run_depth_line": "📏 Depth: {depth}",
   "maze.run_depth_return": " (≈{depth} to return)",
   "maze.run_header": "🌀 RUN",
-  "maze.night_closed": "🌙 The gates are closed at night. Come back at dawn."
+  "maze.night_closed": "🌙 The gates are closed at night. Come back at dawn.",
+  "daycycle.morning": "🌅 The gates are open. The Maze awaits. Good luck.",
+  "daycycle.evening": "🌙 The gates are closed. No one returns tonight. Stay by the fire."
 }

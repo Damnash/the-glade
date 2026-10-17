@@ -281,6 +281,10 @@ async def main():
 
     asyncio.create_task(cleanup_task())
     asyncio.create_task(maze_cleanup_task())
+
+    # Уведомления утро/вечер
+    from services.daycycle_events import daycycle_events_task
+    asyncio.create_task(daycycle_events_task(bot))
     # FSM: приём текста в рацию (в самом конце, чтобы не перехватить команды)
     dp.message.register(
         radio_h.process_radio_message,

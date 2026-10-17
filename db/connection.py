@@ -494,6 +494,15 @@ def init_db():
     # Migration v0.2 → v1: удалить устаревшую таблицу maze_moves
     cur.execute("DROP TABLE IF EXISTS maze_moves")
 
+    # system_state: key-value для служебных данных (last_morning, last_evening)
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS system_state (
+            key TEXT PRIMARY KEY,
+            value TEXT,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+
     cur.execute("""
         CREATE TABLE IF NOT EXISTS story_quests (
             user_id INTEGER,
