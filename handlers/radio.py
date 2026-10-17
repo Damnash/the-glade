@@ -326,7 +326,7 @@ async def on_radio_history(callback: CallbackQuery):
     await callback.answer()
 
 
-async def on_radio_talk(callback: CallbackQuery):
+async def on_radio_talk(callback: CallbackQuery, state):
     from config import BOT_TOKEN
     from aiogram import Bot
 
@@ -347,6 +347,10 @@ async def on_radio_talk(callback: CallbackQuery):
         return
 
     freq_str = format_frequency(radio["frequency"])
+
+    # FSM: следующий текст уйдёт в process_radio_message
+    from handlers.radio_states import RadioTalkState
+    await state.set_state(RadioTalkState.waiting_for_message)
 
     text = (
         "<b>" + t("radio.talk_title", lang) + "</b>\n\n"
