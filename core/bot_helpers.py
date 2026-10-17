@@ -134,9 +134,6 @@ async def command_reply(message, text: str, kb=None):
     Не генерирует новую session — использует существующую.
     Это значит, что кнопки в kb должны быть созданы с актуальной session.
     """
-    from aiogram import Bot
-    from config import BOT_TOKEN
-
     user_id = message.from_user.id
     player = get_player(user_id)
     if not player:
@@ -146,7 +143,7 @@ async def command_reply(message, text: str, kb=None):
     # НЕ генерируем новую session — используем существующую
     # (kb была создана с session из БД)
 
-    bot = Bot(token=BOT_TOKEN)
+    bot = make_bot()
     try:
         await edit_main(bot, user_id, text, kb)
     finally:

@@ -50,10 +50,22 @@ def render_category(lang: str, cat: str) -> str:
 # ============ Команда ============
 
 async def cmd_help(message: Message):
-    lang = get_lang(message.from_user.id)
+    from core.bot_helpers import command_reply
+    from db.players import get_player
+
+    user_id = message.from_user.id
+    player = get_player(user_id)
+    if not player:
+        await message.answer(t("start.need_start", get_lang(user_id)))
+        return
+
+    lang = player["language"]
+    session = player.get("current_session", "")
+
     text = render_main(lang)
-    kb = help_main_keyboard(lang)
-    await message.answer(text, reply_markup=kb)
+    kb = help_main_keyboard(lang, session)
+
+    await command_reply(message, text, kb)
 
 
 # ============ Callbacks ============
