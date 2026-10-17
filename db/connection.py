@@ -384,6 +384,26 @@ def init_db():
         )
     """)
 
+    # clan_storage: общий склад клана (ресурсы, не жетоны)
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS clan_storage (
+            clan_id INTEGER,
+            item_key TEXT,
+            quantity INTEGER DEFAULT 0,
+            PRIMARY KEY (clan_id, item_key)
+        )
+    """)
+
+    # clan_upgrades: уровни апгрейдов Глэййда
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS clan_upgrades (
+            clan_id INTEGER,
+            upgrade_key TEXT,
+            level INTEGER DEFAULT 0,
+            PRIMARY KEY (clan_id, upgrade_key)
+        )
+    """)
+
     cur.execute("CREATE INDEX IF NOT EXISTS idx_clan_members_user ON clan_members(user_id)")
     cur.execute("CREATE INDEX IF NOT EXISTS idx_clan_invites_to ON clan_invites(to_id)")
     cur.execute("CREATE INDEX IF NOT EXISTS idx_clan_messages_clan ON clan_messages(clan_id, sent_at)")

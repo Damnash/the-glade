@@ -153,6 +153,7 @@ def disband_clan(clan_id: int):
     cur.execute("DELETE FROM clan_messages WHERE clan_id = ?", (clan_id,))
     cur.execute("DELETE FROM clan_invites WHERE clan_id = ?", (clan_id,))
     cur.execute("DELETE FROM clan_map_sections WHERE clan_id = ?", (clan_id,))
+    cur.execute("DELETE FROM clan_storage WHERE clan_id = ?", (clan_id,))
     cur.execute("DELETE FROM clans WHERE clan_id = ?", (clan_id,))
     conn.commit()
     conn.close()
@@ -294,3 +295,154 @@ def count_clan_map_sections(clan_id: int, season_id: int, layer: int) -> int:
     count = cur.fetchone()[0]
     conn.close()
     return count
+
+
+# ============ Общий склад клана (v1.1) ============
+
+def get_storage(clan_id: int) -> list[dict]:
+    """Все предметы на складе клана."""
+    conn = get_conn()
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT item_key, quantity FROM clan_storage
+        WHERE clan_id = ? AND quantity > 0
+        ORDER BY item_key
+    """, (clan_id,))
+    rows = cur.fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
+def get_storage_item(clan_id: int, item_key: str) -> int:
+    """Количество конкретного предмета на складе."""
+    conn = get_conn()
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT quantity FROM clan_storage
+        WHERE clan_id = ? AND item_key = ?
+    """, (clan_id, item_key))
+    row = cur.fetchone()
+    conn.close()
+    return row[0] if row else 0
+
+
+def add_to_storage(clan_id: int, item_key: str, quantity: int = 1) -> int:
+    """Добавить на склад. Возвращает новое количество."""
+    conn = get_conn()
+    cur = conn.cursor()
+    cur.execute("""
+        INSERT INTO clan_storage (clan_id, item_key, quantity)
+        VALUES (?, ?, ?)
+        ON CONFLICT(clan_id, item_key) DO UPDATE SET
+            quantity = quantity + excluded.quantity
+    """, (clan_id, item_key, quantity))
+    conn.commit()
+
+    cur.execute("""
+        SELECT quantity FROM clan_storage
+        WHERE clan_id = ? AND item_key = ?
+    """, (clan_id, item_key))
+    row = cur.fetchone()
+    conn.close()
+    return row[0] if row else 0
+
+
+def remove_from_storage(clan_id: int, item_key: str, quantity: int = 1) -> bool:
+    """Убрать со склада. Возвращает True, если удалось."""
+    conn = get_conn()
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT quantity FROM clan_storage
+        WHERE clan_id = ? AND item_key = ?
+    """, (clan_id, item_key))
+    row = cur.fetchone()
+    if not row or row[0] < quantity:
+        conn.close()
+        return False
+
+    new_qty = row[0] - quantity
+    if new_qty == 0:
+        cur.execute("""
+            DELETE FROM clan_storage
+            WHERE clan_id = ? AND item_key = ?
+        """, (clan_id, item_key))
+    else:
+        cur.execute("""
+            UPDATE clan_storage SET quantity = ?
+            WHERE clan_id = ? AND item_key = ?
+        """, (new_qty, clan_id, item_key))
+    conn.commit()
+    conn.close()
+    return True
+
+
+def get_storage_total(clan_id: int) -> int:
+    """Сумма всех предметов на складе."""
+    conn = get_conn()
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT COALESCE(SUM(quantity), 0) FROM clan_storage
+        WHERE clan_id = ?
+    """, (clan_id,))
+    row = cur.fetchone()
+    conn.close()
+    return row[0] if row else 0
+
+
+def cleanup_clan_storage(clan_id: int):
+    """Очистить склад при роспуске клана."""
+    conn = get_conn()
+    cur = conn.cursor()
+    cur.execute("DELETE FROM clan_storage WHERE clan_id = ?", (clan_id,))
+    conn.commit()
+    conn.close()
+
+
+# ============ Апгрейды Глэййда (v1.1) ============
+
+def get_upgrade_level(clan_id: int, upgrade_key: str) -> int:
+    """Уровень апгрейда (0 если нет)."""
+    conn = get_conn()
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT level FROM clan_upgrades
+        WHERE clan_id = ? AND upgrade_key = ?
+    """, (clan_id, upgrade_key))
+    row = cur.fetchone()
+    conn.close()
+    return row[0] if row else 0
+
+
+def set_upgrade_level(clan_id: int, upgrade_key: str, level: int):
+    """Установить уровень апгрейда."""
+    conn = get_conn()
+    cur = conn.cursor()
+    cur.execute("""
+        INSERT INTO clan_upgrades (clan_id, upgrade_key, level)
+        VALUES (?, ?, ?)
+        ON CONFLICT(clan_id, upgrade_key) DO UPDATE SET level = excluded.level
+    """, (clan_id, upgrade_key, level))
+    conn.commit()
+    conn.close()
+
+
+def get_all_upgrades(clan_id: int) -> dict[str, int]:
+    """Все апгрейды клана: {upgrade_key: level}."""
+    conn = get_conn()
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT upgrade_key, level FROM clan_upgrades
+        WHERE clan_id = ?
+    """, (clan_id,))
+    rows = cur.fetchall()
+    conn.close()
+    return {row[0]: row[1] for row in rows}
+
+
+def cleanup_clan_upgrades(clan_id: int):
+    """Очистить апгрейды при роспуске клана."""
+    conn = get_conn()
+    cur = conn.cursor()
+    cur.execute("DELETE FROM clan_upgrades WHERE clan_id = ?", (clan_id,))
+    conn.commit()
+    conn.close()

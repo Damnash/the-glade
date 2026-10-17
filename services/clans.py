@@ -273,3 +273,93 @@ def get_clan_map(clan_id: int, layer: int = 1) -> dict:
         "sections": sections,
         "count": len(sections),
     }
+
+
+# ============ Апгрейды Глэййда (v1.1) ============
+
+def upgrade_clan(clan_id: int, upgrade_key: str) -> dict:
+    """
+    Повысить уровень апгрейда.
+    Списывает ресурсы со склада + жетоны из treasury.
+    Возвращает {'upgrade_key': str, 'new_level': int}.
+    """
+    from content.clan_upgrades import get_upgrade, get_next_level
+    from db.clans import (
+        get_clan, get_upgrade_level, set_upgrade_level,
+        get_storage_item, remove_from_storage, set_clan_treasury,
+    )
+
+    upgrade = get_upgrade(upgrade_key)
+    if not upgrade:
+        raise ClanError("upgrade.unknown")
+
+    current_level = get_upgrade_level(clan_id, upgrade_key)
+    next_level = get_next_level(upgrade_key, current_level)
+
+    if next_level is None:
+        raise ClanError("upgrade.max_level")
+
+    cost = upgrade["costs"][next_level]
+    tokens_cost = cost.get("tokens", 0)
+
+    clan = get_clan(clan_id)
+    if not clan:
+        raise ClanError("clan.err.clan_not_found")
+
+    # Проверка ресурсов на складе
+    for item_key, qty in cost.items():
+        if item_key == "tokens":
+            continue
+        have = get_storage_item(clan_id, item_key)
+        if have < qty:
+            raise ClanError(
+                "upgrade.not_enough",
+                item=item_key, need=qty, have=have,
+            )
+
+    # Проверка жетонов
+    if clan["treasury"] < tokens_cost:
+        raise ClanError(
+            "upgrade.not_enough_tokens",
+            need=tokens_cost, have=clan["treasury"],
+        )
+
+    # Списание
+    for item_key, qty in cost.items():
+        if item_key == "tokens":
+            continue
+        remove_from_storage(clan_id, item_key, qty)
+
+    if tokens_cost > 0:
+        set_clan_treasury(clan_id, clan["treasury"] - tokens_cost)
+
+    # Повышение
+    set_upgrade_level(clan_id, upgrade_key, next_level)
+
+    return {"upgrade_key": upgrade_key, "new_level": next_level}
+
+
+def get_clan_bonuses(clan_id: int) -> dict:
+    """
+    Сумма бонусов от всех апгрейдов клана.
+    """
+    from content.clan_upgrades import CLAN_UPGRADES
+    from db.clans import get_all_upgrades
+
+    levels = get_all_upgrades(clan_id)
+    bonuses = {}
+
+    for key, level in levels.items():
+        if level <= 0:
+            continue
+        upgrade = CLAN_UPGRADES.get(key)
+        if not upgrade:
+            continue
+        bonus = upgrade["bonus"].get(level, {})
+        for bkey, bvalue in bonus.items():
+            if bkey in bonuses:
+                bonuses[bkey] = max(bonuses[bkey], bvalue)
+            else:
+                bonuses[bkey] = bvalue
+
+    return bonuses
