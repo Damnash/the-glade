@@ -31,12 +31,17 @@ do_start() {
     if is_running; then
         echo "⚠️  Найдены старые процессы: $(find_pids | tr '\n' ' ')"
         echo "🛑 Останавливаем..."
-        do_stop >/dev/null 2>&1
-        sleep 1
+        do_stop >/dev/null 2>&1 || true
+        sleep 2
+        if is_running; then
+            echo "❌ Не удалось убить старые процессы. Прерываю старт."
+            echo "   PIDs: $(find_pids | tr '\n' ' ')"
+            exit 1
+        fi
     fi
 
     echo "🚀 Запуск бота..."
-    nohup "$PYTHON" bot.py > "$LOG_FILE" 2>&1 &
+    nohup "$PYTHON" -u bot.py > "$LOG_FILE" 2>&1 &
     echo $! > "$PID_FILE"
 
     # Ждём до 10 секунд
@@ -68,6 +73,13 @@ do_start() {
         exit 1
     fi
 
+    if ! grep -q "Run polling for bot" "$LOG_FILE" 2>/dev/null; then
+        echo "⚠️  Процесс жив, но polling не запустился. Логи:"
+        tail -20 "$LOG_FILE"
+        do_stop >/dev/null 2>&1 || true
+        exit 1
+    fi
+
     echo "✅ Бот запущен (PID: $(find_pids | tr '\n' ' '))"
     echo "   Логи: $0 logs"
 }
@@ -80,8 +92,14 @@ do_stop() {
         return 0
     fi
 
-    echo "🛑 Остановка (PID: $(find_pids | tr '\n' ' '))..."
-    pkill -TERM -f "$BOT_DIR/bot.py" 2>/dev/null
+    local pids
+    pids=$(find_pids)
+    echo "🛑 Остановка (PID: $(echo "$pids" | tr '\n' ' '))..."
+
+    # Шлём TERM именно найденным PID (а не по -f $BOT_DIR/bot.py)
+    for pid in $pids; do
+        kill -TERM "$pid" 2>/dev/null || true
+    done
 
     # Ждём до 15 секунд
     for i in {1..15}; do
@@ -93,9 +111,12 @@ do_stop() {
         fi
     done
 
-    # Не остановился — kill -9
+    # Не остановился — kill -9 по найденным PID
     echo "⚠️  Не остановился за 15s, убиваем жёстко..."
-    pkill -9 -f "$BOT_DIR/bot.py" 2>/dev/null
+    pids=$(find_pids)
+    for pid in $pids; do
+        kill -9 "$pid" 2>/dev/null || true
+    done
     sleep 2
 
     if is_running; then
