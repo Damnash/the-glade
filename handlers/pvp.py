@@ -283,3 +283,104 @@ async def cmd_pvp_flag(message: Message):
 
     set_pvp_flag(user_id)
     await message.answer(t("pvp.flag_set", lang, hours=24))
+
+
+# ============ PvP флаг: UI (v1.1) ============
+
+async def show_pvp_flag(callback: CallbackQuery):
+    """Показать экран PvP-флага."""
+    from core.bot_helpers import check_session, edit_main, make_bot
+    from db.pvp import has_pvp_flag, get_pvp_flag_time_left
+    from core.time_utils import humanize_seconds
+    from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+    from core.maze_current import get_current_season, get_season_day
+
+    user_id = callback.from_user.id
+    player = get_player(user_id)
+    if not player:
+        return
+
+    lang = player["language"]
+
+    if not check_session(user_id, callback.data):
+        await callback.answer(t("log.stale", lang), show_alert=True)
+        return
+
+    season = get_current_season()
+    day = get_season_day(season)
+
+    has = has_pvp_flag(user_id)
+    time_left = get_pvp_flag_time_left(user_id) if has else 0
+    time_str = humanize_seconds(time_left, lang)
+
+    if day >= 80:
+        text = t("pvp.flag_mandatory", lang)
+        kb = InlineKeyboardMarkup(inline_keyboard=[[
+            InlineKeyboardButton(text=t("nav.back", lang), callback_data="nav:back"),
+        ]])
+    else:
+        status = t("pvp.flag_status_on", lang, time=time_str) if has else t("pvp.flag_status_off", lang)
+
+        lines = [
+            "⚔️ <b>" + t("pvp.flag_title", lang) + "</b>",
+            "",
+            status,
+            "",
+            t("pvp.flag_help", lang),
+        ]
+        text = "\n".join(lines)
+
+        session = player.get("current_session", "")
+        s = f":{session}" if session else ""
+
+        if has:
+            btn = InlineKeyboardButton(
+                text=t("pvp.btn_disable", lang),
+                callback_data=f"pvp:flag_off{s}",
+            )
+        else:
+            btn = InlineKeyboardButton(
+                text=t("pvp.btn_enable", lang),
+                callback_data=f"pvp:flag_on{s}",
+            )
+
+        kb = InlineKeyboardMarkup(inline_keyboard=[
+            [btn],
+            [InlineKeyboardButton(text=t("nav.back", lang), callback_data=f"nav:back{s}")],
+        ])
+
+    from core.bot_helpers import edit_main, make_bot
+    bot = make_bot()
+    try:
+        await edit_main(bot, user_id, text, kb)
+    finally:
+        await bot.session.close()
+    await callback.answer()
+
+
+async def on_pvp_flag_toggle(callback: CallbackQuery):
+    """Включить/выключить флаг."""
+    from core.bot_helpers import check_session, refresh_main
+    from db.pvp import has_pvp_flag, set_pvp_flag, clear_pvp_flag
+
+    user_id = callback.from_user.id
+    player = get_player(user_id)
+    if not player:
+        return
+
+    lang = player["language"]
+
+    if not check_session(user_id, callback.data):
+        await callback.answer(t("log.stale", lang), show_alert=True)
+        return
+
+    # pvp:flag_on / pvp:flag_off
+    if "flag_on" in callback.data:
+        set_pvp_flag(user_id)
+        await callback.answer(t("pvp.flag_set", lang, hours=24))
+    else:
+        clear_pvp_flag(user_id)
+        await callback.answer(t("pvp.flag_removed", lang))
+
+    # Перерисовать экран
+    await show_pvp_flag(callback)

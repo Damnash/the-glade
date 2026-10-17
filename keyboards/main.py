@@ -55,6 +55,10 @@ def main_keyboard(lang: str, context: dict, session: str = "") -> InlineKeyboard
     ])
 
     rows.append([
+        InlineKeyboardButton(text="⚔️ PvP", callback_data=f"pvp:flag{s}"),
+    ])
+
+    rows.append([
         InlineKeyboardButton(text=t("nav.help", lang), callback_data=f"help:main{s}"),
     ])
 

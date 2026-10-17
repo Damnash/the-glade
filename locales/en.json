@@ -1255,5 +1255,9 @@
   "commands.pvp_flag": [
     "pvp_flag",
     "flag"
-  ]
+  ],
+  "pvp.flag_title": "PvP Flag",
+  "pvp.flag_help": "With flag ON: you can attack and be attacked in PvP zones. Without flag: you are safe.",
+  "pvp.btn_enable": "⚔️ Enable PvP flag",
+  "pvp.btn_disable": "🛡️ Disable PvP flag"
 }
