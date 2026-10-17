@@ -48,7 +48,7 @@ def get_player_achievements(user_id: int) -> list[str]:
 # ============ Очки ============
 
 def add_score(user_id: int, season_id: int, points: int, field: str = None):
-    """Добавить очки и увеличить счётчик."""
+    """Добавить очки и увеличить счётчик. Очки не опускаются ниже 0."""
     conn = get_conn()
     cur = conn.cursor()
 
@@ -60,10 +60,12 @@ def add_score(user_id: int, season_id: int, points: int, field: str = None):
     row = cur.fetchone()
 
     if not row:
+        # Новая запись: max(0, points)
+        initial_score = max(0, points)
         cur.execute("""
             INSERT INTO season_scores (user_id, season_id, score)
             VALUES (?, ?, ?)
-        """, (user_id, season_id, points))
+        """, (user_id, season_id, initial_score))
         # Инициализируем счётчики
         if field:
             cur.execute(f"""
@@ -71,11 +73,15 @@ def add_score(user_id: int, season_id: int, points: int, field: str = None):
                 WHERE user_id = ? AND season_id = ?
             """, (user_id, season_id))
     else:
+        # Существующая запись: max(0, score + points)
+        current_score = row["score"] if row["score"] is not None else 0
+        new_score = max(0, current_score + points)
+
         cur.execute("""
             UPDATE season_scores
-            SET score = score + ?, updated_at = CURRENT_TIMESTAMP
+            SET score = ?, updated_at = CURRENT_TIMESTAMP
             WHERE user_id = ? AND season_id = ?
-        """, (points, user_id, season_id))
+        """, (new_score, user_id, season_id))
         if field:
             cur.execute(f"""
                 UPDATE season_scores SET {field} = {field} + 1

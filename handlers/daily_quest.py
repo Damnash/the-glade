@@ -29,7 +29,7 @@ def _render_quest(lang: str, rec: dict, session: str) -> tuple[str, InlineKeyboa
     reward = quest.get("reward", {})
 
     lines = [
-        f"📋 <b>{t('dq.title', lang)}</b>",
+        f"<b>{t('dq.title', lang)}</b>",
         "",
         f"{icon} <b>{title}</b>",
         f"<i>{desc}</i>",

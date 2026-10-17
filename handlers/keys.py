@@ -48,7 +48,7 @@ async def cmd_keys(message: Message):
     lines.append("")
     lines.append(t("keys.hint", lang))
 
-    await command_reply("\n".join(lines))
+    await command_reply(message, "\n".join(lines))
 
     # Вернуть контекст
     from handlers.location_render import send_current_context

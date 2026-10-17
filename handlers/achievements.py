@@ -39,7 +39,7 @@ async def cmd_achievements(message: Message):
             name = t(spec.get("name_key", f"ach.{key}.name"), lang)
             lines.append(f"{icon} <b>{name}</b>")
 
-    await command_reply("\n".join(lines))
+    await command_reply(message, "\n".join(lines))
 
     from handlers.location_render import send_current_context
     await send_current_context(message, message.from_user.id)
@@ -101,7 +101,7 @@ async def cmd_leaderboard(message: Message):
             name = entry["display_name"] or entry["username"] or "?"
             lines.append(f"  {i}. {name} — {entry['fragments']}")
 
-    await command_reply("\n".join(lines).rstrip())
+    await command_reply(message, "\n".join(lines).rstrip())
 
     # Вернуть контекст
     from handlers.location_render import send_current_context
@@ -141,7 +141,7 @@ async def cmd_hall_of_fame(message: Message):
             lines.append(f"  {icon} {name} — {ach_name}")
         lines.append("")
 
-    await command_reply("\n".join(lines).rstrip())
+    await command_reply(message, "\n".join(lines).rstrip())
 
     from handlers.location_render import send_current_context
     await send_current_context(message, message.from_user.id)

@@ -26,7 +26,7 @@ async def cmd_season(message: Message):
         + t("season.hint", lang)
     )
 
-    await command_reply(text)
+    await command_reply(message, text)
 
     # Вернуть контекст
     from handlers.location_render import send_current_context
