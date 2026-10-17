@@ -59,11 +59,25 @@ async def cmd_help(message: Message):
 # ============ Callbacks ============
 
 async def on_help_main(callback: CallbackQuery):
+    from core.bot_helpers import check_session
+    from db.players import get_player
+
     user_id = callback.from_user.id
-    lang = get_lang(user_id)
+    player = get_player(user_id)
+    if not player:
+        return
+
+    lang = player["language"]
+
+    if not check_session(user_id, callback.data):
+        from core.i18n import t
+        await callback.answer(t("log.stale", lang), show_alert=True)
+        return
+
+    session = player.get("current_session", "")
 
     text = render_main(lang)
-    kb = help_main_keyboard(lang)
+    kb = help_main_keyboard(lang, session)
 
     try:
         await callback.message.edit_text(text, reply_markup=kb)
@@ -73,13 +87,26 @@ async def on_help_main(callback: CallbackQuery):
 
 
 async def on_help_category(callback: CallbackQuery):
-    user_id = callback.from_user.id
-    lang = get_lang(user_id)
+    from core.bot_helpers import check_session
+    from db.players import get_player
 
-    cat = callback.data.split(":")[2]  # help:cat:movement
+    user_id = callback.from_user.id
+    player = get_player(user_id)
+    if not player:
+        return
+
+    lang = player["language"]
+
+    if not check_session(user_id, callback.data):
+        from core.i18n import t
+        await callback.answer(t("log.stale", lang), show_alert=True)
+        return
+
+    session = player.get("current_session", "")
+    cat = callback.data.split(":")[2]
 
     text = render_category(lang, cat)
-    kb = help_cat_keyboard(lang)
+    kb = help_cat_keyboard(lang, session)
 
     try:
         await callback.message.edit_text(text, reply_markup=kb)

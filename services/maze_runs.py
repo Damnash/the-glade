@@ -230,6 +230,19 @@ def move_in_run(user_id: int, to_section: str) -> dict:
     except Exception:
         pass
 
+    # Story tracking (для сюжетных квестов типа "Разведка")
+    try:
+        from services.story import track_event
+        track_event(user_id, "visit_sections")
+
+        # Если секция — центр, отметить "reach_center"
+        section_obj = layer["sections"].get(to_section)
+        if section_obj and section_obj.get("type") == "center":
+            track_event(user_id, "reach_center")
+    except Exception as e:
+        import logging
+        logging.debug(f"[maze_runs] story track_event error: {e}")
+
     return {
         "ok": True,
         "current_section": to_section,

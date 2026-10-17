@@ -13,6 +13,9 @@ def todo_keyboard(lang: str, session: str = "") -> InlineKeyboardMarkup:
         [
             InlineKeyboardButton(text=t("btn.actions", lang), callback_data=f"nav:actions{s}"),
             InlineKeyboardButton(text=t("btn.work", lang),    callback_data=f"nav:work{s}"),
+        ],
+        [
+            InlineKeyboardButton(text=t("dq.title", lang),    callback_data=f"daily_quest:show{s}"),
             InlineKeyboardButton(text=t("nav.back", lang),    callback_data=f"nav:back{s}"),
         ],
     ]

@@ -91,6 +91,15 @@ async def refresh_main(bot: Bot, user_id: int, new_session_flag: bool = True):
 
     lang = player["language"]
 
+    # Авто-выдача ежедневного квеста (если игрок уже прошёл intro)
+    if player.get("intro_done"):
+        try:
+            from services.daily_quests import ensure_today_quest
+            ensure_today_quest(user_id)
+        except Exception as e:
+            import logging
+            logging.error(f"[refresh_main] daily quest error: {e}")
+
     # Новый session
     session = new_session()
     update_player_fields(user_id, {"current_session": session})

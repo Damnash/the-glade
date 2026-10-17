@@ -51,6 +51,7 @@ from handlers import (
     achievements as ach_h,
     season_cmd as season_h,
     gates as gates_h,
+    daily_quest as dq_h,
 )
 
 
@@ -224,6 +225,10 @@ async def main():
     dp.callback_query.register(nav_cb.on_actions,   F.data.startswith("nav:actions"))
     dp.callback_query.register(nav_cb.on_work,      F.data.startswith("nav:work"))
     dp.callback_query.register(nav_cb.on_back,      F.data.startswith("nav:back"))
+
+    # Daily quest
+    dp.callback_query.register(dq_h.show_daily_quest, F.data.startswith("daily_quest:show"))
+    dp.callback_query.register(dq_h.on_daily_quest_complete, F.data.startswith("daily_quest:complete"))
 
     # Перемещение и осмотр
     dp.callback_query.register(nav_cb.on_go,        F.data.startswith("go:"))
