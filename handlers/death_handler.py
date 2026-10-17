@@ -17,10 +17,12 @@ async def show_death_message(callback: CallbackQuery, user_id: int, lang: str):
         f"{t('death.respawn_info', lang)}"
     )
 
+    session = player.get("current_session", "")
+    s = f":{session}" if session else ""
     kb = InlineKeyboardMarkup(inline_keyboard=[[
         InlineKeyboardButton(
             text=t("death.btn_respawn", lang),
-            callback_data="nav:back",
+            callback_data=f"nav:back{s}",
         )
     ]])
 

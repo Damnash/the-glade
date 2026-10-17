@@ -213,8 +213,10 @@ async def _handle_death(callback, user_id, lang):
         + t('death.respawn_info', lang)
     )
 
+    session = player.get("current_session", "")
+    s = f":{session}" if session else ""
     kb = InlineKeyboardMarkup(inline_keyboard=[[
-        InlineKeyboardButton(text=t("death.btn_respawn", lang), callback_data="nav:back")
+        InlineKeyboardButton(text=t("death.btn_respawn", lang), callback_data=f"nav:back{s}")
     ]])
 
     bot = make_bot()

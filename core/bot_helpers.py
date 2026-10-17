@@ -14,6 +14,40 @@ def new_session() -> str:
     return str(uuid.uuid4())[:8]
 
 
+# Навигационные callback'и БЕЗ параметров — всегда разрешены (без session)
+GLOBAL_CALLBACKS = {
+    # навигация
+    "nav:back", "nav:move", "nav:todo", "nav:actions",
+    "nav:work", "nav:stats", "nav:inv",
+    "noop",
+    # лабиринт
+    "maze:back", "maze:exit", "raid:return", "raid:enter_force",
+    # карты
+    "map:list", "maps:list",
+    # прочее меню
+    "help:main", "radio:menu",
+    "clan:main", "pvp:flag",
+}
+
+# Навигационные callback'и С параметрами — разрешены по префиксу
+# (maze:go:L1_N5, map:open:5, maze:look:... и т.д.)
+# Сюда НЕ входят действия: work:*, use:*, act:*, combat:*, npc:*,
+# pvp:steal/attack/duel, duel:accept/decline, story:start/complete,
+# daily_quest:complete, map:rename/drop/note/delete_sec, intro:perk/prof.
+GLOBAL_CALLBACK_PREFIXES = (
+    "maze:look:",
+    "maze:go:",
+    "maze:pickup:",
+    "maze:compass:",
+    "maze:heal:",
+    "map:open:",
+    "map:draw:",
+    "map:sections:",
+    "map:edit:",
+    "raid:enter_force:",
+)
+
+
 def check_session(user_id: int, callback_data: str) -> bool:
     """
     Проверить session в callback_data.
@@ -21,6 +55,11 @@ def check_session(user_id: int, callback_data: str) -> bool:
     """
     if not callback_data:
         return False
+
+    if callback_data in GLOBAL_CALLBACKS:
+        return True
+    if any(callback_data.startswith(p) for p in GLOBAL_CALLBACK_PREFIXES):
+        return True
 
     parts = callback_data.split(":")
 
