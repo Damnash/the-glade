@@ -77,6 +77,11 @@ def enter_maze(user_id: int, gate: str) -> str:
     if player["status"] == "working":
         raise MazeError("maze.working")
 
+    # Ворота закрыты ночью (22:00 - 06:00 UTC)
+    from core.daycycle import is_night
+    if is_night():
+        raise MazeError("maze.night_closed")
+
     tier = get_tier_config()
 
     # Списываем только расходники из инвентаря (факелы, верёвки).

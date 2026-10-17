@@ -1182,5 +1182,6 @@
   "maze.run_timer_line": "⏳ Time left: {time}",
   "maze.run_depth_line": "📏 Depth: {depth}",
   "maze.run_depth_return": " (≈{depth} to return)",
-  "maze.run_header": "🌀 RUN"
+  "maze.run_header": "🌀 RUN",
+  "maze.night_closed": "🌙 The gates are closed at night. Come back at dawn."
 }

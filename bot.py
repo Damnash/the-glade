@@ -56,6 +56,36 @@ from handlers import (
 
 
 
+async def maze_cleanup_task():
+    """Раз в минуту: убивать игроков с истёкшим таймером вылазки."""
+    import asyncio
+    import logging
+    from services.maze_runs import get_expired_runs, end_run
+    from services.death import die_in_maze
+
+    while True:
+        try:
+            await asyncio.sleep(60)  # раз в минуту
+
+            expired = get_expired_runs()
+            for run in expired:
+                uid = run["user_id"]
+                try:
+                    die_in_maze(uid)
+                    logging.info(f"[MAZE] killed {uid} (timer expired)")
+                except Exception as e:
+                    logging.error(f"[MAZE] kill {uid} failed: {e}")
+                finally:
+                    try:
+                        end_run(uid)
+                    except Exception:
+                        pass
+        except asyncio.CancelledError:
+            raise
+        except Exception as e:
+            logging.error(f"maze_cleanup error: {e}")
+
+
 async def cleanup_task():
     """Фоновая задача: очистка и проверка сезона."""
     import asyncio
@@ -250,6 +280,7 @@ async def main():
     dp.callback_query.register(maze_cb.on_look,     F.data.startswith("maze:look:"))
 
     asyncio.create_task(cleanup_task())
+    asyncio.create_task(maze_cleanup_task())
     # FSM: приём текста в рацию (в самом конце, чтобы не перехватить команды)
     dp.message.register(
         radio_h.process_radio_message,

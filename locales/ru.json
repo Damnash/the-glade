@@ -1204,5 +1204,6 @@
   "maze.run_timer_line": "⏳ Осталось: {time}",
   "maze.run_depth_line": "📏 Глубина: {depth}",
   "maze.run_depth_return": " (≈{depth} до входа)",
-  "maze.run_header": "🌀 ВЫЛАЗКА"
+  "maze.run_header": "🌀 ВЫЛАЗКА",
+  "maze.night_closed": "🌙 Ночью ворота закрыты. Возвращайся на рассвете."
 }
