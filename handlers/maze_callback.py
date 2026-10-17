@@ -66,12 +66,13 @@ async def on_enter(callback: CallbackQuery):
         session = player.get("current_session", "")
         kb = enter_anyway_keyboard(lang, session)
 
+        from core.bot_helpers import edit_main, make_bot
+
+        bot = make_bot()
         try:
-            await callback.message.edit_text(text, reply_markup=kb)
-        except Exception as e:
-            err = str(e).lower()
-            if "message is not modified" not in err:
-                await callback.message.answer(text, reply_markup=kb)
+            await edit_main(bot, callback.from_user.id, text, kb)
+        finally:
+            await bot.session.close()
         await callback.answer()
         return
 

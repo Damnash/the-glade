@@ -79,10 +79,13 @@ async def on_help_main(callback: CallbackQuery):
     text = render_main(lang)
     kb = help_main_keyboard(lang, session)
 
+    from core.bot_helpers import edit_main, make_bot
+
+    bot = make_bot()
     try:
-        await callback.message.edit_text(text, reply_markup=kb)
-    except Exception:
-        await callback.message.answer(text, reply_markup=kb)
+        await edit_main(bot, user_id, text, kb)
+    finally:
+        await bot.session.close()
     await callback.answer()
 
 
@@ -108,8 +111,11 @@ async def on_help_category(callback: CallbackQuery):
     text = render_category(lang, cat)
     kb = help_cat_keyboard(lang, session)
 
+    from core.bot_helpers import edit_main, make_bot
+
+    bot = make_bot()
     try:
-        await callback.message.edit_text(text, reply_markup=kb)
-    except Exception:
-        await callback.message.answer(text, reply_markup=kb)
+        await edit_main(bot, user_id, text, kb)
+    finally:
+        await bot.session.close()
     await callback.answer()

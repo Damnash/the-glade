@@ -102,10 +102,13 @@ async def on_map_open(callback: CallbackQuery):
 
     kb = InlineKeyboardMarkup(inline_keyboard=rows)
 
+    from core.bot_helpers import edit_main, make_bot
+
+    bot = make_bot()
     try:
-        await callback.message.edit_text(text, reply_markup=kb)
-    except Exception:
-        await callback.message.answer(text, reply_markup=kb)
+        await edit_main(bot, user_id, text, kb)
+    finally:
+        await bot.session.close()
     await callback.answer()
 
 
@@ -137,8 +140,11 @@ async def on_map_layer(callback: CallbackQuery):
 
     kb = InlineKeyboardMarkup(inline_keyboard=rows)
 
+    from core.bot_helpers import edit_main, make_bot
+
+    bot = make_bot()
     try:
-        await callback.message.edit_text(text, reply_markup=kb)
-    except Exception:
-        await callback.message.answer(text, reply_markup=kb)
+        await edit_main(bot, user_id, text, kb)
+    finally:
+        await bot.session.close()
     await callback.answer()
