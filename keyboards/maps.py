@@ -69,14 +69,10 @@ def map_view_keyboard(lang: str, map_id: int, is_personal: bool,
             back_btn = InlineKeyboardButton(text=t("map.btn_back_to_list", lang),
                                              callback_data=f"map:list{s}")
         rows.append([
-            InlineKeyboardButton(text=t("map.btn_show", lang),
-                                  callback_data=f"map:show:{map_id}{s}"),
             back_btn,
         ])
     else:
         rows.append([
-            InlineKeyboardButton(text=t("map.btn_show", lang),
-                                  callback_data=f"map:show:{map_id}{s}"),
             InlineKeyboardButton(text=t("map.btn_drop", lang),
                                   callback_data=f"map:drop:{map_id}{s}"),
         ])
@@ -132,18 +128,15 @@ def map_sections_keyboard(lang: str, map_id: int, sections: list,
 
 def map_section_edit_keyboard(lang: str, map_id: int, section_id: str,
                                 session: str = "") -> InlineKeyboardMarkup:
+    """Клавиатура редактирования секции.
+
+    Кнопки rename/note/delete убраны: для них пока нет обработчиков.
+    Вернуть, когда появятся on_map_rename_sec / on_map_note / on_map_delete_sec.
+    """
     s = f":{session}" if session else ""
 
     rows = [
         [
-            InlineKeyboardButton(text=t("map.btn_rename_section", lang),
-                                  callback_data=f"map:rename_sec:{map_id}:{section_id}{s}"),
-            InlineKeyboardButton(text=t("map.btn_note_section", lang),
-                                  callback_data=f"map:note:{map_id}:{section_id}{s}"),
-        ],
-        [
-            InlineKeyboardButton(text=t("map.btn_delete_section", lang),
-                                  callback_data=f"map:delete_sec:{map_id}:{section_id}{s}"),
             InlineKeyboardButton(text=t("map.btn_back_to_sections", lang),
                                   callback_data=f"map:sections:{map_id}{s}"),
         ],

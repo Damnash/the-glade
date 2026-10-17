@@ -99,6 +99,8 @@ async def on_npc_action(callback: CallbackQuery):
         await _frypan_buy(callback, user_id, lang)
     elif npc_key == "jeff" and action == "heal":
         await _jeff_heal(callback, user_id, lang)
+    elif npc_key == "jeff" and action == "buy_bandage":
+        await _jeff_buy_bandage(callback, user_id, lang)
     elif npc_key == "chuck" and action == "hint":
         await _chuck_hint(callback, user_id, lang)
     elif npc_key == "minho" and action == "show_map":
@@ -115,12 +117,18 @@ async def on_npc_action(callback: CallbackQuery):
         await _gally_respond(callback, user_id, lang)
     elif npc_key == "winston" and action == "talk":
         await _winston_trade(callback, user_id, lang)
+    elif npc_key == "winston" and action == "trade":
+        await _winston_trade(callback, user_id, lang)
     elif npc_key == "winston" and action.startswith("trade_"):
         await _winston_do_trade(callback, user_id, lang)
     elif npc_key == "frypan" and action == "bring_meat":
         await _frypan_bring_meat(callback, user_id, lang)
     elif npc_key == "winston" and action == "bring_water":
         await _winston_bring_water(callback, user_id, lang)
+    elif npc_key == "newt" and action == "talk":
+        await callback.answer(t("npc.newt.dialog", lang), show_alert=True)
+    elif npc_key == "teresa" and action == "talk":
+        await callback.answer(t("npc.teresa.dialog", lang), show_alert=True)
     elif action == "story":
         from handlers.story import show_story_menu
         from core.bot_helpers import make_bot

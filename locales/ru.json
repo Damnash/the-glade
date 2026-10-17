@@ -331,9 +331,9 @@
   "move.working": "Ты работаешь. Закончи работу или забери награду.",
   "move.working_busy": "⏳ Ты работаешь. Осталось: {time}.",
   "move.working_done": "✅ Работа завершена! Забери награду через ⚒️ Что делать → 🛠️ Работать.",
-  "btn.working": "⏳ Working...",
+  "btn.working": "⏳ Работаю...",
   "work.status_line": "⏳ {work} — {time}",
-  "work.done": "Work complete! Rewards: {rewards}",
+  "work.done": "Работа завершена! Награда: {rewards}",
   "maze.btn_exit_to_glade": "⬅️ К воротам",
   "maze.btn_go": "➡️ {name}",
   "maze.btn_stairs_down": "⬇️ Спуститься глубже",
@@ -1293,5 +1293,6 @@
   "npc.bring_progress": "📋 Прогресс ежедневного квеста +1.",
   "npc.bring_quest_complete": "🏆 Ежедневный квест выполнен! Забери награду через 📋 Ежедневный квест.",
   "npc.no_item": "У тебя нет {item}. Нужно {need}.",
-  "help.feedback": "💬 Обратная связь: @AdmPenalty — баги, идеи, жалобы."
+  "help.feedback": "💬 Обратная связь: @AdmPenalty — баги, идеи, жалобы.",
+  "move.in_maze": "Ты в Лабиринте. Сначала вернись к воротам (/вернуться)."
 }

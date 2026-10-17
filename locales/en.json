@@ -319,9 +319,9 @@
   "move.working": "You are working. Finish or collect the reward first.",
   "move.working_busy": "⏳ You are working. {time} left.",
   "move.working_done": "✅ Work done! Collect the reward via ⚒️ What to do → 🛠️ Work.",
-  "btn.working": "⏳ Работаю...",
+  "btn.working": "⏳ Working...",
   "work.status_line": "⏳ {work} — {time}",
-  "work.done": "Работа завершена! Награда: {rewards}",
+  "work.done": "Work complete! Rewards: {rewards}",
   "maze.btn_exit_to_glade": "⬅️ Back to gates",
   "maze.btn_go": "➡️ {name}",
   "maze.btn_stairs_down": "⬇️ Descend deeper",
@@ -1271,5 +1271,6 @@
   "npc.bring_progress": "📋 Daily quest progress +1.",
   "npc.bring_quest_complete": "🏆 Daily quest complete! Claim it via 📋 Daily Quest.",
   "npc.no_item": "You don't have {item}. Need {need}.",
-  "help.feedback": "💬 Feedback: @AdmPenalty — bugs, ideas, complaints."
+  "help.feedback": "💬 Feedback: @AdmPenalty — bugs, ideas, complaints.",
+  "move.in_maze": "You are in the Maze. Return to the gate first (/return)."
 }

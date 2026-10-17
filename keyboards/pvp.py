@@ -6,6 +6,7 @@ from core.i18n import t
 
 
 def pvp_actions_keyboard(lang: str, target_user_id: int) -> InlineKeyboardMarkup:
+    # NOTE: not used yet — handlers for pvp:steal/attack/duel not implemented
     """Действия против игрока."""
     rows = [
         [
