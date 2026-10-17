@@ -74,7 +74,7 @@ def _render_upgrades(lang: str, clan_id: int, session: str) -> tuple[str, Inline
     s = f":{session}" if session else ""
     levels = get_all_upgrades(clan_id)
 
-    lines = [f"🏗️ <b>{t('upgrade.title', lang)}</b>", ""]
+    lines = [f"<b>{t('upgrade.title', lang)}</b>", ""]
     rows = []
 
     for key, spec in CLAN_UPGRADES.items():
@@ -88,7 +88,13 @@ def _render_upgrades(lang: str, clan_id: int, session: str) -> tuple[str, Inline
         else:
             next_level = level + 1
             cost = spec["costs"][next_level]
-            cost_str = ", ".join(f"{t(f'item.{k}.name', lang)} ×{v}" for k, v in cost.items())
+            cost_parts = []
+            for k, v in cost.items():
+                if k == "tokens":
+                    cost_parts.append(f"🪙 ×{v}")
+                else:
+                    cost_parts.append(f"{t(f'item.{k}.name', lang)} ×{v}")
+            cost_str = ", ".join(cost_parts)
             lines.append(f"<b>{name}</b> — ур. {level}")
             lines.append(f"  → {cost_str}")
 

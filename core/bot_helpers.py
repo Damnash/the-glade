@@ -128,7 +128,12 @@ async def refresh_main(bot: Bot, user_id: int, new_session_flag: bool = True):
 
 
 async def command_reply(message, text: str, kb=None):
-    """Ответ на команду через edit главного сообщения."""
+    """
+    Ответ на команду через edit главного сообщения.
+    
+    Не генерирует новую session — использует существующую.
+    Это значит, что кнопки в kb должны быть созданы с актуальной session.
+    """
     from aiogram import Bot
     from config import BOT_TOKEN
 
@@ -138,8 +143,8 @@ async def command_reply(message, text: str, kb=None):
         await message.answer(text, reply_markup=kb)
         return
 
-    session = new_session()
-    update_player_fields(user_id, {"current_session": session})
+    # НЕ генерируем новую session — используем существующую
+    # (kb была создана с session из БД)
 
     bot = Bot(token=BOT_TOKEN)
     try:
