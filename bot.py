@@ -168,6 +168,7 @@ async def main():
     dp.message.register(pvp_h.cmd_steal, Command(*command_aliases("commands.steal")))
     dp.message.register(pvp_h.cmd_attack, Command(*command_aliases("commands.attack")))
     dp.message.register(pvp_h.cmd_duel, Command(*command_aliases("commands.duel")))
+    dp.message.register(pvp_h.cmd_pvp_flag, Command(*command_aliases("commands.pvp_flag")))
     dp.message.register(clans_h.cmd_clan, Command(*command_aliases("commands.clan")))
     dp.message.register(clans_h.cmd_clan_create, Command(*command_aliases("commands.clan_create")))
     dp.message.register(clans_h.cmd_clan_invite, Command(*command_aliases("commands.clan_invite")))

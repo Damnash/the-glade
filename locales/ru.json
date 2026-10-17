@@ -1265,5 +1265,17 @@
   "upgrade.no_clan": "Ты не в клане.",
   "upgrade.need_clan": "Только члены клана видят апгрейды.",
   "upgrade.clan_storage": "🏗️ Склад клана",
-  "upgrade.clan_storage_empty": "Склад пуст."
+  "upgrade.clan_storage_empty": "Склад пуст.",
+  "pvp.err.attacker_no_flag": "⚠️ У тебя нет PvP-флага. Используй /pvp_flag, чтобы включить.",
+  "pvp.err.victim_no_flag": "🛡️ У цели нет PvP-флага. Она в безопасности.",
+  "pvp.flag_set": "⚔️ PvP-флаг включён на {hours}ч. Теперь ты можешь атаковать и быть атакованным.",
+  "pvp.flag_already": "⚔️ PvP-флаг уже активен: осталось {time}.",
+  "pvp.flag_removed": "🛡️ PvP-флаг снят.",
+  "pvp.flag_status_on": "⚔️ PvP-флаг: ВКЛ ({time})",
+  "pvp.flag_status_off": "🛡️ PvP-флаг: ВЫКЛ",
+  "pvp.flag_mandatory": "⚔️ С 80-го дня PvP обязателен. Флаг не нужен.",
+  "commands.pvp_flag": [
+    "pvp_флаг",
+    "флаг"
+  ]
 }

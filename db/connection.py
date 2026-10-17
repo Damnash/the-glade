@@ -415,6 +415,14 @@ def init_db():
         )
     """)
 
+    # PvP флаг (Fix 6.4)
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS pvp_flags (
+            user_id INTEGER PRIMARY KEY,
+            expires_at TIMESTAMP
+        )
+    """)
+
     cur.execute("""
         CREATE TABLE IF NOT EXISTS duels (
             id INTEGER PRIMARY KEY AUTOINCREMENT,

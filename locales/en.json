@@ -1243,5 +1243,17 @@
   "upgrade.no_clan": "You are not in a clan.",
   "upgrade.need_clan": "Only clan members can view upgrades.",
   "upgrade.clan_storage": "🏗️ Clan Storage",
-  "upgrade.clan_storage_empty": "Storage is empty."
+  "upgrade.clan_storage_empty": "Storage is empty.",
+  "pvp.err.attacker_no_flag": "⚠️ You don't have a PvP flag. Use /pvp_flag to enable it.",
+  "pvp.err.victim_no_flag": "🛡️ Target has no PvP flag. They are safe.",
+  "pvp.flag_set": "⚔️ PvP flag enabled for {hours}h. You can now attack and be attacked.",
+  "pvp.flag_already": "⚔️ PvP flag already active: {time} left.",
+  "pvp.flag_removed": "🛡️ PvP flag removed.",
+  "pvp.flag_status_on": "⚔️ PvP flag: ON ({time} left)",
+  "pvp.flag_status_off": "🛡️ PvP flag: OFF",
+  "pvp.flag_mandatory": "⚔️ From day 80, PvP is mandatory. No flag needed.",
+  "commands.pvp_flag": [
+    "pvp_flag",
+    "flag"
+  ]
 }

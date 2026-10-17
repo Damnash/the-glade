@@ -76,6 +76,18 @@ def check_pvp_possible(attacker_id: int, victim_id: int) -> None:
        attacker.get("maze_section") != victim.get("maze_section"):
         raise PvPError("pvp.err.not_nearby")
 
+    # PvP флаг (до 80-го дня)
+    from db.pvp import has_pvp_flag
+    from core.maze_current import get_current_season, get_season_day
+    season = get_current_season()
+    day = get_season_day(season)
+
+    if day < 80:
+        if not has_pvp_flag(attacker_id):
+            raise PvPError("pvp.err.attacker_no_flag")
+        if not has_pvp_flag(victim_id):
+            raise PvPError("pvp.err.victim_no_flag")
+
     # Щит новичка
     if has_shield(victim_id):
         raise PvPError("pvp.err.victim_shielded")

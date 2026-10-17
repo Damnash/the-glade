@@ -257,3 +257,29 @@ async def on_duel_decline(callback: CallbackQuery, bot: Bot):
         pass
 
     await callback.answer()
+
+
+# ============ PvP флаг (v1.1) ============
+
+async def cmd_pvp_flag(message: Message):
+    """/pvp_flag — включить PvP флаг на 24 часа."""
+    user_id = message.from_user.id
+    player = get_player(user_id)
+    lang = get_lang(user_id)
+
+    if not player:
+        await message.answer(t("start.need_start", lang))
+        return
+
+    from db.pvp import (
+        has_pvp_flag, set_pvp_flag, get_pvp_flag_time_left,
+    )
+    from core.time_utils import humanize_seconds
+
+    if has_pvp_flag(user_id):
+        left = get_pvp_flag_time_left(user_id)
+        await message.answer(t("pvp.flag_already", lang, time=humanize_seconds(left, lang)))
+        return
+
+    set_pvp_flag(user_id)
+    await message.answer(t("pvp.flag_set", lang, hours=24))

@@ -162,3 +162,62 @@ def get_player_deaths(user_id: int) -> int:
     count = cur.fetchone()[0]
     conn.close()
     return count
+
+
+# ============ PvP флаг (v1.1) ============
+
+PVP_FLAG_HOURS = 24
+
+
+def set_pvp_flag(user_id: int, hours: int = PVP_FLAG_HOURS):
+    """Включить PvP флаг на N часов."""
+    expires = datetime.utcnow() + timedelta(hours=hours)
+    conn = get_conn()
+    cur = conn.cursor()
+    cur.execute("""
+        INSERT OR REPLACE INTO pvp_flags (user_id, expires_at)
+        VALUES (?, ?)
+    """, (user_id, expires))
+    conn.commit()
+    conn.close()
+
+
+def clear_pvp_flag(user_id: int):
+    """Выключить PvP флаг."""
+    conn = get_conn()
+    cur = conn.cursor()
+    cur.execute("DELETE FROM pvp_flags WHERE user_id = ?", (user_id,))
+    conn.commit()
+    conn.close()
+
+
+def has_pvp_flag(user_id: int) -> bool:
+    """Есть ли активный PvP флаг."""
+    conn = get_conn()
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT 1 FROM pvp_flags
+        WHERE user_id = ? AND expires_at > ?
+    """, (user_id, datetime.utcnow()))
+    row = cur.fetchone()
+    conn.close()
+    return bool(row)
+
+
+def get_pvp_flag_time_left(user_id: int) -> int:
+    """Секунд до истечения флага (0 если нет)."""
+    conn = get_conn()
+    cur = conn.cursor()
+    cur.execute("SELECT expires_at FROM pvp_flags WHERE user_id = ?", (user_id,))
+    row = cur.fetchone()
+    conn.close()
+
+    if not row:
+        return 0
+
+    expires = row[0]
+    if isinstance(expires, str):
+        expires = datetime.fromisoformat(expires)
+
+    delta = (expires - datetime.utcnow()).total_seconds()
+    return max(0, int(delta))
