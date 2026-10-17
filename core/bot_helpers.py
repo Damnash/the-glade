@@ -47,41 +47,22 @@ def check_session(user_id: int, callback_data: str) -> bool:
 
 
 async def edit_main(bot: Bot, user_id: int, text: str, kb=None):
-    """Отредактировать главное сообщение."""
+    """
+    Всегда удаляет старое сообщение и создаёт новое внизу.
+    Гарантирует, что в чате одно главное сообщение.
+    """
     player = get_player(user_id)
-    if not player:
-        try:
-            return await bot.send_message(user_id, text, reply_markup=kb)
-        except Exception:
-            return None
+    msg_id = player.get("main_message_id") if player else None
 
-    msg_id = player.get("main_message_id")
-
+    # Удаляем старое, если есть
     if msg_id:
-        try:
-            await bot.edit_message_text(
-                chat_id=user_id,
-                message_id=msg_id,
-                text=text,
-                reply_markup=kb,
-            )
-            logging.info(f"[edit_main] OK edit user={user_id} msg={msg_id}")
-            return None
-        except TelegramBadRequest as e:
-            err = str(e).lower()
-            if "message is not modified" in err:
-                logging.info(f"[edit_main] not modified user={user_id}")
-                return None
-            logging.warning(f"[edit_main] edit failed user={user_id} msg={msg_id}: {e}")
-        except Exception as e:
-            logging.error(f"[edit_main] edit error user={user_id}: {e}")
-
         try:
             await bot.delete_message(chat_id=user_id, message_id=msg_id)
             logging.info(f"[edit_main] deleted old msg={msg_id}")
         except Exception as e:
-            logging.debug(f"[edit_main] delete failed: {e}")
+            logging.debug(f"[edit_main] delete failed (ok): {e}")
 
+    # Создаём новое
     try:
         msg = await bot.send_message(user_id, text, reply_markup=kb)
         update_player_fields(user_id, {"main_message_id": msg.message_id})

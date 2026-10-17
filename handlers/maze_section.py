@@ -131,25 +131,27 @@ async def _render(callback, player, lang, season, section, layer, section_id):
 
     text += ground_text
 
+    _s = ":" + player.get("current_session", "") if player.get("current_session") else ""
+
     rows = [
         [
             InlineKeyboardButton(
                 text=t("maze.btn_look", lang),
-                callback_data=f"maze:look:{section_id}",
+                callback_data=f"maze:look:{section_id}{_s}",
             ),
             InlineKeyboardButton(
                 text=t("btn.inventory", lang),
-                callback_data="nav:inv",
+                callback_data=f"nav:inv{_s}",
             ),
         ],
         [
             InlineKeyboardButton(
                 text=t("map.btn_draw", lang),
-                callback_data=f"map:draw:{section_id}",
+                callback_data=f"map:draw:{section_id}{_s}",
             ),
             InlineKeyboardButton(
                 text=t("map.btn_open", lang),
-                callback_data="map:list",
+                callback_data=f"map:list{_s}",
             ),
         ],
     ]
@@ -158,7 +160,7 @@ async def _render(callback, player, lang, season, section, layer, section_id):
         rows.append([
             InlineKeyboardButton(
                 text=t("ground.btn_pickup", lang),
-                callback_data=f"maze:pickup:{section_id}",
+                callback_data=f"maze:pickup:{section_id}{_s}",
             )
         ])
 
@@ -169,7 +171,7 @@ async def _render(callback, player, lang, season, section, layer, section_id):
         rows.append([
             InlineKeyboardButton(
                 text=t("maze.btn_go", lang, name=exit_section["name"]),
-                callback_data=f"maze:go:{exit_id}",
+                callback_data=f"maze:go:{exit_id}{_s}",
             )
         ])
 
@@ -185,10 +187,25 @@ async def _render(callback, player, lang, season, section, layer, section_id):
 
     kb = InlineKeyboardMarkup(inline_keyboard=rows)
 
+    # Всегда удаляем старое главное сообщение и создаём новое
+    from core.bot_helpers import make_bot
+    from db.players import update_player_fields
+
+    player_now = get_player(callback.from_user.id)
+    old_msg_id = player_now.get("main_message_id") if player_now else None
+
+    bot = make_bot()
     try:
-        await callback.message.edit_text(text, reply_markup=kb)
-    except Exception:
-        await callback.message.answer(text, reply_markup=kb)
+        if old_msg_id:
+            try:
+                await bot.delete_message(callback.from_user.id, old_msg_id)
+            except Exception:
+                pass
+        msg = await bot.send_message(callback.from_user.id, text, reply_markup=kb)
+        update_player_fields(callback.from_user.id, {"main_message_id": msg.message_id})
+    finally:
+        await bot.session.close()
+
     await callback.answer()
 
 

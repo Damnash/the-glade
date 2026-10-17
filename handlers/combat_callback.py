@@ -5,6 +5,7 @@ from aiogram.types import CallbackQuery, InlineKeyboardMarkup, InlineKeyboardBut
 from core.i18n import t
 from db.players import get_player
 from keyboards.combat import combat_keyboard
+from core.bot_helpers import make_bot
 from services.combat import (
     get_active_combat, start_combat, end_combat,
     player_attack, player_defend, player_flee,

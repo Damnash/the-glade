@@ -215,8 +215,8 @@ async def main():
     dp.callback_query.register(act_cb.on_work_start,   F.data.startswith("work:"))
 
     # Лабиринт
-    dp.callback_query.register(maze_cb.on_enter,       F.data.startswith("raid:enter"))
     dp.callback_query.register(maze_cb.on_enter_force, F.data.startswith("raid:enter_force"))
+    dp.callback_query.register(maze_cb.on_enter,       F.data.startswith("raid:enter:"))
     dp.callback_query.register(maze_cb.on_maze_back, F.data.startswith("maze:back"))
     dp.callback_query.register(maze_cb.on_return, F.data == "raid:return")
     dp.callback_query.register(maze_mv.on_exit,   F.data.startswith("maze:exit"))
