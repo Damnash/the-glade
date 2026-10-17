@@ -11,9 +11,30 @@ SEASON_LENGTH_DAYS = 90
 
 
 def should_end_season(season_id: int) -> bool:
-    """Пора ли завершить сезон?"""
-    day = get_season_day(season_id)
-    return day > SEASON_LENGTH_DAYS
+    """Пора ли завершить сезон?
+
+    Считаем СЫРЫЕ дни от start_date, не клипая до 90
+    (get_season_day клипает, поэтому здесь напрямую).
+    """
+    from datetime import datetime
+    conn = get_conn()
+    cur = conn.cursor()
+    cur.execute(
+        "SELECT start_date FROM maze_state WHERE season_id = ?",
+        (season_id,),
+    )
+    row = cur.fetchone()
+    conn.close()
+
+    if not row:
+        return False
+
+    start = row[0]
+    if isinstance(start, str):
+        start = datetime.fromisoformat(start)
+
+    raw_days = (datetime.utcnow() - start).days + 1
+    return raw_days > SEASON_LENGTH_DAYS
 
 
 def end_season(season_id: int) -> dict:

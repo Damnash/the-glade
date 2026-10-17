@@ -156,12 +156,13 @@ async def on_look(callback: CallbackQuery):
     player = get_player(user_id)
     lang = player["language"]
 
-    parts = callback.data.split(":", 2)
+    # Формат: maze:look:SECTION_ID:session
+    parts = callback.data.split(":")
     if len(parts) < 3:
         await callback.answer("Invalid.", show_alert=True)
         return
 
-    section_id = parts[2]
+    section_id = parts[2]  # без session
     layer = player.get("maze_layer", 1)
 
     # 0. Проверка ключа

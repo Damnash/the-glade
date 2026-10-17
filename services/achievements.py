@@ -82,15 +82,19 @@ def try_open_gates(user_id: int) -> dict | None:
     if not section or section["type"] != "center":
         return None
 
-    # Все игроки в центре
-    from db.players import players_in_location
-    others = players_in_location(player["location"], exclude_id=None)
+    # Все игроки в центре лабиринта (по maze_section/maze_layer, НЕ по location)
+    from db.connection import get_conn
+    conn = get_conn()
+    cur = conn.cursor()
+    cur.execute(
+        "SELECT user_id FROM players "
+        "WHERE maze_section = ? AND maze_layer = ? AND user_id != ?",
+        (section_id, layer, user_id),
+    )
+    rows = cur.fetchall()
+    conn.close()
 
-    # Собираем всех, кто в центре
-    winners = [user_id]
-    for p in others:
-        if p.get("maze_section") == section_id and p.get("maze_layer") == layer:
-            winners.append(p["user_id"])
+    winners = [user_id] + [r[0] for r in rows]
 
     # Порог по тиру
     from core.season import get_tier_config

@@ -17,6 +17,9 @@ def move(user_id: int, target: str):
     if not player:
         raise MoveError("start.need_start")
 
+    if player.get("maze_layer", 0) > 0:
+        raise MoveError("move.in_maze")
+
     if player["status"] == "sleeping":
         raise MoveError("move.sleeping")
 

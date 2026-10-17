@@ -114,8 +114,6 @@ def enter_maze(user_id: int, gate: str) -> str:
     wing = wing_map[gate]
     section_id = f"L1_{wing}1"
 
-    update_player_fields(user_id, {"location": section_id})
-
     # Story tracking
     try:
         from services.story import track_event
