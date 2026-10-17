@@ -503,6 +503,26 @@ def init_db():
         )
     """)
 
+    # daily_quests: ежедневные личные квесты
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS daily_quests (
+            user_id INTEGER,
+            quest_date TEXT,
+            quest_key TEXT,
+            progress INTEGER DEFAULT 0,
+            need INTEGER,
+            status TEXT DEFAULT 'active',
+            started_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            completed_at TIMESTAMP,
+            PRIMARY KEY (user_id, quest_date)
+        )
+    """)
+
+    cur.execute("""
+        CREATE INDEX IF NOT EXISTS idx_daily_quests_date
+            ON daily_quests(quest_date, status)
+    """)
+
     cur.execute("""
         CREATE TABLE IF NOT EXISTS story_quests (
             user_id INTEGER,
