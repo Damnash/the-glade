@@ -115,8 +115,39 @@ async def _broadcast(bot, text_key: str, with_advice: bool = False):
 
         try:
             from services.keys import ensure_keys_spawned, get_today_key_rumor
-            from core.maze_current import get_current_season
+            from services.maze_wallshift import should_wallshift, has_wallshift_today, wallshift, mark_wallshift_done
+            from core.maze_current import get_current_season, get_season_day
+
             season = get_current_season()
+            day = get_season_day(season)
+
+            # Wallshift раз в 7 дней
+            if should_wallshift(season) and not has_wallshift_today(season, day):
+                result = wallshift(season, 1)
+                logging.info(f"[DAYCYCLE] wallshift: {result}")
+                mark_wallshift_done(season, day)
+
+                # Уведомление игрокам
+                try:
+                    from db.players import get_conn as _pc
+                    from core.i18n import t as _t
+
+                    conn = _pc()
+                    cur = conn.cursor()
+                    cur.execute("SELECT user_id, language FROM players WHERE intro_done = 1")
+                    ws_players = cur.fetchall()
+                    conn.close()
+
+                    ws_bot = bot
+                    for uid, ulang in ws_players:
+                        try:
+                            text = _t("wallshift.notification", ulang or "en")
+                            await ws_bot.send_message(chat_id=uid, text=text)
+                        except Exception:
+                            pass
+                except Exception as e:
+                    logging.error(f"[DAYCYCLE] wallshift notify: {e}")
+
             ensure_keys_spawned(season)
             rumor = get_today_key_rumor(season)
         except Exception as e:

@@ -1263,5 +1263,6 @@
   "keys.rumor_title": "🗝️ Key Rumor",
   "keys.rumor_body": "Today someone saw Key {num} in the {wing}.",
   "keys.rumor_hint": "Go and find it. But be careful — the Maze is dangerous.",
-  "keys.found_by_someone": "🗝️ {name} found Key {num}! The Maze shifts."
+  "keys.found_by_someone": "🗝️ {name} found Key {num}! The Maze shifts.",
+  "wallshift.notification": "🌀 The Maze has shifted. The walls have changed. Old paths may be gone. New paths are open."
 }
