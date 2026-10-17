@@ -1259,5 +1259,9 @@
   "pvp.flag_title": "PvP Flag",
   "pvp.flag_help": "With flag ON: you can attack and be attacked in PvP zones (Maze, Center, day 80+). In the Glade you are always safe.",
   "pvp.btn_enable": "⚔️ Enable PvP flag",
-  "pvp.btn_disable": "🛡️ Disable PvP flag"
+  "pvp.btn_disable": "🛡️ Disable PvP flag",
+  "keys.rumor_title": "🗝️ Key Rumor",
+  "keys.rumor_body": "Today someone saw Key {num} in the {wing}.",
+  "keys.rumor_hint": "Go and find it. But be careful — the Maze is dangerous.",
+  "keys.found_by_someone": "🗝️ {name} found Key {num}! The Maze shifts."
 }

@@ -173,6 +173,10 @@ async def on_look(callback: CallbackQuery):
         from db.inventory import add_item
         add_item(user_id, f"key_{key_num}", 1)
         await callback.answer(t("key.found", lang, name=key_name), show_alert=True)
+
+        # Broadcast всем
+        await _broadcast_key_found(user_id, key_num, lang)
+
         await _show_section(callback, user_id, layer, section_id)
         return
 

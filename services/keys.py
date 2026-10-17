@@ -7,7 +7,7 @@ from db.keys import (
     KEY_DAY, KEY_DUPLICATE_DAYS,
     has_player_key, get_player_keys, key_spawned, key_exists_unfound,
     spawn_key, find_key_in_section, mark_key_found,
-    get_key_by_number, drop_player_key,
+    get_key_by_number, drop_player_key, respawn_key,
 )
 from db.maze_map import load_layer
 
@@ -25,7 +25,19 @@ WINGS = ["N", "S", "W", "E"]
 
 
 def ensure_keys_spawned(season_id: int):
-    """Проверить и создать ключи, которые должны появиться."""
+    """
+    Утром: спавн/переспавн ключей.
+    
+    - Ключ 2: кольцо 1-2
+    - Ключ 3: кольцо 2-3
+    - Ключ 4: кольцо 3-4
+    - Ключ 5: центр
+    
+    Если ключ найден — не трогаем.
+    Если не найден и spawned_date != today — переспавн.
+    """
+    from datetime import date as _date
+    today = _date.today().isoformat()
     day = get_season_day(season_id)
     layer_data = load_layer(season_id, 1)
     if not layer_data:
@@ -42,25 +54,65 @@ def ensure_keys_spawned(season_id: int):
             continue
         by_wing_ring.setdefault((wing, ring), []).append(sid)
 
-    # Ключ 2, 3, 4
+    # Ключи 2, 3, 4
     for key_num in [2, 3, 4]:
         spawn_day = KEY_DAY[key_num]
         if day < spawn_day:
             continue
 
-        if key_spawned(season_id, key_num):
-            # Проверим дубликат
-            _check_duplicate(season_id, key_num, day, by_wing_ring)
+        all_keys = get_key_by_number(season_id, key_num)
+        found_keys = [k for k in all_keys if k["found_by"] is not None]
+
+        # Если ключ уже найден — не трогаем
+        if found_keys:
             continue
 
-        # Спавним в первый раз
-        _spawn_key_random(season_id, key_num, by_wing_ring, layer=1)
+        # Уже есть не найденный? Проверим дату
+        unfound = [k for k in all_keys if k["found_by"] is None]
+        if unfound:
+            k = unfound[0]
+            if k.get("spawned_date") != today:
+                # Переспавн — в новую секцию
+                target_ring = {2: 1, 3: 2, 4: 3}[key_num]
+                wing = random.choice(WINGS)
+                candidates = by_wing_ring.get((wing, target_ring), [])
+                if not candidates:
+                    for (w, r), secs in by_wing_ring.items():
+                        if r == target_ring:
+                            candidates = secs
+                            wing = w
+                            break
+                if candidates:
+                    new_section = random.choice(candidates)
+                    respawn_key(k["id"], new_section, wing, 1, today)
+        else:
+            # Первый спавн
+            target_ring = {2: 1, 3: 2, 4: 3}[key_num]
+            wing = random.choice(WINGS)
+            candidates = by_wing_ring.get((wing, target_ring), [])
+            if not candidates:
+                for (w, r), secs in by_wing_ring.items():
+                    if r == target_ring:
+                        candidates = secs
+                        wing = w
+                        break
+            if candidates:
+                section_id = random.choice(candidates)
+                spawn_key(season_id, key_num, section_id, wing, 1, spawned_date=today)
 
-    # Ключ 5 — в центре (позже, когда будет центр-секция)
-    if day >= KEY_DAY[5] and not key_spawned(season_id, 5):
-        center_id = layer_data.get("center")
-        if center_id:
-            spawn_key(season_id, 5, center_id, "C", 1)
+    # Ключ 5 — центр
+    if day >= KEY_DAY[5]:
+        all_keys = get_key_by_number(season_id, 5)
+        found = [k for k in all_keys if k["found_by"] is not None]
+        if not found:
+            unfound = [k for k in all_keys if k["found_by"] is None]
+            center_id = layer_data.get("center")
+            if not unfound and center_id:
+                spawn_key(season_id, 5, center_id, "C", 1, spawned_date=today)
+            elif unfound:
+                k = unfound[0]
+                if k.get("spawned_date") != today and center_id:
+                    respawn_key(k["id"], center_id, "C", 1, today)
 
 
 def _spawn_key_random(season_id: int, key_num: int, by_wing_ring: dict, layer: int = 1):
@@ -203,3 +255,44 @@ def drop_all_keys_on_death(user_id: int, section_id: str, layer: int) -> int:
             dropped += 1
 
     return dropped
+
+
+# ============ Слух о ключе (v1.1) ============
+
+WING_NAMES = {
+    "N": "loc.north_gates.name",
+    "S": "loc.south_gates.name",
+    "W": "loc.west_gates.name",
+    "E": "loc.east_gates.name",
+}
+
+
+def get_today_key_rumor(season_id: int) -> dict | None:
+    """
+    Слух о ненайденном ключе.
+    Возвращает {'key_num': int, 'wing': str, 'wing_name_key': str} или None.
+    """
+    from db.keys import get_key_wing, get_key_by_number
+
+    day = get_season_day(season_id)
+
+    for key_num in [2, 3, 4, 5]:
+        spawn_day = KEY_DAY[key_num]
+        if day < spawn_day:
+            continue
+
+        # Уже найден?
+        keys = get_key_by_number(season_id, key_num)
+        found = any(k["found_by"] is not None for k in keys)
+        if found:
+            continue
+
+        wing = get_key_wing(season_id, key_num)
+        if wing:
+            return {
+                "key_num": key_num,
+                "wing": wing,
+                "wing_name_key": WING_NAMES.get(wing, "loc.center.name"),
+            }
+
+    return None

@@ -279,9 +279,16 @@ def init_db():
             found_by INTEGER,
             found_at TIMESTAMP,
             duplicate_of INTEGER,
-            spawned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            spawned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            spawned_date TEXT
         )
     """)
+
+    # Миграция: добавить spawned_date, если нет
+    cur.execute("PRAGMA table_info(season_keys)")
+    columns = [row[1] for row in cur.fetchall()]
+    if "spawned_date" not in columns:
+        cur.execute("ALTER TABLE season_keys ADD COLUMN spawned_date TEXT")
 
     cur.execute("""
         CREATE INDEX IF NOT EXISTS idx_keys_season

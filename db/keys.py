@@ -80,15 +80,20 @@ def key_spawned(season_id: int, key_number: int) -> bool:
 
 
 def spawn_key(season_id: int, key_number: int, section_id: str, wing: str,
-              layer: int, duplicate_of: int | None = None) -> int:
+              layer: int, duplicate_of: int | None = None,
+              spawned_date: str | None = None) -> int:
     """Разместить ключ в секции."""
+    from datetime import date as _date
+    if spawned_date is None:
+        spawned_date = _date.today().isoformat()
+
     conn = get_conn()
     cur = conn.cursor()
     cur.execute("""
         INSERT INTO season_keys
-        (season_id, key_number, layer, section_id, wing, duplicate_of)
-        VALUES (?, ?, ?, ?, ?, ?)
-    """, (season_id, key_number, layer, section_id, wing, duplicate_of))
+        (season_id, key_number, layer, section_id, wing, duplicate_of, spawned_date)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+    """, (season_id, key_number, layer, section_id, wing, duplicate_of, spawned_date))
     key_id = cur.lastrowid
     conn.commit()
     conn.close()
@@ -167,3 +172,58 @@ def drop_player_key(season_id: int, user_id: int, key_number: int,
     conn.commit()
     conn.close()
     return affected > 0
+
+
+# ============ Переспавн ключей (v1.1) ============
+
+def delete_key(key_id: int):
+    """Удалить ключ (для переспавна)."""
+    conn = get_conn()
+    cur = conn.cursor()
+    cur.execute("DELETE FROM season_keys WHERE id = ?", (key_id,))
+    conn.commit()
+    conn.close()
+
+
+def get_unfound_keys(season_id: int) -> list[dict]:
+    """Все ненайденные ключи сезона."""
+    conn = get_conn()
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT * FROM season_keys
+        WHERE season_id = ? AND found_by IS NULL
+        ORDER BY key_number
+    """, (season_id,))
+    rows = cur.fetchall()
+    conn.close()
+    return [dict(r) for r in rows]
+
+
+def respawn_key(key_id: int, section_id: str, wing: str, layer: int,
+                spawned_date: str) -> bool:
+    """Переместить ключ в новую секцию (переспавн)."""
+    conn = get_conn()
+    cur = conn.cursor()
+    cur.execute("""
+        UPDATE season_keys
+        SET section_id = ?, wing = ?, layer = ?, spawned_date = ?
+        WHERE id = ? AND found_by IS NULL
+    """, (section_id, wing, layer, spawned_date, key_id))
+    affected = cur.rowcount
+    conn.commit()
+    conn.close()
+    return affected > 0
+
+
+def get_key_wing(season_id: int, key_number: int) -> str | None:
+    """Крыло, в котором сейчас ненайденный ключ."""
+    conn = get_conn()
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT wing FROM season_keys
+        WHERE season_id = ? AND key_number = ? AND found_by IS NULL
+        ORDER BY id DESC LIMIT 1
+    """, (season_id, key_number))
+    row = cur.fetchone()
+    conn.close()
+    return row[0] if row else None

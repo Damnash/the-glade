@@ -103,14 +103,24 @@ async def _broadcast(bot, text_key: str, with_advice: bool = False):
     finally:
         conn.close()
 
-    # Совет дня (если нужен)
+    # Совет дня + слух о ключе (если нужен)
     advice_key = None
+    rumor = None
     if with_advice:
         try:
             from services.daily_advice import get_today_advice_key
             advice_key = get_today_advice_key()
         except Exception as e:
             logging.error(f"[DAYCYCLE] advice error: {e}")
+
+        try:
+            from services.keys import ensure_keys_spawned, get_today_key_rumor
+            from core.maze_current import get_current_season
+            season = get_current_season()
+            ensure_keys_spawned(season)
+            rumor = get_today_key_rumor(season)
+        except Exception as e:
+            logging.error(f"[DAYCYCLE] rumor error: {e}")
 
     sent = 0
     for user_id, lang in players:
@@ -120,9 +130,17 @@ async def _broadcast(bot, text_key: str, with_advice: bool = False):
                 advice_text = t(advice_key, lang or "en")
                 advice_title = t("advice.title", lang or "en")
                 text = text + "\n\n" + advice_title + "\n" + advice_text
+
+            if rumor:
+                rumor_title = t("keys.rumor_title", lang or "en")
+                wing = t(rumor["wing_name_key"], lang or "en")
+                rumor_body = t("keys.rumor_body", lang or "en", num=rumor["key_num"], wing=wing)
+                rumor_hint = t("keys.rumor_hint", lang or "en")
+                text = text + "\n\n" + rumor_title + "\n" + rumor_body + "\n<i>" + rumor_hint + "</i>"
+
             await bot.send_message(chat_id=user_id, text=text)
             sent += 1
         except Exception as e:
             logging.debug(f"[DAYCYCLE] send to {user_id} failed: {e}")
 
-    logging.info(f"[DAYCYCLE] broadcast '{text_key}': {sent}/{len(players)} (advice={advice_key})")
+    logging.info(f"[DAYCYCLE] broadcast '{text_key}': {sent}/{len(players)} (advice={advice_key}, rumor={rumor})")
