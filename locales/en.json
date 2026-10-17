@@ -1185,5 +1185,19 @@
   "maze.run_header": "🌀 RUN",
   "maze.night_closed": "🌙 The gates are closed at night. Come back at dawn.",
   "daycycle.morning": "🌅 The gates are open. The Maze awaits. Good luck.",
-  "daycycle.evening": "🌙 The gates are closed. No one returns tonight. Stay by the fire."
+  "daycycle.evening": "🌙 The gates are closed. No one returns tonight. Stay by the fire.",
+  "advice.title": "📋 Council's Advice",
+  "advice.day.fragments": "Today the council seeks map fragments. Who will go into the Maze?",
+  "advice.day.keys": "The keys are out there. We need to find them before the season ends.",
+  "advice.day.explore": "We've explored too little. New paths must be discovered.",
+  "advice.day.return_alive": "Runners, return alive. The Maze is not worth a life.",
+  "advice.day.griever": "Grievers are growing bolder. Be careful in the dark corridors.",
+  "advice.day.clan": "Clans must stand together. Only together can we find the exit.",
+  "advice.day.food": "Check your supplies. The Maze takes everything from the unprepared.",
+  "advice.day.north": "Something stirs in the northern wing. Scouts, check it out.",
+  "advice.day.south": "The southern gates are the oldest. Perhaps the answer is there.",
+  "advice.day.center": "The heart of the Maze is close. But are we ready for it?",
+  "advice.context.beginning": "It's only the beginning. First steps into the Maze — careful ones.",
+  "advice.context.keys_final": "Final days. Five keys — five chances. Every moment matters.",
+  "advice.context.many_runners": "Many runners are in the Maze today. Watch your back."
 }

@@ -70,7 +70,7 @@ async def daycycle_events_task(bot):
                 last = _get_state("last_morning_notification")
                 if last != today:
                     logging.info("[DAYCYCLE] morning: gates open")
-                    await _broadcast(bot, "daycycle.morning")
+                    await _broadcast(bot, "daycycle.morning", with_advice=True)
                     _set_state("last_morning_notification", today)
 
             # ============ 22:00 — ВЕЧЕР ============
@@ -87,7 +87,7 @@ async def daycycle_events_task(bot):
             logging.error(f"daycycle_events error: {e}")
 
 
-async def _broadcast(bot, text_key: str):
+async def _broadcast(bot, text_key: str, with_advice: bool = False):
     """Отправить сообщение всем активным игрокам."""
     from core.i18n import t
     from db.connection import get_conn
@@ -103,13 +103,26 @@ async def _broadcast(bot, text_key: str):
     finally:
         conn.close()
 
+    # Совет дня (если нужен)
+    advice_key = None
+    if with_advice:
+        try:
+            from services.daily_advice import get_today_advice_key
+            advice_key = get_today_advice_key()
+        except Exception as e:
+            logging.error(f"[DAYCYCLE] advice error: {e}")
+
     sent = 0
     for user_id, lang in players:
         try:
             text = t(text_key, lang or "en")
+            if advice_key:
+                advice_text = t(advice_key, lang or "en")
+                advice_title = t("advice.title", lang or "en")
+                text = text + "\n\n" + advice_title + "\n" + advice_text
             await bot.send_message(chat_id=user_id, text=text)
             sent += 1
         except Exception as e:
             logging.debug(f"[DAYCYCLE] send to {user_id} failed: {e}")
 
-    logging.info(f"[DAYCYCLE] broadcast '{text_key}': {sent}/{len(players)}")
+    logging.info(f"[DAYCYCLE] broadcast '{text_key}': {sent}/{len(players)} (advice={advice_key})")
