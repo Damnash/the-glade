@@ -19,7 +19,7 @@ CATEGORY_KEYS = {
              "help.section_rename", "help.section_note", "help.pickup_maps", "help.shares"],
     "pvp": ["help.steal", "help.attack", "help.duel"],
     "progress": ["help.achievements", "help.top", "help.hall", "help.gates"],
-    "info": ["help.stats", "help.language", "help.help"],
+    "info": ["help.stats", "help.language", "help.help", "help.feedback"],
 }
 
 

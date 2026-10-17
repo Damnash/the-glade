@@ -1074,7 +1074,7 @@
   "prof.scout.desc": "Ran. No one was faster. +10 energy, +5% flee chance.",
   "intro.step_gift": "🧑 <b>Newt:</b>\n\n<i>\"Take this. It's all I can give. The rest — on your own.\"</i>\n\nHe hands you:",
   "intro.btn_look_around": "👀 Look around",
-  "intro.finished": "🌿 Welcome to the Glade.",
+  "intro.finished": "🌿 Welcome to the Glade.\n\n💬 Feedback: @AdmPenalty",
   "loc.abandoned_hut.name": "🏚️ Abandoned Hut",
   "loc.abandoned_hut.desc": "A hut on the edge of the Glade. Walls covered in moss, roof sagging. The door is ajar — cold and something else, unfamiliar, drifts from inside. No one comes here. They say Teresa lives here.",
   "loc.abandoned_hut.desc.day": "By day the hut seems almost ordinary — just old, forgotten. But the shadow at the door does not move with the sun. Someone is watching from inside.",
@@ -1270,5 +1270,6 @@
   "npc.bring_ok": "✅ Accepted.",
   "npc.bring_progress": "📋 Daily quest progress +1.",
   "npc.bring_quest_complete": "🏆 Daily quest complete! Claim it via 📋 Daily Quest.",
-  "npc.no_item": "You don't have {item}. Need {need}."
+  "npc.no_item": "You don't have {item}. Need {need}.",
+  "help.feedback": "💬 Feedback: @AdmPenalty — bugs, ideas, complaints."
 }
