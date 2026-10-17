@@ -90,8 +90,8 @@ async def on_attack(callback: CallbackQuery):
         return
 
     if result.get("victory"):
-        combat = get_active_combat(user_id)
-        monster_type = combat["monster_type"] if combat else "young"
+        # monster_type берём из result (player_attack уже вызвал end_combat)
+        monster_type = result.get("monster_type", "young")
         rewards = give_victory_rewards(user_id, monster_type)
 
         reward_lines = []

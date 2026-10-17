@@ -138,6 +138,7 @@ def player_attack(user_id: int) -> dict:
     if new_monster_hp <= 0:
         end_combat(user_id)
         result["victory"] = True
+        result["monster_type"] = combat["monster_type"]  # для give_victory_rewards
         result["rewards"] = monster["rewards"]
         result["fragment_chance"] = monster["fragment_chance"]
     else:
