@@ -174,39 +174,6 @@ def count_map_sections(map_id: int, season_id: int, layer: int) -> int:
 
 # ============ Смерть и подбор ============
 
-def drop_non_personal_maps(user_id: int, section_id: str, layer: int) -> int:
-    """
-    Все НЕ-личные карты игрока выпадают в секции.
-    Возвращает количество выпавших карт.
-    """
-    conn = get_conn()
-    cur = conn.cursor()
-    cur.execute("""
-        UPDATE map_items
-        SET owner_id = NULL,
-            current_location = ?,
-            current_layer = ?
-        WHERE owner_id = ? AND is_personal = 0
-    """, (section_id, layer, user_id))
-    dropped = cur.rowcount
-    conn.commit()
-    conn.close()
-    return dropped
-
-
-def get_maps_on_ground(section_id: str, layer: int) -> list[dict]:
-    """Все карты, лежащие в секции."""
-    conn = get_conn()
-    cur = conn.cursor()
-    cur.execute("""
-        SELECT * FROM map_items
-        WHERE owner_id IS NULL
-          AND current_location = ?
-          AND current_layer = ?
-    """, (section_id, layer))
-    rows = cur.fetchall()
-    conn.close()
-    return [dict(r) for r in rows]
 
 
 def pickup_map(map_id: int, user_id: int) -> bool:
