@@ -18,6 +18,10 @@ def clan_main_keyboard(lang: str, session: str = "") -> InlineKeyboardMarkup:
             InlineKeyboardButton(text=t("clan.btn_treasury", lang), callback_data=f"clan:treasury{s}"),
         ],
         [
+            InlineKeyboardButton(text=t("upgrade.title", lang), callback_data=f"clan_upgrades:show{s}"),
+            InlineKeyboardButton(text=t("upgrade.clan_storage", lang), callback_data=f"clan_storage:show{s}"),
+        ],
+        [
             InlineKeyboardButton(text=t("clan.btn_invite", lang), callback_data=f"clan:invite_help{s}"),
             InlineKeyboardButton(text=t("clan.btn_leave", lang), callback_data=f"clan:leave{s}"),
         ],
