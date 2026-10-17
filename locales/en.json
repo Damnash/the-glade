@@ -1257,7 +1257,7 @@
     "flag"
   ],
   "pvp.flag_title": "PvP Flag",
-  "pvp.flag_help": "With flag ON: you can attack and be attacked in PvP zones. Without flag: you are safe.",
+  "pvp.flag_help": "With flag ON: you can attack and be attacked in PvP zones (Maze, Center, day 80+). In the Glade you are always safe.",
   "pvp.btn_enable": "⚔️ Enable PvP flag",
   "pvp.btn_disable": "🛡️ Disable PvP flag"
 }
