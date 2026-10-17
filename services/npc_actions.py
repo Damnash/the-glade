@@ -364,3 +364,63 @@ def winston_trade(user_id: int, trade_key: str) -> dict:
         "trade_key": trade_key,
         "updates": updates,
     }
+
+
+# ============ Сдача ресурсов NPC (v1.1) ============
+
+def bring_to_npc(user_id: int, npc_key: str, item_key: str, qty: int = 1) -> dict:
+    """
+    Сдать предмет NPC.
+    
+    - Списывает из инвентаря.
+    - Даёт прогресс ежедневного квеста (если квест = bring_meat/find_water).
+    - Возвращает {'ok': True, 'progress_updated': bool, 'quest_completed': bool}.
+    """
+    from db.inventory import has_item, remove_item
+    from db.players import get_player
+    from services.daily_quests import add_progress, get_today_quest, try_complete
+    from content.daily_quests import get_quest
+
+    player = get_player(user_id)
+    if not player:
+        raise NPCActionError("start.need_start")
+
+    if not has_item(user_id, item_key, qty):
+        raise NPCActionError("npc.no_item", item=item_key, need=qty)
+
+    # Списание
+    if not remove_item(user_id, item_key, qty):
+        raise NPCActionError("npc.no_item", item=item_key, need=qty)
+
+    # Проверка ежедневного квеста
+    quest_rec = get_today_quest(user_id)
+    progress_updated = False
+    quest_completed = False
+
+    if quest_rec and quest_rec["status"] == "active":
+        quest = get_quest(quest_rec["quest_key"])
+        if quest:
+            # Маппинг: npc + item → type
+            expected_type = None
+            if npc_key == "frypan" and item_key == "meat":
+                expected_type = "bring_meat"
+            elif npc_key == "winston" and item_key == "water_flask":
+                expected_type = "find_water"
+
+            if expected_type and quest["type"] == expected_type:
+                add_progress(user_id, expected_type, qty)
+                progress_updated = True
+
+                # Проверим, не завершён ли квест
+                rec_after = get_today_quest(user_id)
+                if rec_after and rec_after["status"] == "complete":
+                    quest_completed = True
+
+    return {
+        "ok": True,
+        "npc": npc_key,
+        "item": item_key,
+        "qty": qty,
+        "progress_updated": progress_updated,
+        "quest_completed": quest_completed,
+    }

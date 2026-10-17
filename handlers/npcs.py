@@ -117,6 +117,10 @@ async def on_npc_action(callback: CallbackQuery):
         await _winston_trade(callback, user_id, lang)
     elif npc_key == "winston" and action.startswith("trade_"):
         await _winston_do_trade(callback, user_id, lang)
+    elif npc_key == "frypan" and action == "bring_meat":
+        await _frypan_bring_meat(callback, user_id, lang)
+    elif npc_key == "winston" and action == "bring_water":
+        await _winston_bring_water(callback, user_id, lang)
     elif action == "story":
         from handlers.story import show_story_menu
         from core.bot_helpers import make_bot

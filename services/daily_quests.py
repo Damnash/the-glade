@@ -197,7 +197,12 @@ def format_reward(reward: dict, lang: str) -> str:
 
     resources = reward.get("resource", {})
     for item_key, qty in resources.items():
-        name = t(f"item.{item_key}.name", lang)
-        parts.append(f"{name} +{qty}")
+        if item_key == "food":
+            parts.append(f"🍞 +{qty}")
+        elif item_key == "water":
+            parts.append(f"💧 +{qty}")
+        else:
+            name = t(f"item.{item_key}.name", lang)
+            parts.append(f"{name} +{qty}")
 
     return ", ".join(parts) if parts else "—"

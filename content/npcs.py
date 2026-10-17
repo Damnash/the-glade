@@ -6,7 +6,7 @@ NPCS = {
         "desc_key": "npc.frypan.desc",
         "location": "kitchen",
         "dialog_key": "npc.frypan.dialog",
-        "actions": ["trade_food"],
+        "actions": ["trade_food", "bring_meat"],
     },
     "clint": {
         "name_key": "npc.clint.name",
@@ -48,7 +48,7 @@ NPCS = {
         "desc_key": "npc.winston.desc",
         "location": "farms",
         "dialog_key": "npc.winston.dialog",
-        "actions": ["trade"],
+        "actions": ["trade", "bring_water"],
     },
     "newt": {
         "name_key": "npc.newt.name",

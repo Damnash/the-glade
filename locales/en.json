@@ -1264,5 +1264,11 @@
   "keys.rumor_body": "Today someone saw Key {num} in the {wing}.",
   "keys.rumor_hint": "Go and find it. But be careful — the Maze is dangerous.",
   "keys.found_by_someone": "🗝️ {name} found Key {num}! The Maze shifts.",
-  "wallshift.notification": "🌀 The Maze has shifted. The walls have changed. Old paths may be gone. New paths are open."
+  "wallshift.notification": "🌀 The Maze has shifted. The walls have changed. Old paths may be gone. New paths are open.",
+  "npc.frypan.action.bring_meat": "🥩 Bring meat (for daily quest)",
+  "npc.winston.action.bring_water": "💧 Bring water (for daily quest)",
+  "npc.bring_ok": "✅ Accepted.",
+  "npc.bring_progress": "📋 Daily quest progress +1.",
+  "npc.bring_quest_complete": "🏆 Daily quest complete! Claim it via 📋 Daily Quest.",
+  "npc.no_item": "You don't have {item}. Need {need}."
 }
