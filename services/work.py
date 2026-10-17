@@ -79,7 +79,17 @@ def collect_rewards(user_id: int) -> dict | None:
         })
         return None
 
-    rewards = spec["rewards"]
+    rewards = dict(spec["rewards"])
+
+    # Бонус клана (ферма → больше еды)
+    from services.bonuses import get_clan_bonus
+    clan_bonus = get_clan_bonus(player)
+
+    if work_type == "farm" and "food" in rewards:
+        food_bonus = clan_bonus.get("food_bonus", 0)
+        if food_bonus > 0:
+            rewards["food"] = int(rewards["food"] * (1 + food_bonus))
+
     updates = {
         "status": "active",
         "work_type": None,

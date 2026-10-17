@@ -49,3 +49,17 @@ def get_max_hp(player: dict) -> int:
 
 def get_max_energy(player: dict) -> int:
     return get_player_bonus(player)["max_energy"]
+
+
+def get_clan_bonus(player: dict) -> dict:
+    """
+    Бонусы клана игрока (от апгрейдов).
+    Пустой dict, если игрок не в клане.
+    """
+    from db.clans import get_player_clan
+    from services.clans import get_clan_bonuses
+
+    clan = get_player_clan(player["user_id"])
+    if not clan:
+        return {}
+    return get_clan_bonuses(clan["clan_id"])

@@ -54,16 +54,23 @@ def craft(user_id: int, recipe_key: str) -> dict:
     recipe = CRAFT_RECIPES[recipe_key]
     player = get_player(user_id)
 
-    if player.get("tokens", 0) < recipe["tokens"]:
+    # Бонус клана (скидка на крафт)
+    from services.bonuses import get_clan_bonus
+    clan_bonus = get_clan_bonus(player)
+    discount = clan_bonus.get("craft_discount", 0)
+    final_cost = int(recipe["tokens"] * (1 - discount))
+    final_cost = max(1, final_cost)  # минимум 1
+
+    if player.get("tokens", 0) < final_cost:
         raise NPCActionError(
             "npc.clint.no_tokens",
-            cost=recipe["tokens"],
+            cost=final_cost,
             have=player.get("tokens", 0),
         )
 
     # Списываем жетоны
     update_player_fields(user_id, {
-        "tokens": player["tokens"] - recipe["tokens"],
+        "tokens": player["tokens"] - final_cost,
     })
 
     # Выдаём предмет
@@ -72,7 +79,8 @@ def craft(user_id: int, recipe_key: str) -> dict:
     return {
         "item": recipe["result_item"],
         "qty": recipe["result_qty"],
-        "cost": recipe["tokens"],
+        "cost": final_cost,
+        "discount": discount,
     }
 
 

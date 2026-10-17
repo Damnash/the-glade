@@ -33,6 +33,11 @@ def heal_self(user_id: int) -> dict:
     bonus = get_player_bonus(player)
     heal_amount = 20 + bonus["heal_bonus"] * 5  # медик лечит на +5
 
+    # Бонус клана (госпиталь)
+    from services.bonuses import get_clan_bonus
+    clan_bonus = get_clan_bonus(player)
+    heal_amount += clan_bonus.get("heal_bonus", 0)
+
     if not remove_item(user_id, "bandage", 1):
         raise ValueError("medic.no_bandage")
 
