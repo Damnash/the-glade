@@ -1326,5 +1326,12 @@
   "silence.wall": "🧱 You press your palm against the wall. It is warm.",
   "silence.cold": "🥶 Cold air. Your breath turns to mist.",
   "silence.drip": "💧 Drip. Pause. Drip.",
-  "silence.scratch": "👂 A scratch on the wall. From the other side."
+  "silence.scratch": "👂 A scratch on the wall. From the other side.",
+  "diary.header": "Your Diary",
+  "diary.empty": "Your diary is empty. Write something with /diary <text>.",
+  "diary.added": "📖 Entry added to your diary.",
+  "diary.too_long": "Too long (max 500 chars).",
+  "commands.diary": [
+    "diary"
+  ]
 }

@@ -526,6 +526,17 @@ def init_db():
 
     cur.execute("CREATE INDEX IF NOT EXISTS idx_log_user ON player_log(user_id, created_at DESC)")
 
+    # Личный дневник игрока
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS player_diary (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER,
+            text TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+    cur.execute("CREATE INDEX IF NOT EXISTS idx_diary_user ON player_diary(user_id, created_at DESC)")
+
     # NPC visits (для first_visit диалогов)
     cur.execute("""
         CREATE TABLE IF NOT EXISTS npc_visits (

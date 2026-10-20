@@ -54,6 +54,7 @@ from handlers import (
     gates as gates_h,
     daily_quest as dq_h,
     journal,
+    diary,
 )
 
 
@@ -206,6 +207,7 @@ async def main():
     dp.message.register(radio_h.cmd_radio,  Command(*command_aliases("commands.radio")))
     dp.message.register(radio_h.cmd_walkie_talk, Command(*command_aliases("commands.talk")))
     dp.message.register(journal.cmd_journal, Command(*command_aliases("commands.journal")))
+    dp.message.register(diary.cmd_diary, Command(*command_aliases("commands.diary")))
     dp.callback_query.register(maps_h.on_maps_list, F.data.startswith("maps:list"))
     dp.callback_query.register(maps_h.on_maps_list, F.data.startswith("map:list"))
     dp.callback_query.register(maps_h.on_map_open, F.data.startswith("map:open:"))
