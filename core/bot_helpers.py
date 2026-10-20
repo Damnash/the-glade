@@ -155,7 +155,7 @@ async def refresh_main(bot: Bot, user_id: int, new_session_flag: bool = True):
         kb = main_keyboard(lang, {"player": player}, session)
 
     # Лог
-    events = get_recent_events(user_id, limit=5)
+    events = get_recent_events(user_id, limit=5, severity="important")
     if events:
         log_lines = []
         for e in events:

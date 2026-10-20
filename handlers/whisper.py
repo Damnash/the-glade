@@ -39,13 +39,13 @@ async def cmd_whisper(message: Message, bot: Bot):
 
     # Лог отправителю
     add_event(user_id, "whisper", t("log.whisper_sent", lang,
-                                     name=result["to_name"], text=text))
+                                     name=result["to_name"], text=text), severity="chat")
     cleanup_old_events(user_id)
 
     # Лог получателю
     target_lang = get_lang(result["to_id"])
     add_event(result["to_id"], "whisper",
-              t("log.whisper_received", target_lang, name=sender_name, text=text))
+              t("log.whisper_received", target_lang, name=sender_name, text=text), severity="chat")
     cleanup_old_events(result["to_id"])
 
     # Обновить обоим

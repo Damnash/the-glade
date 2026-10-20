@@ -6,6 +6,7 @@ from db.connection import get_conn
 from db.map_items import drop_all_non_personal_maps, get_maps_on_ground
 from db.players import get_player, die_and_respawn
 from core.time_utils import now
+from services.event_log import add_event, cleanup_old_events
 
 
 class DeathError(Exception):
@@ -71,6 +72,16 @@ def die_in_maze(user_id: int, lang: str = "ru") -> dict:
     # Очки за смерть
     from services.achievements import award_points
     award_points(user_id, "death", field="deaths")
+    # Лог для главного меню
+    try:
+        from core.i18n import t
+        from db.players import get_player
+        _p = get_player(user_id)
+        if _p:
+            add_event(user_id, "died", t("log.died", _p["language"]), severity="important")
+            cleanup_old_events(user_id)
+    except Exception:
+        pass
 
     # 3. Завершаем вылазку (если была)
     from services.maze_runs import end_run

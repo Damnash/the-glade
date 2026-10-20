@@ -1272,5 +1272,8 @@
   "npc.bring_quest_complete": "🏆 Daily quest complete! Claim it via 📋 Daily Quest.",
   "npc.no_item": "You don't have {item}. Need {need}.",
   "help.feedback": "💬 Feedback: @AdmPenalty — bugs, ideas, complaints.",
-  "move.in_maze": "You are in the Maze. Return to the gate first (/return)."
+  "move.in_maze": "You are in the Maze. Return to the gate first (/return).",
+  "btn.status_busy": "⏳ Busy",
+  "journal.header": "Journal",
+  "journal.empty": "Nothing yet."
 }

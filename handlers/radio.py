@@ -84,7 +84,7 @@ async def cmd_walkie_talk(message: Message, bot: Bot):
 
     freq_str = format_frequency(result["frequency"])
 
-    add_event(user_id, "radio", t("log.radio_sent", lang, freq=freq_str, text=text))
+    add_event(user_id, "radio", t("log.radio_sent", lang, freq=freq_str, text=text), severity="chat")
     cleanup_old_events(user_id)
 
     # Уведомления
@@ -93,7 +93,7 @@ async def cmd_walkie_talk(message: Message, bot: Bot):
         try:
             add_event(listener_id, "radio_received",
                       t("log.radio_received", listener_lang, freq=freq_str,
-                        name=result["sender_name"], text=text))
+                        name=result["sender_name"], text=text), severity="chat")
             cleanup_old_events(listener_id)
             await refresh_main(bot, listener_id)
         except Exception:
@@ -154,7 +154,7 @@ async def cmd_radio(message: Message, bot: Bot):
 
     # Лог
     add_event(user_id, "radio_center",
-              "📻 " + t("radio.center_sent", lang, text=clean_text))
+              "📻 " + t("radio.center_sent", lang, text=clean_text), severity="chat")
     cleanup_old_events(user_id)
 
     # Уведомления всем в центре
@@ -170,7 +170,7 @@ async def cmd_radio(message: Message, bot: Bot):
             txt = t("radio.center_received", target_lang, name=result["sender_name"], text=clean_text)
 
         try:
-            add_event(p["user_id"], "radio_center", "📻 " + txt)
+            add_event(p["user_id"], "radio_center", "📻 " + txt, severity="chat")
             cleanup_old_events(p["user_id"])
             await refresh_main(bot, p["user_id"])
         except Exception:
@@ -401,7 +401,7 @@ async def process_radio_message(message, state, bot):
     freq_str = format_frequency(result["frequency"])
 
     from services.event_log import add_event, cleanup_old_events
-    add_event(user_id, "radio", t("log.radio_sent", lang, freq=freq_str, text=text))
+    add_event(user_id, "radio", t("log.radio_sent", lang, freq=freq_str, text=text), severity="chat")
     cleanup_old_events(user_id)
 
     await refresh_main(bot, user_id)
@@ -411,7 +411,7 @@ async def process_radio_message(message, state, bot):
         try:
             add_event(listener_id, "radio_received",
                       t("log.radio_received", listener_lang,
-                        freq=freq_str, name=result["sender_name"], text=text))
+                        freq=freq_str, name=result["sender_name"], text=text), severity="chat")
             cleanup_old_events(listener_id)
             await refresh_main(bot, listener_id)
         except Exception:

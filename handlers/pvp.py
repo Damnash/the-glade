@@ -7,6 +7,7 @@ from aiogram.filters import Command
 from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 
 from core.i18n import t
+from services.event_log import add_event, cleanup_old_events
 from db.players import get_player, get_lang, find_by_name
 from services.pvp import (
     attempt_steal, attack_player, kill_player,
@@ -93,6 +94,15 @@ async def cmd_attack(message: Message, bot: Bot):
     except Exception:
         pass
 
+    # Лог жертве (важное)
+    try:
+        add_event(result["victim_id"], "attacked_by",
+                  t("log.attacked_by", get_lang(result["victim_id"]), name=player["display_name"] or player["username"]),
+                  severity="important")
+        cleanup_old_events(result["victim_id"])
+    except Exception:
+        pass
+
     # Если умер — убийство
     if result["victim_dead"]:
         attacker = get_player(user_id)
@@ -100,6 +110,17 @@ async def cmd_attack(message: Message, bot: Bot):
         layer = attacker.get("maze_layer", 1)
 
         loot = kill_player(user_id, result["victim_id"], section_id, layer)
+
+        # Логи
+        try:
+            add_event(user_id, "killed",
+                      t("log.killed", lang, name=result["victim_name"]), severity="important")
+            cleanup_old_events(user_id)
+            add_event(result["victim_id"], "died",
+                      t("log.died", get_lang(result["victim_id"])), severity="important")
+            cleanup_old_events(result["victim_id"])
+        except Exception:
+            pass
 
         await message.answer(
             t("pvp.kill_success", lang,

@@ -4,6 +4,7 @@ from aiogram.filters import Command
 from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 
 from core.i18n import t
+from services.event_log import add_event, cleanup_old_events
 from core.bot_helpers import check_session, edit_main, refresh_main, command_reply, make_bot
 from core.maze_current import get_current_season
 from db.players import get_player, get_lang, find_by_name
@@ -178,6 +179,11 @@ async def cmd_draw(message: Message):
 
     if added:
         await message.answer(t("map.drawn_ok", lang, section=section_id))
+        try:
+            add_event(user_id, "map_drawn", t("log.map_drawn", lang), severity="important")
+            cleanup_old_events(user_id)
+        except Exception:
+            pass
     else:
         await message.answer(t("map.already_drawn", lang))
 

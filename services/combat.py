@@ -7,6 +7,7 @@ from content.monsters import (
     ENCOUNTER_CHANCE_DAY, ENCOUNTER_CHANCE_NIGHT, ENCOUNTER_CHANCE_CENTER,
 )
 from core.time_utils import now
+from services.event_log import add_event, cleanup_old_events
 from db.connection import get_conn
 from db.players import get_player, update_player_fields
 
@@ -259,6 +260,16 @@ def give_victory_rewards(user_id: int, monster_type: str) -> dict:
     """Выдать награды за победу."""
     from services.achievements import award_points, check_hunter
     award_points(user_id, "kill_griever", field="griever_kills")
+    # Лог для главного меню
+    try:
+        from core.i18n import t
+        from db.players import get_player
+        _p = get_player(user_id)
+        if _p:
+            add_event(user_id, "kill_griever", t("log.kill_griever", _p["language"]), severity="important")
+            cleanup_old_events(user_id)
+    except Exception:
+        pass
     check_hunter(user_id)
 
     # Daily quest progress

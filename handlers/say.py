@@ -35,7 +35,7 @@ async def cmd_say(message: Message, bot: Bot):
     maze_layer = sender.get("maze_layer", 0)
 
     # Лог
-    add_event(user_id, "say", t("log.say_sent", lang, text=text))
+    add_event(user_id, "say", t("log.say_sent", lang, text=text), severity="chat")
     cleanup_old_events(user_id)
 
     # Уведомления другим
@@ -53,7 +53,7 @@ async def cmd_say(message: Message, bot: Bot):
             # Лог получателю
             target_lang = p.get("language", "ru")
             add_event(p["user_id"], "say_received",
-                      t("log.say_received", target_lang, name=sender_name, text=text))
+                      t("log.say_received", target_lang, name=sender_name, text=text), severity="chat")
             # Обновить его главное
             await refresh_main(bot, p["user_id"])
         except Exception:

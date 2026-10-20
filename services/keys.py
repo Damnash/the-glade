@@ -3,6 +3,7 @@
 import random
 
 from core.maze_current import get_current_season, get_season_day
+from services.event_log import add_event, cleanup_old_events
 from db.keys import (
     KEY_DAY, KEY_DUPLICATE_DAYS,
     has_player_key, get_player_keys, key_spawned, key_exists_unfound,
@@ -205,6 +206,17 @@ def try_find_key(user_id: int, section_id: str, layer: int) -> int | None:
         return None  # Не отдаём дубликат
 
     mark_key_found(key["id"], user_id)
+
+    # Лог для главного меню
+    try:
+        from core.i18n import t
+        from db.players import get_player
+        _p = get_player(user_id)
+        if _p:
+            add_event(user_id, "found_key", t("log.found_key", _p["language"], name=t(f"key.{key_num}.name", _p["language"])), severity="important")
+            cleanup_old_events(user_id)
+    except Exception:
+        pass
 
     # Story tracking
     try:

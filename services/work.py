@@ -4,6 +4,7 @@ from datetime import timedelta
 
 from content.work import WORK_TYPES
 from core.player_state import update_player_state
+from services.event_log import add_event, cleanup_old_events
 from core.time_utils import now, parse_dt, seconds_until
 from db.players import get_player, update_player_fields
 
@@ -99,4 +100,13 @@ def collect_rewards(user_id: int) -> dict | None:
         updates[key] = player.get(key, 0) + amount
 
     update_player_fields(user_id, updates)
+
+    # Лог для главного меню
+    try:
+        from core.i18n import t
+        add_event(user_id, "work_done", t("log.work_done", player["language"]), severity="important")
+        cleanup_old_events(user_id)
+    except Exception:
+        pass
+
     return rewards

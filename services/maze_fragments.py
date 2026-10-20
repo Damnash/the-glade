@@ -3,6 +3,7 @@
 import random
 
 from core.maze_current import get_current_season
+from services.event_log import add_event, cleanup_old_events
 from db.maze_state import (
     can_find_fragment,
     is_discovered,
@@ -51,6 +52,17 @@ def try_find_fragment(user_id: int, section_id: str, layer: int) -> bool:
     try:
         from services.daily_quests import add_progress
         add_progress(user_id, "find_fragments", 1)
+    except Exception:
+        pass
+
+    # Лог для главного меню
+    try:
+        from core.i18n import t
+        from db.players import get_player
+        _p = get_player(user_id)
+        if _p:
+            add_event(user_id, "found_fragment", t("log.found_fragment", _p["language"]), severity="important")
+            cleanup_old_events(user_id)
     except Exception:
         pass
 

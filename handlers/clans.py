@@ -165,14 +165,14 @@ async def cmd_clan_chat(message: Message, bot: Bot):
         await message.answer(t(e.key, lang, **e.kwargs))
         return
 
-    add_event(user_id, "clan", t("log.clan_sent", lang, text=text))
+    add_event(user_id, "clan", t("log.clan_sent", lang, text=text), severity="chat")
     cleanup_old_events(user_id)
 
     for uid in result["recipients"]:
         try:
             target_lang = get_lang(uid)
             add_event(uid, "clan", t("log.clan_received", target_lang,
-                                      name=result["display_name"], text=text))
+                                      name=result["display_name"], text=text), severity="chat")
             cleanup_old_events(uid)
             await refresh_main(bot, uid)
         except Exception:

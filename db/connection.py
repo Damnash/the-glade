@@ -526,6 +526,12 @@ def init_db():
 
     cur.execute("CREATE INDEX IF NOT EXISTS idx_log_user ON player_log(user_id, created_at DESC)")
 
+    # Миграция: severity в player_log (important / chat)
+    cur.execute("PRAGMA table_info(player_log)")
+    cols = [row[1] for row in cur.fetchall()]
+    if "severity" not in cols:
+        cur.execute("ALTER TABLE player_log ADD COLUMN severity TEXT DEFAULT 'important'")
+
     # Migration v0.2 → v1: удалить устаревшую таблицу maze_moves
     cur.execute("DROP TABLE IF EXISTS maze_moves")
 
