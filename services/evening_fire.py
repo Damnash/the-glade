@@ -48,7 +48,7 @@ async def start_evening_fire_async(bot):
     for user_id, lang in players:
         try:
             text = t("evening_fire.text", lang or "en")
-            add_event(user_id, "evening_fire", text, severity="important")
+            add_event(user_id, "evening_fire", text, severity="chat")
             cleanup_old_events(user_id)
             sent += 1
         except Exception:

@@ -84,7 +84,7 @@ def try_find_fragment(user_id: int, section_id: str, layer: int) -> bool:
         from db.players import get_player
         _p = get_player(user_id)
         if _p:
-            add_event(user_id, "found_fragment", t("log.found_fragment", _p["language"]), severity="important")
+            add_event(user_id, "found_fragment", t("log.found_fragment", _p["language"]), severity="chat")
             cleanup_old_events(user_id)
     except Exception:
         pass

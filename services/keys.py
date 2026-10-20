@@ -213,7 +213,7 @@ def try_find_key(user_id: int, section_id: str, layer: int) -> int | None:
         from db.players import get_player
         _p = get_player(user_id)
         if _p:
-            add_event(user_id, "found_key", t("log.found_key", _p["language"], name=t(f"key.{key_num}.name", _p["language"])), severity="important")
+            add_event(user_id, "found_key", t("log.found_key", _p["language"], name=t(f"key.{key_num}.name", _p["language"])), severity="chat")
             cleanup_old_events(user_id)
     except Exception:
         pass

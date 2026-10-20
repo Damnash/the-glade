@@ -59,7 +59,7 @@ async def broadcast_world_event(bot, event_key: str):
     for user_id, lang in players:
         try:
             text = t(f"world_events.{event_key}", lang or "en")
-            add_event(user_id, "world_event", text, severity="important")
+            add_event(user_id, "world_event", text, severity="chat")
             cleanup_old_events(user_id)
             sent += 1
         except Exception:

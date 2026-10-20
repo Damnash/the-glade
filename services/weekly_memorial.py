@@ -66,7 +66,7 @@ async def broadcast_memorial(bot):
                 text = t("memorial.text", lang or "en", n=len(deaths), names=names_str)
             else:
                 text = t("memorial.text_empty", lang or "en")
-            add_event(user_id, "memorial", text, severity="important")
+            add_event(user_id, "memorial", text, severity="chat")
             cleanup_old_events(user_id)
             sent += 1
         except Exception as e:

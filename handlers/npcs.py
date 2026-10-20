@@ -114,12 +114,13 @@ async def on_talk_to_npc(callback: CallbackQuery):
                 if _secret_text and _secret_text != _secret_key:
                     text += "\n\n🌙 <b>Секрет:</b> <i>" + _secret_text + "</i>"
 
-                    # В журнал (important) + автодневник
+                    # В журнал: 10-й секрет — important, остальные — chat
                     try:
                         from services.event_log import add_event, cleanup_old_events
+                        _sev = "important" if (_secret_idx + 1) == 10 else "chat"
                         add_event(user_id, "teresa_secret",
                                   f"🌙 Секрет Терезы ({_secret_idx + 1}/10): {_secret_text}",
-                                  severity="important")
+                                  severity=_sev)
                         cleanup_old_events(user_id)
                     except Exception:
                         pass

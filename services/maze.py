@@ -281,7 +281,7 @@ def on_artifact_found(user_id: int, artifact_text: str, lang: str):
     """Записать артефакт в журнал (important) и автодневник."""
     try:
         from services.event_log import add_event, cleanup_old_events
-        add_event(user_id, "artifact", artifact_text, severity="important")
+        add_event(user_id, "artifact", artifact_text, severity="chat")
         cleanup_old_events(user_id)
     except Exception:
         pass

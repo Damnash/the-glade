@@ -98,7 +98,7 @@ async def change_weather(bot):
     for user_id, lang in players:
         try:
             text = t(f"weather.{new}.change", lang or "en")
-            add_event(user_id, "weather_change", text, severity="important")
+            add_event(user_id, "weather_change", text, severity="chat")
             cleanup_old_events(user_id)
             sent += 1
         except Exception:

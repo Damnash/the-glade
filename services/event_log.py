@@ -67,3 +67,32 @@ def cleanup_old_events(user_id: int, keep: int = 30):
     """, (user_id, user_id, keep))
     conn.commit()
     conn.close()
+
+# ============ Обёртки ============
+
+IMPORTANT_EVENT_TYPES = (
+    # прогресс
+    "new_title",
+    "fragment_goal_done",
+    "starter_done",
+    "daily_quest_done",
+    # дебаффы/баффы
+    "buff_applied",
+    # смерть / PvP
+    "died",
+    "attacked_by",
+    "killed",
+    # бой
+    "kill_griever",
+    # сюжет (10-й секрет Терезы — важное)
+    "teresa_secret",
+)
+
+
+def get_recent_important(user_id: int, limit: int = 3) -> list[dict]:
+    """Только важные события (для главного меню)."""
+    return get_recent_events(
+        user_id, limit=limit, severity="important",
+        event_types=list(IMPORTANT_EVENT_TYPES),
+    )
+

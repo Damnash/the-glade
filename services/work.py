@@ -120,7 +120,7 @@ def collect_rewards(user_id: int) -> dict | None:
         add_event(
             user_id, "work_done",
             t("log.work_done", player["language"], rewards=_fmt(rewards, player["language"])),
-            severity="important",
+            severity="chat",
         )
         cleanup_old_events(user_id)
 
