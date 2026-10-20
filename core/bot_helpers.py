@@ -99,7 +99,7 @@ async def edit_main(bot: Bot, user_id: int, text: str, kb=None):
             await bot.delete_message(chat_id=user_id, message_id=msg_id)
             logging.info(f"[edit_main] deleted old msg={msg_id}")
         except Exception as e:
-            logging.debug(f"[edit_main] delete failed (ok): {e}")
+            logging.warning(f"[edit_main] delete FAILED msg={msg_id}: {type(e).__name__}: {e}")
 
     # Создаём новое
     try:
