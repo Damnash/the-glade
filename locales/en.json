@@ -1465,7 +1465,12 @@
   "push.new_title": "🏅 You've earned a new title. Open /stats to see it.",
   "intro.step_choose": "🌿 <b>Newt:</b>\n\n<i>\"Get up. I'm Newt. Welcome to the Glade.\"</i>\n\nHe looks at you intently.\n\n<i>\"Listen. Everyone here is the same — no one remembers how they got here. But everyone remembers why they want out. Do you?\"</i>\n\nChoose your motivation.",
   "intro.step_choose_prof": "🧑 <b>Newt:</b>\n\n<i>\"Fine. Now the main thing. You will go into the Maze. Sooner or later. Everyone goes. What could you do before you forgot everything?\"</i>",
-  "starter.banner": "📋 <b>First quest:</b> Work at the farms (5 min).\\n<i>Reward: 🪙 +10, 🍞 +2.</i>",
+  "starter.banner": "📋 <b>First quest:</b> Work at the farms (5 min).\n<i>Reward: 🪙 +10, 🍞 +2.</i>",
   "starter.done": "📋 First quest complete: 🪙 +{tokens}, 🍞 +{food}",
-  "starter.complete_popup": "📋 First quest complete! 🪙 +{tokens}, 🍞 +{food}"
+  "starter.complete_popup": "📋 First quest complete! 🪙 +{tokens}, 🍞 +{food}",
+  "goal.fragments.banner": "🗺️ Fragments: {bar} {have}/{need} → personal map of Layer 1",
+  "goal.fragments.done": "🗺️ Goal complete: {n} fragments. Personal map of Layer 1 unlocked!",
+  "title.cartographer_5.name": "Pathfinder",
+  "title.cartographer_5.desc": "Collected 5 map fragments",
+  "diary.auto.fragment_goal_done": "Collected {n} map fragments. Personal map of Layer 1 unlocked."
 }
