@@ -127,16 +127,31 @@ def die_in_maze(user_id: int, lang: str = "ru") -> dict:
     # 4. Респавн
     die_and_respawn(user_id)
 
-    # 5. Записать в memorial (для поминания)
+    # 5. Записать в memorial (для поминания) — с именем секции
     try:
         from services.weekly_memorial import record_death
+        from core.maze_current import get_current_season
+        from db.maze_map import get_section
+        from core.i18n import t
+
         _player = get_player(user_id)
         if _player:
             _name = _player["display_name"] or _player["username"] or "?"
-            record_death(
-                user_id, _name,
-                f"Умер в секции {section_id} (слой {layer})",
-            )
+            _lang = _player["language"]
+
+            # Имя секции (если есть)
+            _section_display = section_id
+            try:
+                _season = get_current_season()
+                _sec = get_section(_season, layer, section_id)
+                if _sec and _sec.get("name"):
+                    _section_display = _sec["name"]
+            except Exception:
+                pass
+
+            _message = t("memorial.death_line", _lang,
+                         section=_section_display, layer=layer)
+            record_death(user_id, _name, _message)
     except Exception as e:
         import logging
         logging.warning(f"[DEATH] memorial failed: {e}")

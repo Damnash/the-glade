@@ -1438,5 +1438,6 @@
   "buff.blessed.line": "🌟 Blessed ({time})",
   "work.night": "🌙 No work at night. Only guards and watchtower. Wait for dawn.",
   "memorial.text": "🕯️ <b>In Memory of the Fallen</b>\n\nThis week, the Maze took {n} runners. Their names remain — for now. The Glade remembers.\n\n{names}\n\n<i>Tomorrow, their names will fade from the walls. But tonight — we remember. We remember their faces. Their voices. Their last words. We remember why we are still here.</i>\n\n<i>Rest, runners. The Maze is quieter now.</i>",
-  "memorial.text_empty": "🕯️ <b>In Memory of the Fallen</b>\n\nThis week, no one died in the Maze. The Glade is quiet. Too quiet.\n\n<i>But the Maze is patient. It always is.</i>"
+  "memorial.text_empty": "🕯️ <b>In Memory of the Fallen</b>\n\nThis week, no one died in the Maze. The Glade is quiet. Too quiet.\n\n<i>But the Maze is patient. It always is.</i>",
+  "memorial.death_line": "Died in \"{section}\" (layer {layer})"
 }
