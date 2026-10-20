@@ -91,14 +91,31 @@ NPC_DIALOG_BY_STATE = {
     "minho": {
         "first_visit": "npc.minho.dialog_first",
     },
+    "teresa": {
+        "first_visit": "npc.teresa.dialog_first",
+        "learned_truth": "npc.teresa.dialog_truth",
+    },
     "newt": {
         "first_visit": "npc.newt.dialog_first",
         "low_hp": "npc.newt.dialog_hurt",
         "learned_truth": "npc.newt.dialog_truth",
     },
-    "teresa": {
-        "first_visit": "npc.teresa.dialog_first",
-        "learned_truth": "npc.teresa.dialog_truth",
+    "chuck": {
+        "first_visit": "npc.chuck.dialog_first",
+        "learned_truth": "npc.chuck.dialog_truth",
+    },
+    "alby": {
+        "first_visit": "npc.alby.dialog_first",
+        "low_hp": "npc.alby.dialog_hurt",
+        "learned_truth": "npc.alby.dialog_truth",
+    },
+    "winston": {
+        "first_visit": "npc.winston.dialog_first",
+        "low_food": "npc.winston.dialog_hungry",
+    },
+    "gally": {
+        "first_visit": "npc.gally.dialog_first",
+        "low_hp": "npc.gally.dialog_hurt",
     },
 }
 

@@ -1443,5 +1443,14 @@
   "npc.newt.dialog_first": "\"You came. I'm glad. Many don't make it this far. Sit — we need to talk. About the Maze. About why we're here. About what comes next.\"",
   "npc.newt.dialog_hurt": "\"You're bleeding. Badly. Sit. I'll do what I can. But you need to rest — not just your body. Your mind too.\"",
   "npc.newt.dialog_truth": "\"You know the truth now. About WICKED. About the other Glade. It changes things, doesn't it? But it doesn't change why we fight. We fight to get out. Together. Or not at all.\"",
-  "npc.newt.talk_ok": "💬 Newt nods."
+  "npc.newt.talk_ok": "💬 Newt nods.",
+  "npc.chuck.dialog_first": "\"Hi! You're new, right? I was new too. I was scared. But it gets better. Really. Want a hint? Or just to talk?\"",
+  "npc.chuck.dialog_truth": "\"You know about WICKED now? And the other Glade? I... I don't know what to say. I'm just a kid. But I'm glad you're here. We need people who know things.\"",
+  "npc.alby.dialog_first": "\"You came. Good. Sit. We have much to discuss. About the Glade. About the Maze. About what we do next. Every choice matters here.\"",
+  "npc.alby.dialog_hurt": "\"You're hurt. Sit down. Jeff will look at you. But first — tell me what happened. Every detail matters. The Council needs to know.\"",
+  "npc.alby.dialog_truth": "\"You know the truth. About WICKED. About the other Glade. I've known for a long time. I hoped you wouldn't have to. But now — we need a plan. Together.\"",
+  "npc.winston.dialog_first": "\"Here to work? Good. Or just to talk? The earth doesn't care. It just is. Sit if you want. The garden is quiet today.\"",
+  "npc.winston.dialog_hungry": "\"You look hungry. Take this. Don't argue. The earth provides — we just have to share. That's the only way we survive.\"",
+  "npc.gally.dialog_first": "\"Another newcomer. Great. Just what we need. Don't expect me to be nice. I've seen too many newcomers die. You'll probably die too. Prove me wrong.\"",
+  "npc.gally.dialog_hurt": "\"You're bleeding. Good. Maybe you'll learn. Pain is the only teacher here. The Maze doesn't care about your feelings. Neither do I.\""
 }
