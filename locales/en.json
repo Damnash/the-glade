@@ -1477,5 +1477,8 @@
   "npc.jeff.action.hint": "💡 Hint",
   "npc.minho.action.hint": "💡 Hint",
   "npc.winston.action.hint": "💡 Hint",
-  "npc.alby.action.hint": "💡 Hint"
+  "npc.alby.action.hint": "💡 Hint",
+  "npc.no_quest": "📋 You have no active daily quest. Check /daily_quest.",
+  "npc.quest_full": "📋 Quest complete — claim the reward first (📋 Daily Quest).",
+  "npc.wrong_quest": "📋 This NPC doesn't need that for your current quest."
 }
