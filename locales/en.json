@@ -429,7 +429,8 @@
     "clan"
   ],
   "commands.journal": [
-    "journal"
+    "journal",
+    "journal_events"
   ],
   "say.no_args": "Say what? Example: <code>/say hi</code>",
   "say.too_long": "Too long. Max 300 characters.",
@@ -1332,6 +1333,9 @@
   "diary.added": "📖 Entry added to your diary.",
   "diary.too_long": "Too long (max 500 chars).",
   "commands.diary": [
-    "diary"
-  ]
+    "diary",
+    "my_diary"
+  ],
+  "diary.btn": "📖 Diary",
+  "keys.btn": "🔑 Keys"
 }

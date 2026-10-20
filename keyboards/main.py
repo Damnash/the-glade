@@ -68,6 +68,10 @@ def main_keyboard(lang: str, context: dict, session: str = "") -> InlineKeyboard
     # 4) Социалка / прогресс
     rows.append([
         InlineKeyboardButton(text=t("journal.btn", lang), callback_data=f"journal:show:menu{s}"),
+        InlineKeyboardButton(text=t("diary.btn", lang),   callback_data=f"diary:show{s}"),
+    ])
+    rows.append([
+        InlineKeyboardButton(text=t("keys.btn", lang),    callback_data=f"keys:show{s}"),
         InlineKeyboardButton(text="⚔️ PvP",              callback_data=f"pvp:flag{s}"),
     ])
 
