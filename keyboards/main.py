@@ -76,6 +76,7 @@ def main_keyboard(lang: str, context: dict, session: str = "") -> InlineKeyboard
 
     rows.append([
         InlineKeyboardButton(text=t("nav.help", lang), callback_data=f"help:main{s}"),
+        InlineKeyboardButton(text=t("journal.btn", lang), callback_data=f"journal:show{s}"),
     ])
 
     return InlineKeyboardMarkup(inline_keyboard=rows)

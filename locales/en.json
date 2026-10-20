@@ -1278,5 +1278,6 @@
   "journal.empty": "Nothing yet.",
   "noop.sleeping": "😴 You are sleeping. Send /wake to get up.",
   "noop.working": "⏳ You are working. {time} left.",
-  "noop.work_done": "✅ Work is done. Collect the reward via ⚒️ What to do → 🛠️ Work."
+  "noop.work_done": "✅ Work is done. Collect the reward via ⚒️ What to do → 🛠️ Work.",
+  "journal.btn": "📖 Journal"
 }

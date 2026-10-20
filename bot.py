@@ -286,6 +286,7 @@ async def main():
     dp.callback_query.register(clans_h.on_clan_leave, F.data.startswith("clan:leave"))
     dp.callback_query.register(clans_h.on_clan_leave_confirm, F.data.startswith("clan:leave_confirm"))
     dp.callback_query.register(help_h.on_help_main, F.data.startswith("help:main"))
+    dp.callback_query.register(journal.on_journal_show, F.data.startswith("journal:show"))
     dp.callback_query.register(help_h.on_help_category, F.data.startswith("help:cat:"))
     dp.callback_query.register(npcs_h.on_talk_to_npc, F.data.startswith("npc:talk:"))
     dp.callback_query.register(npcs_h.on_npc_action, F.data.startswith("npc:"))
