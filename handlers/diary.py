@@ -55,7 +55,6 @@ async def cmd_diary(message: Message):
 
     lines = [f"📖 <b>{t('diary.header', lang)}</b>\n"]
     for text, created_at in reversed(rows):
-        # short date
         d = str(created_at)[:16]
         lines.append(f"<i>{d}</i>\n{text}\n")
     await message.answer("\n".join(lines))
