@@ -410,6 +410,11 @@ async def on_use(callback):
         await callback.answer(f"🍞 HP: {result['hp']}/100", show_alert=True)
     elif result["action"] == "drink":
         await callback.answer(f"💧 Water: {result['water']}", show_alert=True)
+    elif result["action"] == "heal":
+        await callback.answer(
+            t("medic.healed", lang, healed=result["healed"], hp=result["hp"]),
+            show_alert=True,
+        )
 
     bot = make_bot()
     try:
