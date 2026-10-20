@@ -111,6 +111,25 @@ async def world_events_task(bot):
             logging.error(f"world_events error: {e}")
 
 
+async def weather_task(bot):
+    """Раз в час: смена погоды + broadcast."""
+    import asyncio
+    import logging
+    from services.weather import change_weather
+
+    await asyncio.sleep(60)  # дать боту стартовать
+
+    while True:
+        try:
+            await asyncio.sleep(3600)  # раз в час
+            new = await change_weather(bot)
+            logging.info(f"[WEATHER] changed to {new}")
+        except asyncio.CancelledError:
+            raise
+        except Exception as e:
+            logging.error(f"weather_task error: {e}")
+
+
 async def cleanup_task():
     """Фоновая задача: очистка и проверка сезона."""
     import asyncio
@@ -325,6 +344,7 @@ async def main():
     dp.callback_query.register(maze_cb.on_diary_read, F.data.startswith("maze:diary:"))
 
     asyncio.create_task(cleanup_task())
+    asyncio.create_task(weather_task(bot))
     asyncio.create_task(world_events_task(bot))
     asyncio.create_task(maze_cleanup_task())
 

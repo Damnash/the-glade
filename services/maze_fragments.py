@@ -31,6 +31,14 @@ def try_find_fragment(user_id: int, section_id: str, layer: int) -> bool:
     bonus = get_player_bonus(player)
     chance = FRAGMENT_CHANCE + bonus["fragment_chance"]
 
+    # Погода влияет на шанс фрагмента
+    try:
+        from services.weather import get_weather_modifiers
+        _, frag_mult = get_weather_modifiers()
+        chance = min(1.0, chance * frag_mult)
+    except Exception:
+        pass
+
     if random.random() > chance:
         return False
 

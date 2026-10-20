@@ -49,6 +49,16 @@ def render_location_text(lang: str, loc_key: str, viewer_id: int) -> str:
     except Exception:
         pass
 
+    # Погода
+    try:
+        from services.weather import get_current_weather
+        weather_key = get_current_weather()
+        weather_line = t(f"weather.{weather_key}.line", lang)
+        if weather_line and weather_line != f"weather.{weather_key}.line":
+            parts.append(f"<i>{weather_line}</i>")
+    except Exception:
+        pass
+
     parts.append(t("look.players", lang, players=names))
 
     npcs = get_npcs_in_location(loc_key)

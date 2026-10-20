@@ -29,6 +29,7 @@ def roll_encounter(ring: int, is_center: bool = False) -> str | None:
     """
     Проверить, встретится ли Гривер.
     Возвращает monster_type или None.
+    Погода умножает шанс (туман/гроза — чаще).
     """
     if is_center or ring == 0:
         chance = ENCOUNTER_CHANCE_CENTER
@@ -36,6 +37,14 @@ def roll_encounter(ring: int, is_center: bool = False) -> str | None:
         chance = ENCOUNTER_CHANCE_NIGHT
     else:
         chance = ENCOUNTER_CHANCE_DAY
+
+    # Погода
+    try:
+        from services.weather import get_weather_modifiers
+        mult, _ = get_weather_modifiers()
+        chance = min(1.0, chance * mult)
+    except Exception:
+        pass
 
     if random.random() > chance:
         return None
