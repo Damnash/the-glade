@@ -32,11 +32,13 @@ def render_location_text(lang: str, loc_key: str, viewer_id: int) -> str:
         desc,
     ]
 
-    # Звуковое описание (атмосфера)
+    # Звуковое описание (атмосфера) — по фазе дня
     try:
         import random
-        from content.loc_sounds import LOC_SOUNDS
-        sounds = LOC_SOUNDS.get(loc_key)
+        from content.loc_sounds import LOC_SOUNDS, LOC_SOUNDS_NIGHT
+        from core.daycycle import is_night
+        pool = LOC_SOUNDS_NIGHT if is_night() else LOC_SOUNDS
+        sounds = pool.get(loc_key)
         if sounds:
             parts.append(f"<i>{random.choice(sounds)}</i>")
     except Exception:
@@ -55,7 +57,8 @@ def render_location_text(lang: str, loc_key: str, viewer_id: int) -> str:
     parts.append(t("look.players", lang, players=names))
 
     # NPC в локации
-    npcs = get_npcs_in_location(loc_key)
+    from core.daycycle import is_night
+    npcs = get_npcs_in_location(loc_key, is_night=is_night())
     if npcs:
         npc_names = ", ".join(t(n["name_key"], lang) for n in npcs)
         parts.append(t("look.npcs", lang, npcs=npc_names))

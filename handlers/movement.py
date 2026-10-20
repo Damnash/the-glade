@@ -27,11 +27,13 @@ def render_location(lang: str, loc_key: str, viewer_id: int) -> str:
         desc,
     ]
 
-    # Звуковое описание (атмосфера)
+    # Звуковое описание (атмосфера) — по фазе дня
     try:
         import random
-        from content.loc_sounds import LOC_SOUNDS
-        sounds = LOC_SOUNDS.get(loc_key)
+        from content.loc_sounds import LOC_SOUNDS, LOC_SOUNDS_NIGHT
+        from core.daycycle import is_night
+        pool = LOC_SOUNDS_NIGHT if is_night() else LOC_SOUNDS
+        sounds = pool.get(loc_key)
         if sounds:
             parts.append(f"<i>{random.choice(sounds)}</i>")
     except Exception:

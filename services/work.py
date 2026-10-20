@@ -16,8 +16,13 @@ class WorkError(Exception):
 
 
 def available_works(player: dict) -> list[str]:
+    """Доступные работы в локации. Ночью — только стража и смотровая."""
+    from core.daycycle import is_night
     loc = player["location"]
-    return [k for k, v in WORK_TYPES.items() if loc in v["locations"]]
+    works = [k for k, v in WORK_TYPES.items() if loc in v["locations"]]
+    if is_night():
+        works = [w for w in works if w in ("guard", "watch")]
+    return works
 
 
 def start_work(user_id: int, work_type: str) -> dict:
@@ -39,6 +44,11 @@ def start_work(user_id: int, work_type: str) -> dict:
     spec = WORK_TYPES[work_type]
     if player["location"] not in spec["locations"]:
         raise WorkError("work.wrong_place")
+
+    # Ночью — только стража и смотровая
+    from core.daycycle import is_night
+    if is_night() and work_type not in ("guard", "watch"):
+        raise WorkError("work.night")
 
     if player["energy"] < spec["needs_energy"]:
         raise WorkError("work.tired", need=spec["needs_energy"], have=player["energy"])

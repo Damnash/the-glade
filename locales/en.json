@@ -1435,5 +1435,6 @@
   "buff.cursed.applied": "🌑 Cursed! ({hours}h) Griever attacks +10%, fragment chance −10%, flee −10%, −2 HP per move.",
   "buff.cursed.line": "🌑 Cursed ({time})",
   "buff.blessed.applied": "🌟 Blessed! ({hours}h) Griever attacks −10%, fragment chance +10%, flee +10%, +1 water when drinking.",
-  "buff.blessed.line": "🌟 Blessed ({time})"
+  "buff.blessed.line": "🌟 Blessed ({time})",
+  "work.night": "🌙 No work at night. Only guards and watchtower. Wait for dawn."
 }

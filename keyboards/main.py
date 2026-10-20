@@ -17,7 +17,8 @@ def main_keyboard(lang: str, context: dict, session: str = "") -> InlineKeyboard
     rows = []
 
     # 1) NPC (если есть) — сверху, по 2 в ряд
-    npcs = get_npcs_in_location(location)
+    from core.daycycle import is_night
+    npcs = get_npcs_in_location(location, is_night=is_night())
     if npcs:
         npc_buttons = []
         for npc in npcs:

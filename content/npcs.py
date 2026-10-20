@@ -74,13 +74,6 @@ NPCS = {
 }
 
 
-def get_npcs_in_location(location: str) -> list[dict]:
-    """Все NPC в локации."""
-    return [
-        {"key": k, **v}
-        for k, v in NPCS.items()
-        if v["location"] == location
-    ]
 
 # ============ Варианты диалога по состоянию игрока ============
 #
@@ -131,4 +124,30 @@ def get_npc_dialog_key(npc_key: str, player: dict, is_first_visit: bool = False)
         return variants["first_visit"]
 
     return npc["dialog_key"]
+
+# ============ Ночные локации NPC ============
+# Ночью все спят (huts), кроме стражи и Терезы.
+
+NPC_NIGHT_LOCATIONS = {
+    "frypan": "huts",
+    "clint": "huts",
+    "jeff": "huts",
+    "chuck": "huts",
+    "newt": "huts",
+    "gally": "huts",
+    "winston": "huts",
+    "minho": "watchtower",        # стража
+    "alby": "council",            # совет
+    "teresa": "abandoned_hut",    # не спит
+}
+
+
+def get_npcs_in_location(location: str, is_night: bool = False) -> list[dict]:
+    """Все NPC в локации (учитывая ночные перемещения)."""
+    result = []
+    for k, v in NPCS.items():
+        eff_loc = NPC_NIGHT_LOCATIONS.get(k, v["location"]) if is_night else v["location"]
+        if eff_loc == location:
+            result.append({"key": k, **v})
+    return result
 
