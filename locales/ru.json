@@ -1367,5 +1367,10 @@
   "diary.auto.found_fragment": "Нашёл фрагмент карты в секции {section}.",
   "diary.auto.found_key": "Нашёл {name}.",
   "diary.auto.died": "Умер в секции {section}. Лабиринт забрал всё.",
-  "diary.auto.work_done": "Закончил {work}: {rewards}."
+  "diary.auto.work_done": "Закончил {work}: {rewards}.",
+  "maze.dropped_diaries": "Найдены дневники!",
+  "maze.dropped_diaries_text": "📖 Здесь {n} выпавших дневников. Прочитай:",
+  "maze.diary_of": "Дневник {name}",
+  "maze.diary_not_found": "Дневник не найден.",
+  "maze.diary_found": "📖 Дневник прочитан."
 }

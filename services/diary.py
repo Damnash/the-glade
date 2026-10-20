@@ -53,3 +53,34 @@ def get_player_autodiary_text(user_id: int) -> str:
         conn.close()
     return "\n".join(r[0] for r in rows)
 
+def get_dropped_diaries(section_id: str, layer: int) -> list[dict]:
+    """Дневники, выпавшие в секции и ещё не найденные."""
+    conn = get_conn()
+    try:
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT id, original_user_id, display_name, text, dropped_at
+            FROM dropped_diaries
+            WHERE section_id = ? AND layer = ? AND found_by IS NULL
+            ORDER BY dropped_at DESC
+        """, (section_id, layer))
+        rows = cur.fetchall()
+    finally:
+        conn.close()
+    return [dict(r) for r in rows]
+
+
+def mark_diary_found(diary_id: int, user_id: int):
+    """Отметить, что игрок прочитал дневник."""
+    from core.time_utils import now
+    conn = get_conn()
+    try:
+        cur = conn.cursor()
+        cur.execute("""
+            UPDATE dropped_diaries SET found_by = ?, found_at = ?
+            WHERE id = ?
+        """, (user_id, now(), diary_id))
+        conn.commit()
+    finally:
+        conn.close()
+

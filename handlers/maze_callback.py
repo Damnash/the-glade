@@ -187,6 +187,40 @@ async def on_look(callback: CallbackQuery):
         await _show_section(callback, user_id, layer, section_id)
         return
 
+    # 1.5 Выпавшие дневники — если есть, показать кнопку «Прочитать»
+    try:
+        from services.diary import get_dropped_diaries, mark_diary_found
+        from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+
+        dropped = get_dropped_diaries(section_id, layer)
+        if dropped:
+            session = player.get("current_session", "")
+            s = f":{session}" if session else ""
+            rows = []
+            for d in dropped:
+                rows.append([InlineKeyboardButton(
+                    text=f"📖 Дневник {d['display_name']}",
+                    callback_data=f"maze:diary:{d['id']}{s}",
+                )])
+            rows.append([InlineKeyboardButton(
+                text=t("maze.btn_continue", lang) if t("maze.btn_continue", lang) != "maze.btn_continue" else "➡️ Продолжить",
+                callback_data=f"maze:back{s}",
+            )])
+            kb = InlineKeyboardMarkup(inline_keyboard=rows)
+            await callback.answer(t("maze.dropped_diaries", lang), show_alert=False)
+            from core.bot_helpers import edit_main, make_bot
+            bot = make_bot()
+            try:
+                await edit_main(bot, user_id,
+                                t("maze.dropped_diaries_text", lang, n=len(dropped)),
+                                kb)
+            finally:
+                await bot.session.close()
+            return
+    except Exception as e:
+        import logging
+        logging.warning(f"[on_look] dropped_diaries error: {e}")
+
     # 2. Обычное событие
     event = roll_event(section_id, user_id, lang)
 
@@ -343,3 +377,72 @@ async def on_heal(callback):
         await refresh_main(bot, user_id)
     finally:
         await bot.session.close()
+
+async def on_diary_read(callback):
+    """maze:diary:<id>:session — прочитать выпавший дневник."""
+    from core.bot_helpers import check_session, edit_main, make_bot
+    from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+
+    user_id = callback.from_user.id
+    player = get_player(user_id)
+    if not player:
+        return
+    lang = player["language"]
+
+    if not check_session(user_id, callback.data):
+        await callback.answer(t("log.stale", lang), show_alert=True)
+        return
+
+    # maze:diary:<id>:session
+    parts = callback.data.split(":")
+    if len(parts) < 3:
+        await callback.answer("Invalid.", show_alert=True)
+        return
+    try:
+        diary_id = int(parts[2])
+    except ValueError:
+        await callback.answer("Invalid id.", show_alert=True)
+        return
+
+    from db.connection import get_conn
+    conn = get_conn()
+    try:
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM dropped_diaries WHERE id = ?", (diary_id,))
+        row = cur.fetchone()
+    finally:
+        conn.close()
+
+    if not row:
+        await callback.answer(t("maze.diary_not_found", lang), show_alert=True)
+        return
+
+    d = dict(row)
+    text_lines = [
+        f"📖 <b>{t('maze.diary_of', lang, name=d['display_name'])}</b>",
+        f"<i>{str(d['dropped_at'])[:16]}</i>",
+        "",
+        d["text"],
+    ]
+    text = "\n".join(text_lines)
+
+    # Пометить найденным
+    try:
+        from services.diary import mark_diary_found
+        mark_diary_found(diary_id, user_id)
+    except Exception:
+        pass
+
+    session = player.get("current_session", "")
+    s = f":{session}" if session else ""
+    kb = InlineKeyboardMarkup(inline_keyboard=[[
+        InlineKeyboardButton(text=t("maze.btn_continue", lang), callback_data=f"maze:back{s}"),
+    ]])
+
+    bot = make_bot()
+    try:
+        await edit_main(bot, user_id, text, kb)
+    finally:
+        await bot.session.close()
+    await callback.answer(t("maze.diary_found", lang))
+

@@ -319,6 +319,7 @@ async def main():
     dp.callback_query.register(maze_cb.on_compass,  F.data.startswith("maze:compass:"))
     dp.callback_query.register(maze_cb.on_heal,     F.data.startswith("maze:heal:"))
     dp.callback_query.register(maze_cb.on_look,     F.data.startswith("maze:look:"))
+    dp.callback_query.register(maze_cb.on_diary_read, F.data.startswith("maze:diary:"))
 
     asyncio.create_task(cleanup_task())
     asyncio.create_task(world_events_task(bot))

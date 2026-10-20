@@ -1345,5 +1345,10 @@
   "diary.auto.found_fragment": "Found a map fragment in section {section}.",
   "diary.auto.found_key": "Found {name}.",
   "diary.auto.died": "Died in section {section}. The Maze took everything.",
-  "diary.auto.work_done": "Finished {work}: {rewards}."
+  "diary.auto.work_done": "Finished {work}: {rewards}.",
+  "maze.dropped_diaries": "Dropped diaries found!",
+  "maze.dropped_diaries_text": "📖 There are {n} dropped diaries here. Read them:",
+  "maze.diary_of": "Diary of {name}",
+  "maze.diary_not_found": "Diary not found.",
+  "maze.diary_found": "📖 Diary read."
 }
