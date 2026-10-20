@@ -1318,5 +1318,13 @@
   "npc.jeff.dialog_hurt": "\"You're bleeding. Sit down. Bear it — it will hurt.\"",
   "npc.minho.dialog_first": "\"Run? Good. I'll show you where we've been. Listen — I won't repeat.\"",
   "npc.teresa.dialog_first": "\"You came. I've been waiting. I know why the Maze was built. Want to find out? You'll have to work.\"",
-  "npc.teresa.dialog_truth": "\"You know the truth now. And the truth is heavy. But there's more. Are you ready?\""
+  "npc.teresa.dialog_truth": "\"You know the truth now. And the truth is heavy. But there's more. Are you ready?\"",
+  "silence.echo": "🤫 Your footsteps echo — once. Then silence.",
+  "silence.dust": "🌫️ Dust in the air. It does not move.",
+  "silence.footsteps": "👣 You hear footsteps. Not yours. You stop. They stop.",
+  "silence.hum": "🌀 The hum of the Maze. Steady. Like breathing.",
+  "silence.wall": "🧱 You press your palm against the wall. It is warm.",
+  "silence.cold": "🥶 Cold air. Your breath turns to mist.",
+  "silence.drip": "💧 Drip. Pause. Drip.",
+  "silence.scratch": "👂 A scratch on the wall. From the other side."
 }

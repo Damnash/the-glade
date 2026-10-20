@@ -161,9 +161,13 @@ def roll_event(section_id: str, user_id: int, lang: str) -> str | None:
 
     roll = _r.random()
 
-    # 40% — ничего
+    # 40% — «ничего», но с атмосферным текстом «тишины»
     if roll < 0.40:
-        return None
+        from content.silence_texts import SILENCE_TEXTS
+        from core.i18n import t
+        import random as _r
+        key = _r.choice(SILENCE_TEXTS)
+        return t(key, lang)
 
     # Выбираем событие по весам
     roll2 = _r.random()
