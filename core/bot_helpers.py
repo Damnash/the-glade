@@ -1,6 +1,15 @@
 # core/bot_helpers.py
 
 import logging
+import asyncio
+
+_edit_locks: dict[int, asyncio.Lock] = {}
+
+
+def _get_lock(user_id: int) -> asyncio.Lock:
+    if user_id not in _edit_locks:
+        _edit_locks[user_id] = asyncio.Lock()
+    return _edit_locks[user_id]
 import uuid
 
 from aiogram import Bot
@@ -89,7 +98,13 @@ async def edit_main(bot: Bot, user_id: int, text: str, kb=None):
     """
     Всегда удаляет старое сообщение и создаёт новое внизу.
     Гарантирует, что в чате одно главное сообщение.
+    Защищён локом от race condition (два параллельных edit_main).
     """
+    async with _get_lock(user_id):
+        return await _edit_main_impl(bot, user_id, text, kb)
+
+
+async def _edit_main_impl(bot: Bot, user_id: int, text: str, kb=None):
     player = get_player(user_id)
     msg_id = player.get("main_message_id") if player else None
 
