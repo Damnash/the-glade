@@ -91,6 +91,11 @@ NPC_DIALOG_BY_STATE = {
     "minho": {
         "first_visit": "npc.minho.dialog_first",
     },
+    "newt": {
+        "first_visit": "npc.newt.dialog_first",
+        "low_hp": "npc.newt.dialog_hurt",
+        "learned_truth": "npc.newt.dialog_truth",
+    },
     "teresa": {
         "first_visit": "npc.teresa.dialog_first",
         "learned_truth": "npc.teresa.dialog_truth",

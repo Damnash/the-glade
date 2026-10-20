@@ -1439,5 +1439,9 @@
   "work.night": "🌙 No work at night. Only guards and watchtower. Wait for dawn.",
   "memorial.text": "🕯️ <b>In Memory of the Fallen</b>\n\nThis week, the Maze took {n} runners. Their names remain — for now. The Glade remembers.\n\n{names}\n\n<i>Tomorrow, their names will fade from the walls. But tonight — we remember. We remember their faces. Their voices. Their last words. We remember why we are still here.</i>\n\n<i>Rest, runners. The Maze is quieter now.</i>",
   "memorial.text_empty": "🕯️ <b>In Memory of the Fallen</b>\n\nThis week, no one died in the Maze. The Glade is quiet. Too quiet.\n\n<i>But the Maze is patient. It always is.</i>",
-  "memorial.death_line": "Died in \"{section}\" (layer {layer})"
+  "memorial.death_line": "Died in \"{section}\" (layer {layer})",
+  "npc.newt.dialog_first": "\"You came. I'm glad. Many don't make it this far. Sit — we need to talk. About the Maze. About why we're here. About what comes next.\"",
+  "npc.newt.dialog_hurt": "\"You're bleeding. Badly. Sit. I'll do what I can. But you need to rest — not just your body. Your mind too.\"",
+  "npc.newt.dialog_truth": "\"You know the truth now. About WICKED. About the other Glade. It changes things, doesn't it? But it doesn't change why we fight. We fight to get out. Together. Or not at all.\"",
+  "npc.newt.talk_ok": "💬 Newt nods."
 }
