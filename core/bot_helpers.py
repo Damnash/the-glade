@@ -147,6 +147,17 @@ async def refresh_main(bot: Bot, user_id: int, new_session_flag: bool = True):
         import logging
         logging.error(f"[refresh_main] titles error: {e}")
 
+    # Первый квест (если активен) — показать в главном
+    starter_banner = ""
+    try:
+        from services.starter_quest import get_starter_quest
+        sq = get_starter_quest(user_id)
+        if sq and sq["status"] == "active":
+            from core.i18n import t as _t
+            starter_banner = "\n\n" + _t("starter.banner", lang)
+    except Exception:
+        pass
+
     # Новый session
     session = new_session()
     update_player_fields(user_id, {"current_session": session})
@@ -161,6 +172,10 @@ async def refresh_main(bot: Bot, user_id: int, new_session_flag: bool = True):
     else:
         base_text = render_location_text(lang, player["location"], user_id)
         kb = main_keyboard(lang, {"player": player}, session)
+
+    # Первый квест — добавить баннер
+    if starter_banner:
+        base_text += starter_banner
 
     # Лог
     events = get_recent_events(user_id, limit=5, severity="important")

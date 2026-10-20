@@ -128,6 +128,19 @@ async def on_work_collect(callback: CallbackQuery):
         return
 
     rewards = collect_rewards(user_id)
+    if rewards:
+        # Если это первый квест — завершить и выдать бонус
+        try:
+            from services.starter_quest import get_starter_quest, complete_starter_quest
+            if get_starter_quest(user_id) and get_starter_quest(user_id)["status"] == "active":
+                bonus = complete_starter_quest(user_id)
+                if bonus:
+                    await callback.answer(
+                        t("starter.complete_popup", lang, tokens=bonus["tokens"], food=bonus["food"]),
+                        show_alert=True,
+                    )
+        except Exception:
+            pass
     if not rewards:
         await callback.answer(t("work.not_done", lang), show_alert=True)
         return

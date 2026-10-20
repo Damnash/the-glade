@@ -1464,5 +1464,8 @@
   "push.evening_fire": "🔥 Evening fire is burning. Come sit by the fire — the Glade is quiet tonight.",
   "push.new_title": "🏅 You've earned a new title. Open /stats to see it.",
   "intro.step_choose": "🌿 <b>Newt:</b>\n\n<i>\"Get up. I'm Newt. Welcome to the Glade.\"</i>\n\nHe looks at you intently.\n\n<i>\"Listen. Everyone here is the same — no one remembers how they got here. But everyone remembers why they want out. Do you?\"</i>\n\nChoose your motivation.",
-  "intro.step_choose_prof": "🧑 <b>Newt:</b>\n\n<i>\"Fine. Now the main thing. You will go into the Maze. Sooner or later. Everyone goes. What could you do before you forgot everything?\"</i>"
+  "intro.step_choose_prof": "🧑 <b>Newt:</b>\n\n<i>\"Fine. Now the main thing. You will go into the Maze. Sooner or later. Everyone goes. What could you do before you forgot everything?\"</i>",
+  "starter.banner": "📋 <b>First quest:</b> Work at the farms (5 min).\\n<i>Reward: 🪙 +10, 🍞 +2.</i>",
+  "starter.done": "📋 First quest complete: 🪙 +{tokens}, 🍞 +{food}",
+  "starter.complete_popup": "📋 First quest complete! 🪙 +{tokens}, 🍞 +{food}"
 }

@@ -572,6 +572,16 @@ def init_db():
     """)
     cur.execute("CREATE INDEX IF NOT EXISTS idx_memorial_date ON memorial(created_at)")
 
+    # Первый квест (после intro)
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS starter_quest (
+            user_id INTEGER PRIMARY KEY,
+            status TEXT DEFAULT 'active',
+            started_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            completed_at TIMESTAMP
+        )
+    """)
+
     # Выпавшие дневники (потеря при смерти)
     cur.execute("""
         CREATE TABLE IF NOT EXISTS dropped_diaries (

@@ -238,6 +238,13 @@ async def on_intro_finish(callback: CallbackQuery, bot: Bot):
 
     await callback.answer(t("intro.finished", lang))
 
+    # Запустить первый квест
+    try:
+        from services.starter_quest import start_starter_quest
+        start_starter_quest(user_id)
+    except Exception:
+        pass
+
     from core.bot_helpers import refresh_main
     await refresh_main(bot, user_id)
 
