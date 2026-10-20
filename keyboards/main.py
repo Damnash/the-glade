@@ -16,7 +16,7 @@ def main_keyboard(lang: str, context: dict, session: str = "") -> InlineKeyboard
 
     rows = []
 
-    # NPC
+    # 1) NPC (если есть) — сверху, по 2 в ряд
     npcs = get_npcs_in_location(location)
     if npcs:
         npc_buttons = []
@@ -30,9 +30,8 @@ def main_keyboard(lang: str, context: dict, session: str = "") -> InlineKeyboard
         for i in range(0, len(npc_buttons), 2):
             rows.append(npc_buttons[i:i + 2])
 
-    # Основные действия
+    # 2) Действия (или статус, если занят)
     if status in ("sleeping", "working"):
-        # Если работа закончилась — кнопка "Забрать", иначе "Занят" (popup)
         from core.time_utils import seconds_until
         work_done = False
         if status == "working":
@@ -42,17 +41,13 @@ def main_keyboard(lang: str, context: dict, session: str = "") -> InlineKeyboard
 
         if work_done:
             rows.append([
-                InlineKeyboardButton(
-                    text=t("btn.collect", lang),
-                    callback_data=f"work:collect{s}",
-                ),
+                InlineKeyboardButton(text=t("btn.collect", lang),
+                                      callback_data=f"work:collect{s}"),
             ])
         else:
             rows.append([
-                InlineKeyboardButton(
-                    text=t("btn.status_busy", lang),
-                    callback_data=f"noop{s}",
-                ),
+                InlineKeyboardButton(text=t("btn.status_busy", lang),
+                                      callback_data=f"noop{s}"),
             ])
     else:
         rows.append([
@@ -60,23 +55,25 @@ def main_keyboard(lang: str, context: dict, session: str = "") -> InlineKeyboard
             InlineKeyboardButton(text=t("nav.todo", lang), callback_data=f"nav:todo{s}"),
         ])
 
+    # 3) Информация
     rows.append([
-        InlineKeyboardButton(text=t("btn.stats", lang),     callback_data=f"nav:stats{s}"),
         InlineKeyboardButton(text=t("btn.inventory", lang), callback_data=f"nav:inv{s}"),
+        InlineKeyboardButton(text=t("btn.stats", lang),     callback_data=f"nav:stats{s}"),
     ])
-
     rows.append([
         InlineKeyboardButton(text=t("map.btn_open", lang),   callback_data=f"map:list{s}"),
         InlineKeyboardButton(text=t("radio.btn_open", lang), callback_data=f"radio:menu{s}"),
     ])
 
+    # 4) Социалка / прогресс
     rows.append([
-        InlineKeyboardButton(text="⚔️ PvP", callback_data=f"pvp:flag{s}"),
+        InlineKeyboardButton(text=t("journal.btn", lang), callback_data=f"journal:show:menu{s}"),
+        InlineKeyboardButton(text="⚔️ PvP",              callback_data=f"pvp:flag{s}"),
     ])
 
+    # 5) Сервис (помощь — одна, внизу)
     rows.append([
         InlineKeyboardButton(text=t("nav.help", lang), callback_data=f"help:main{s}"),
-        InlineKeyboardButton(text=t("journal.btn", lang), callback_data=f"journal:show{s}"),
     ])
 
     return InlineKeyboardMarkup(inline_keyboard=rows)

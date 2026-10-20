@@ -20,29 +20,33 @@ def add_event(user_id: int, event_type: str, text: str, severity: str = "importa
     conn.close()
 
 
-def get_recent_events(user_id: int, limit: int = 6, severity: str | None = None) -> list[dict]:
+def get_recent_events(user_id: int, limit: int = 6, severity: str | None = None,
+                      event_types: list[str] | None = None,
+                      since=None) -> list[dict]:
     """Последние события игрока.
 
     severity=None — все события;
     severity="important" — только важные (для главного меню);
-    severity="chat" — только чат (для /journal).
+    severity="chat" — только чат.
+    event_types — фильтр по типам (например, ["say", "say_received"]).
+    since — datetime, только события новее этого времени (для уведомлений).
     """
     conn = get_conn()
     cur = conn.cursor()
+    where = ["user_id = ?"]
+    params = [user_id]
     if severity:
-        cur.execute("""
-            SELECT event_type, text, created_at, severity FROM player_log
-            WHERE user_id = ? AND severity = ?
-            ORDER BY created_at DESC
-            LIMIT ?
-        """, (user_id, severity, limit))
-    else:
-        cur.execute("""
-            SELECT event_type, text, created_at, severity FROM player_log
-            WHERE user_id = ?
-            ORDER BY created_at DESC
-            LIMIT ?
-        """, (user_id, limit))
+        where.append("severity = ?")
+        params.append(severity)
+    if event_types:
+        where.append("event_type IN (" + ",".join("?" * len(event_types)) + ")")
+        params.extend(event_types)
+    if since is not None:
+        where.append("created_at >= ?")
+        params.append(since)
+    sql = f"SELECT event_type, text, created_at, severity FROM player_log WHERE {' AND '.join(where)} ORDER BY created_at DESC LIMIT ?"
+    params.append(limit)
+    cur.execute(sql, params)
     rows = cur.fetchall()
     conn.close()
     return [dict(r) for r in reversed(rows)]

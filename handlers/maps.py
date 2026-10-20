@@ -180,7 +180,7 @@ async def cmd_draw(message: Message):
     if added:
         await message.answer(t("map.drawn_ok", lang, section=section_id))
         try:
-            add_event(user_id, "map_drawn", t("log.map_drawn", lang), severity="important")
+            add_event(user_id, "map_drawn", t("log.map_drawn", lang, section=section_id), severity="important")
             cleanup_old_events(user_id)
         except Exception:
             pass

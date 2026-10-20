@@ -101,10 +101,17 @@ def collect_rewards(user_id: int) -> dict | None:
 
     update_player_fields(user_id, updates)
 
-    # Лог для главного меню
+    # Лог для главного меню (с наградой)
     try:
         from core.i18n import t
-        add_event(user_id, "work_done", t("log.work_done", player["language"]), severity="important")
+        def _fmt(rewards, lang):
+            icons = {"food": "🍞", "tokens": "🪙", "water": "💧"}
+            return ", ".join(f"{icons.get(k, k)} +{v}" for k, v in rewards.items())
+        add_event(
+            user_id, "work_done",
+            t("log.work_done", player["language"], rewards=_fmt(rewards, player["language"])),
+            severity="important",
+        )
         cleanup_old_events(user_id)
     except Exception:
         pass
