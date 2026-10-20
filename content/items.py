@@ -19,7 +19,7 @@ ITEMS = {
     "torch": {
         "weight": 1,
         "stackable": True,
-        "use": "light",
+        "use": None,  # нужен для входа в лабиринт, не используется напрямую
     },
     "rope": {
         "weight": 2,
