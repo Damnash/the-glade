@@ -89,6 +89,27 @@ async def maze_cleanup_task():
             logging.error(f"maze_cleanup error: {e}")
 
 
+async def world_events_task(bot):
+    """Раз в час: случайное фоновое событие мира → всем игрокам."""
+    import asyncio
+    import logging
+    from services.world_events import pick_event, broadcast_world_event
+
+    # Дать боту время запуститься
+    await asyncio.sleep(30)
+
+    while True:
+        try:
+            await asyncio.sleep(3600)  # раз в час
+            event_key = pick_event()
+            sent = await broadcast_world_event(bot, event_key)
+            logging.info(f"[WORLD] event={event_key} sent={sent}")
+        except asyncio.CancelledError:
+            raise
+        except Exception as e:
+            logging.error(f"world_events error: {e}")
+
+
 async def cleanup_task():
     """Фоновая задача: очистка и проверка сезона."""
     import asyncio
@@ -298,6 +319,7 @@ async def main():
     dp.callback_query.register(maze_cb.on_look,     F.data.startswith("maze:look:"))
 
     asyncio.create_task(cleanup_task())
+    asyncio.create_task(world_events_task(bot))
     asyncio.create_task(maze_cleanup_task())
 
     # Уведомления утро/вечер
