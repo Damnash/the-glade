@@ -1431,5 +1431,9 @@
   "artifact.ring": "💍 A simple silver ring. No inscription. No stones. Just a band. It's cold to the touch, but there's a warmth when you hold it — or you imagine it. Someone wore this. Someone took it off. Or it was taken from them.",
   "artifact.map_old": "🗺️ An old map. Not of the current Maze — the lines are different. The walls are in different places. At the bottom — a signature. You can't read it. But you can see the word \"EXIT\" — crossed out. Twice.",
   "artifact.glasses": "👓 A pair of broken glasses. One lens is missing, the other is cracked. The frame is bent — as if someone stepped on them, or fell on them. You try them on. The world becomes blurry. You take them off. They weren't for you.",
-  "artifact.badge": "🎖️ A metal badge. No name — only a symbol. An eye inside a triangle. It's worn — someone rubbed it with their thumb. A lot. It was important. It meant something. To someone. Now it's just metal."
+  "artifact.badge": "🎖️ A metal badge. No name — only a symbol. An eye inside a triangle. It's worn — someone rubbed it with their thumb. A lot. It was important. It meant something. To someone. Now it's just metal.",
+  "buff.cursed.applied": "🌑 Cursed! ({hours}h) Griever attacks +10%, fragment chance −10%, flee −10%, −2 HP per move.",
+  "buff.cursed.line": "🌑 Cursed ({time})",
+  "buff.blessed.applied": "🌟 Blessed! ({hours}h) Griever attacks −10%, fragment chance +10%, flee +10%, +1 water when drinking.",
+  "buff.blessed.line": "🌟 Blessed ({time})"
 }

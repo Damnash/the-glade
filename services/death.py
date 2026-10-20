@@ -127,6 +127,15 @@ def die_in_maze(user_id: int, lang: str = "ru") -> dict:
     # 4. Респавн
     die_and_respawn(user_id)
 
+    # 5. Проклятие (50% при смерти)
+    try:
+        import random
+        if random.random() < 0.5:
+            from services.buffs import add_buff
+            add_buff(user_id, "cursed")
+    except Exception:
+        pass
+
     return {
         "section_id": section_id,
         "layer": layer,

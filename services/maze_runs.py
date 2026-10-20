@@ -204,6 +204,22 @@ def move_in_run(user_id: int, to_section: str) -> dict:
     # Списываем ресурсы
     survival_report = consume_on_move(user_id, is_night=is_night())
 
+    # Баффы (проклятие: -HP при переходе, благословение: +HP)
+    try:
+        from services.buffs import get_buff_modifiers
+        from db.players import get_player, update_player_fields
+        b = get_buff_modifiers(user_id)
+        hp_delta = b.get("hp_per_move", 0)
+        if hp_delta != 0:
+            p = get_player(user_id)
+            if p:
+                new_hp = max(0, min(100, p["hp"] + hp_delta))
+                if new_hp != p["hp"]:
+                    update_player_fields(user_id, {"hp": new_hp})
+                    survival_report["buff_hp"] = hp_delta
+    except Exception:
+        pass
+
     # Считаем depth от to_section до entry_section
     depth = _bfs_depth(layer, to_section, run["entry_section"])
     if depth < 0:

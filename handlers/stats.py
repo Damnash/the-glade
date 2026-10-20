@@ -27,6 +27,16 @@ async def cmd_stats(message: Message):
     day = get_season_day(season)
     time_line = format_time_line(lang)
 
+    # Баффы
+    buffs_line = ""
+    try:
+        from services.buffs import format_buffs_for_display
+        b_disp = format_buffs_for_display(user_id, lang)
+        if b_disp:
+            buffs_line = b_disp
+    except Exception:
+        pass
+
     # Профессия и перк
     prof_key = player.get("profession")
     perk_key = player.get("perk")
@@ -87,6 +97,7 @@ async def cmd_stats(message: Message):
         "",
         t("stats.season_line", lang, season=season, day=day),
         time_line,
+    ] + ([buffs_line] if buffs_line else []) + [
         t("stats.location_line", lang, loc=loc),
         t("stats.status_line", lang, status=status),
     ])

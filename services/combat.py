@@ -25,7 +25,7 @@ def is_night() -> bool:
     return hour >= 22 or hour < 6
 
 
-def roll_encounter(ring: int, is_center: bool = False) -> str | None:
+def roll_encounter(ring: int, is_center: bool = False, user_id: int = 0) -> str | None:
     """
     Проверить, встретится ли Гривер.
     Возвращает monster_type или None.
@@ -43,6 +43,14 @@ def roll_encounter(ring: int, is_center: bool = False) -> str | None:
         from services.weather import get_weather_modifiers
         mult, _ = get_weather_modifiers()
         chance = min(1.0, chance * mult)
+    except Exception:
+        pass
+
+    # Баффы (проклятие/благословение)
+    try:
+        from services.buffs import get_buff_modifiers
+        b = get_buff_modifiers(user_id)
+        chance = min(1.0, chance * b["monster_mult"])
     except Exception:
         pass
 

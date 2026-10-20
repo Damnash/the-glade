@@ -129,6 +129,14 @@ async def on_talk_to_npc(callback: CallbackQuery):
                                        n=_secret_idx + 1, text=_secret_text)
                     except Exception:
                         pass
+
+                    # Благословение — раз в 3 секрета
+                    if (_secret_idx + 1) % 3 == 0:
+                        try:
+                            from services.buffs import add_buff
+                            add_buff(user_id, "blessed")
+                        except Exception:
+                            pass
         except Exception as e:
             import logging
             logging.warning(f"[teresa_secret] {e}")

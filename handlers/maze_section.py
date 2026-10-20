@@ -73,7 +73,7 @@ async def show_section(callback, user_id: int, layer: int, section_id: str):
 
     # Проверка встречи с Гривером
     is_center = (section["type"] == "center")
-    monster_type = roll_encounter(section["ring"], is_center=is_center)
+    monster_type = roll_encounter(section["ring"], is_center=is_center, user_id=user_id)
 
     if monster_type:
         start_combat(user_id, monster_type, section_id, layer)

@@ -39,6 +39,14 @@ def try_find_fragment(user_id: int, section_id: str, layer: int) -> bool:
     except Exception:
         pass
 
+    # Баффы
+    try:
+        from services.buffs import get_buff_modifiers
+        b = get_buff_modifiers(user_id)
+        chance = min(1.0, chance * b["fragment_mult"])
+    except Exception:
+        pass
+
     if random.random() > chance:
         return False
 

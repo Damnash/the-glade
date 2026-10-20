@@ -292,3 +292,13 @@ def on_artifact_found(user_id: int, artifact_text: str, lang: str):
     except Exception:
         pass
 
+    # 30% — проклятие или благословение
+    try:
+        import random
+        if random.random() < 0.3:
+            from services.buffs import add_buff
+            buff = random.choice(["cursed", "blessed"])
+            add_buff(user_id, buff)
+    except Exception:
+        pass
+
