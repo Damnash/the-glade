@@ -244,4 +244,19 @@ def _apply_event(event_key: str, spec: dict, user_id: int, lang: str) -> str:
     # story / riddle / hint — просто текст
     return t(text_key, lang)
 
+# ============ Эхо прошлых рейдов ============
+
+ECHO_CHANCE = 0.30  # 30% при осмотре секции
+
+
+def roll_echo(section_id: str, user_id: int, lang: str) -> str | None:
+    """Иногда при осмотре — след другого игрока (атмосферное эхо)."""
+    import random as _r
+    from content.echoes import ECHOES
+    from core.i18n import t
+
+    if _r.random() > ECHO_CHANCE:
+        return None
+    key = _r.choice(ECHOES)
+    return t(key, lang)
 

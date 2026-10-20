@@ -261,7 +261,13 @@ async def on_look(callback: CallbackQuery):
     event = roll_event(section_id, user_id, lang)
 
     if event is None:
-        await callback.answer(t("maze.look.nothing", lang), show_alert=True)
+        # Эхо прошлых рейдов
+        from services.maze import roll_echo
+        echo = roll_echo(section_id, user_id, lang)
+        if echo:
+            await callback.answer(echo, show_alert=True)
+        else:
+            await callback.answer(t("maze.look.nothing", lang), show_alert=True)
     else:
         await callback.answer(event, show_alert=True)
 

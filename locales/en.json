@@ -1353,5 +1353,15 @@
   "maze.diary_found": "📖 Diary read.",
   "maze.diary_btn": "📖 Diary of {name}",
   "more.btn": "📋 More",
-  "more.title": "More"
+  "more.title": "More",
+  "echo.scratches": "🧱 On the wall — fresh scratches, as if someone tried to claw through. The stone is chipped. Whoever did this didn't finish. Or didn't have time.",
+  "echo.broken_knife": "🔪 A broken knife on the floor. The blade is snapped in half, the handle cracked. Whoever left it was in a hurry. Or didn't need it anymore.",
+  "echo.blood": "🩸 A dark stain on the floor. Dried. Someone was hurt here — badly. There are no tracks leading away. Only toward the wall.",
+  "echo.note": "📜 A scrap of paper stuck in a crack. \"Don't go to N3. The Griever there...\" The rest is torn off. The handwriting is shaky.",
+  "echo.footprints": "👣 Fresh footprints in the dust. They lead deeper, then turn back. Whoever it was changed their mind. Or something made them.",
+  "echo.torch": "🔥 A burnt-out torch. The wood is charred, the flame long gone. It's cold to the touch. Someone was here — and the dark took them.",
+  "echo.bones": "💀 Bones in the corner. Not human — too long. But there's a strip of cloth tied around one of them. Someone marked this place. For what?",
+  "echo.rope": "🪢 A piece of rope tied to a stone. Knots at even intervals. Someone was counting paces — or marking the way back. The rope ends abruptly.",
+  "echo.whisper": "👂 A whisper on the edge of hearing. You turn — no one. The dust in the air is still. But you feel someone was just here. A moment ago.",
+  "echo.cold_spot": "🥶 A patch of cold air in the corner. Your breath turns to mist. The stone is too cold for this place. As if something drained the warmth. Recently."
 }
