@@ -526,6 +526,16 @@ def init_db():
 
     cur.execute("CREATE INDEX IF NOT EXISTS idx_log_user ON player_log(user_id, created_at DESC)")
 
+    # NPC visits (для first_visit диалогов)
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS npc_visits (
+            user_id INTEGER,
+            npc_key TEXT,
+            visited_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (user_id, npc_key)
+        )
+    """)
+
     # Миграция: severity в player_log (important / chat)
     cur.execute("PRAGMA table_info(player_log)")
     cols = [row[1] for row in cur.fetchall()]

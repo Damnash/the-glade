@@ -1312,5 +1312,11 @@
   "world_events.whisper": "👂 A whisper on the edge of hearing. Words you cannot make out.",
   "world_events.stomp": "🦶 Heavy stomps from beneath the ground. Then — nothing.",
   "world_events.bell": "🔔 A bell rings once. No one knows where it is.",
-  "world_events.rain": "🌧️ Light rain starts. The fire hisses."
+  "world_events.rain": "🌧️ Light rain starts. The fire hisses.",
+  "npc.frypan.dialog_first": "\"Newcomer? Sit down, have a bite. Don't thank me — it's all shared. What do you need?\"",
+  "npc.frypan.dialog_hungry": "\"You look like death. Sit. Eat. Don't argue — eat.\"",
+  "npc.jeff.dialog_hurt": "\"You're bleeding. Sit down. Bear it — it will hurt.\"",
+  "npc.minho.dialog_first": "\"Run? Good. I'll show you where we've been. Listen — I won't repeat.\"",
+  "npc.teresa.dialog_first": "\"You came. I've been waiting. I know why the Maze was built. Want to find out? You'll have to work.\"",
+  "npc.teresa.dialog_truth": "\"You know the truth now. And the truth is heavy. But there's more. Are you ready?\""
 }

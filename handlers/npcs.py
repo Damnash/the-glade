@@ -48,8 +48,34 @@ async def on_talk_to_npc(callback: CallbackQuery):
     except Exception:
         pass
 
-    dialog = t(npc["dialog_key"], lang)
+    # Выбрать вариант диалога по состоянию игрока
+    from content.npcs import get_npc_dialog_key
+    # first_visit: если у игрока ещё нет истории с этим NPC (упрощённо — intro_done)
+    try:
+        from db.connection import get_conn
+        conn = get_conn()
+        cur = conn.cursor()
+        cur.execute("SELECT 1 FROM npc_visits WHERE user_id = ? AND npc_key = ?", (user_id, npc_key))
+        is_first_visit = cur.fetchone() is None
+        conn.close()
+    except Exception:
+        is_first_visit = False
+    dialog_key = get_npc_dialog_key(npc_key, player, is_first_visit=is_first_visit)
+    dialog = t(dialog_key, lang)
     text = "<b>" + t(npc['name_key'], lang) + "</b>\n\n" + dialog
+
+    # Пометить, что игрок уже говорил с NPC (для first_visit)
+    try:
+        from db.connection import get_conn
+        conn = get_conn()
+        cur = conn.cursor()
+        cur.execute("""
+            INSERT OR IGNORE INTO npc_visits (user_id, npc_key) VALUES (?, ?)
+        """, (user_id, npc_key))
+        conn.commit()
+        conn.close()
+    except Exception:
+        pass
 
     session = player.get("current_session", "")
     kb = npc_talk_keyboard(lang, npc_key, npc["actions"], session)

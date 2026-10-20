@@ -81,3 +81,54 @@ def get_npcs_in_location(location: str) -> list[dict]:
         for k, v in NPCS.items()
         if v["location"] == location
     ]
+
+# ============ Варианты диалога по состоянию игрока ============
+#
+# state: "low_hp" | "low_food" | "first_visit" | "default"
+# Если ключа нет — используется npc["dialog_key"].
+
+NPC_DIALOG_BY_STATE = {
+    "frypan": {
+        "low_food": "npc.frypan.dialog_hungry",
+        "first_visit": "npc.frypan.dialog_first",
+    },
+    "jeff": {
+        "low_hp": "npc.jeff.dialog_hurt",
+    },
+    "minho": {
+        "first_visit": "npc.minho.dialog_first",
+    },
+    "teresa": {
+        "first_visit": "npc.teresa.dialog_first",
+        "learned_truth": "npc.teresa.dialog_truth",
+    },
+}
+
+
+def get_npc_dialog_key(npc_key: str, player: dict, is_first_visit: bool = False) -> str:
+    """Выбрать ключ диалога NPC по состоянию игрока."""
+    npc = NPCS.get(npc_key)
+    if not npc:
+        return "npc.not_implemented"
+    variants = NPC_DIALOG_BY_STATE.get(npc_key, {})
+
+    # low_hp
+    if player.get("hp", 100) < 30 and "low_hp" in variants:
+        return variants["low_hp"]
+    # low_food
+    if player.get("food", 0) <= 0 and "low_food" in variants:
+        return variants["low_food"]
+    # learned_truth (по стадии сюжета)
+    if "learned_truth" in variants:
+        try:
+            from db.story import is_stage_unlocked
+            if is_stage_unlocked(player["user_id"], "learned_truth"):
+                return variants["learned_truth"]
+        except Exception:
+            pass
+    # first_visit
+    if is_first_visit and "first_visit" in variants:
+        return variants["first_visit"]
+
+    return npc["dialog_key"]
+
