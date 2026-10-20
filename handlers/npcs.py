@@ -638,3 +638,54 @@ async def _jeff_buy_bandage(callback, user_id, lang):
         await refresh_main(bot, user_id)
     finally:
         await bot.session.close()
+
+async def _frypan_bring_meat(callback, user_id, lang):
+    """Сдать мясо Фрайпану (для ежедневного квеста)."""
+    from core.bot_helpers import refresh_main, make_bot
+    from services.npc_actions import bring_to_npc, NPCActionError
+
+    try:
+        result = bring_to_npc(user_id, "frypan", "meat", qty=1)
+    except NPCActionError as e:
+        await callback.answer(t(e.key, lang, **e.kwargs), show_alert=True)
+        return
+
+    # Сообщение
+    if result["quest_completed"]:
+        await callback.answer(t("npc.bring_quest_complete", lang), show_alert=True)
+    elif result["progress_updated"]:
+        await callback.answer(t("npc.bring_progress", lang), show_alert=True)
+    else:
+        await callback.answer(t("npc.bring_ok", lang), show_alert=True)
+
+    bot = make_bot()
+    try:
+        await refresh_main(bot, user_id)
+    finally:
+        await bot.session.close()
+
+
+async def _winston_bring_water(callback, user_id, lang):
+    """Сдать воду Уинстону (для ежедневного квеста)."""
+    from core.bot_helpers import refresh_main, make_bot
+    from services.npc_actions import bring_to_npc, NPCActionError
+
+    try:
+        result = bring_to_npc(user_id, "winston", "water_flask", qty=1)
+    except NPCActionError as e:
+        await callback.answer(t(e.key, lang, **e.kwargs), show_alert=True)
+        return
+
+    if result["quest_completed"]:
+        await callback.answer(t("npc.bring_quest_complete", lang), show_alert=True)
+    elif result["progress_updated"]:
+        await callback.answer(t("npc.bring_progress", lang), show_alert=True)
+    else:
+        await callback.answer(t("npc.bring_ok", lang), show_alert=True)
+
+    bot = make_bot()
+    try:
+        await refresh_main(bot, user_id)
+    finally:
+        await bot.session.close()
+

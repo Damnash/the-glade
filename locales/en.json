@@ -1472,5 +1472,10 @@
   "goal.fragments.done": "🗺️ Goal complete",
   "title.cartographer_5.name": "Pathfinder",
   "title.cartographer_5.desc": "Collected 5 map fragments",
-  "diary.auto.fragment_goal_done": "Collected {n} map fragments. Personal map of Layer 1 unlocked."
+  "diary.auto.fragment_goal_done": "Collected {n} map fragments. Personal map of Layer 1 unlocked.",
+  "npc.frypan.action.hint": "💡 Hint",
+  "npc.jeff.action.hint": "💡 Hint",
+  "npc.minho.action.hint": "💡 Hint",
+  "npc.winston.action.hint": "💡 Hint",
+  "npc.alby.action.hint": "💡 Hint"
 }

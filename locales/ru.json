@@ -1494,5 +1494,10 @@
   "goal.fragments.done": "🗺️ Цель выполнена",
   "title.cartographer_5.name": "Путепроходец",
   "title.cartographer_5.desc": "Собрал 5 фрагментов карты",
-  "diary.auto.fragment_goal_done": "Собрано {n} фрагментов карты. Личная карта 1-го слоя открыта."
+  "diary.auto.fragment_goal_done": "Собрано {n} фрагментов карты. Личная карта 1-го слоя открыта.",
+  "npc.frypan.action.hint": "💡 Подсказка",
+  "npc.jeff.action.hint": "💡 Подсказка",
+  "npc.minho.action.hint": "💡 Подсказка",
+  "npc.winston.action.hint": "💡 Подсказка",
+  "npc.alby.action.hint": "💡 Подсказка"
 }
