@@ -616,6 +616,12 @@ def init_db():
     # Migration v0.2 → v1: удалить устаревшую таблицу maze_moves
     cur.execute("DROP TABLE IF EXISTS maze_moves")
 
+    # Миграция: players.fragment_goal_done
+    cur.execute("PRAGMA table_info(players)")
+    cols = [row[1] for row in cur.fetchall()]
+    if "fragment_goal_done" not in cols:
+        cur.execute("ALTER TABLE players ADD COLUMN fragment_goal_done INTEGER DEFAULT 0")
+
     # system_state: key-value для служебных данных (last_morning, last_evening)
     cur.execute("""
         CREATE TABLE IF NOT EXISTS system_state (

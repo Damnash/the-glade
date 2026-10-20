@@ -96,4 +96,11 @@ def try_find_fragment(user_id: int, section_id: str, layer: int) -> bool:
     except Exception:
         pass
 
+    # Среднесрочная цель: 5 фрагментов → карта-путеводитель
+    try:
+        from services.goals import check_fragment_goal
+        check_fragment_goal(user_id)
+    except Exception:
+        pass
+
     return True

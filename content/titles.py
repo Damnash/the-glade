@@ -24,6 +24,12 @@ TITLES = {
         "condition": {"type": "griever_kills", "need": 50},
     },
     # Фрагменты карты
+    "cartographer_5": {
+        "name_key": "title.cartographer_5.name",
+        "desc_key": "title.cartographer_5.desc",
+        "icon": "🧭",
+        "condition": {"type": "fragments", "need": 5},
+    },
     "cartographer_10": {
         "name_key": "title.cartographer_10.name",
         "desc_key": "title.cartographer_10.desc",

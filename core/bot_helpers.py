@@ -158,6 +158,16 @@ async def refresh_main(bot: Bot, user_id: int, new_session_flag: bool = True):
     except Exception:
         pass
 
+    # Среднесрочная цель: фрагменты X/5
+    goal_banner = ""
+    try:
+        from services.goals import get_goal_banner
+        gb = get_goal_banner(user_id, lang)
+        if gb:
+            goal_banner = "\n\n" + gb
+    except Exception:
+        pass
+
     # Новый session
     session = new_session()
     update_player_fields(user_id, {"current_session": session})
@@ -176,6 +186,10 @@ async def refresh_main(bot: Bot, user_id: int, new_session_flag: bool = True):
     # Первый квест — добавить баннер
     if starter_banner:
         base_text += starter_banner
+
+    # Среднесрочная цель — добавить баннер
+    if goal_banner:
+        base_text += goal_banner
 
     # Лог
     events = get_recent_events(user_id, limit=5, severity="important")
