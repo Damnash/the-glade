@@ -22,7 +22,7 @@ CATEGORIES = {
 
 def _render_menu(lang: str, session: str) -> tuple[str, InlineKeyboardMarkup]:
     s = f":{session}" if session else ""
-    text = f"📖 <b>{t('journal.header', lang)}</b>\n\n{t('journal.choose', lang)}"
+    text = f"<b>{t('journal.header', lang)}</b>\n\n{t('journal.choose', lang)}"
     rows = []
     # 2 кнопки в ряд
     keys = list(CATEGORIES.keys())
@@ -100,7 +100,7 @@ async def on_journal_show(callback: CallbackQuery):
         if not events:
             text = t(title_key, lang) + "\n\n" + t("journal.empty", lang)
         else:
-            lines = [f"📖 <b>{t(title_key, lang)}</b>\n"]
+            lines = [f"<b>{t(title_key, lang)}</b>\n"]
             for e in events:
                 lines.append(e["text"])
             text = "\n".join(lines)

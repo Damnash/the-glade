@@ -1297,7 +1297,7 @@
   "help.feedback": "💬 Обратная связь: @AdmPenalty — баги, идеи, жалобы.",
   "move.in_maze": "Ты в Лабиринте. Сначала вернись к воротам (/вернуться).",
   "btn.status_busy": "⏳ Занят",
-  "journal.header": "Дневник",
+  "journal.header": "📜 Журнал",
   "journal.empty": "Пока ничего.",
   "noop.sleeping": "😴 Ты спишь. Напиши /проснуться, чтобы встать.",
   "noop.working": "⏳ Ты работаешь. Осталось: {time}.",
