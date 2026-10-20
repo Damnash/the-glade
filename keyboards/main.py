@@ -32,12 +32,28 @@ def main_keyboard(lang: str, context: dict, session: str = "") -> InlineKeyboard
 
     # Основные действия
     if status in ("sleeping", "working"):
-        rows.append([
-            InlineKeyboardButton(
-                text=t("btn.status_busy", lang),
-                callback_data=f"noop{s}",
-            ),
-        ])
+        # Если работа закончилась — кнопка "Забрать", иначе "Занят" (popup)
+        from core.time_utils import seconds_until
+        work_done = False
+        if status == "working":
+            left = seconds_until(player.get("work_ends_at"))
+            if left <= 0:
+                work_done = True
+
+        if work_done:
+            rows.append([
+                InlineKeyboardButton(
+                    text=t("btn.collect", lang),
+                    callback_data=f"work:collect{s}",
+                ),
+            ])
+        else:
+            rows.append([
+                InlineKeyboardButton(
+                    text=t("btn.status_busy", lang),
+                    callback_data=f"noop{s}",
+                ),
+            ])
     else:
         rows.append([
             InlineKeyboardButton(text=t("nav.move", lang), callback_data=f"nav:move{s}"),

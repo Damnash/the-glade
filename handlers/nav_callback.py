@@ -272,6 +272,47 @@ async def on_look(callback: CallbackQuery):
 
 
 async def on_noop(callback: CallbackQuery):
+    """Пустое действие (noop) — гасим индикатор.
+
+    Если status='sleeping'/'working' — показываем popup с объяснением.
+    """
+    from core.bot_helpers import check_session
+    from db.players import get_player
+    from core.i18n import t
+
+    user_id = callback.from_user.id
+    if not check_session(user_id, callback.data):
+        await callback.answer()
+        return
+
+    player = get_player(user_id)
+    if not player:
+        await callback.answer()
+        return
+
+    status = player.get("status")
+    if status == "sleeping":
+        await callback.answer(t("noop.sleeping", player["language"]), show_alert=True)
+        return
+    if status == "working":
+        from core.time_utils import seconds_until, humanize_seconds
+        left = seconds_until(player.get("work_ends_at"))
+        if left <= 0:
+            # работа закончилась — перерисовываем меню (там будет кнопка "Забрать")
+            from core.bot_helpers import refresh_main, make_bot
+            bot = make_bot()
+            try:
+                await refresh_main(bot, user_id)
+            finally:
+                await bot.session.close()
+            await callback.answer(t("noop.work_done", player["language"]))
+        else:
+            await callback.answer(
+                t("noop.working", player["language"], time=humanize_seconds(left, player["language"])),
+                show_alert=True,
+            )
+        return
+
     await callback.answer()
 
 

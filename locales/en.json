@@ -1275,5 +1275,8 @@
   "move.in_maze": "You are in the Maze. Return to the gate first (/return).",
   "btn.status_busy": "⏳ Busy",
   "journal.header": "Journal",
-  "journal.empty": "Nothing yet."
+  "journal.empty": "Nothing yet.",
+  "noop.sleeping": "😴 You are sleeping. Send /wake to get up.",
+  "noop.working": "⏳ You are working. {time} left.",
+  "noop.work_done": "✅ Work is done. Collect the reward via ⚒️ What to do → 🛠️ Work."
 }
