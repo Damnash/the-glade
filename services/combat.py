@@ -293,6 +293,15 @@ def give_victory_rewards(user_id: int, monster_type: str) -> dict:
                 severity="important",
             )
             cleanup_old_events(user_id)
+
+            # Автодневник
+            try:
+                from services.diary import add_diary_auto
+                add_diary_auto(user_id, "kill_griever",
+                               monster=t(monster["name_key"], lang),
+                               rewards=rewards_str)
+            except Exception:
+                pass
     except Exception:
         pass
 

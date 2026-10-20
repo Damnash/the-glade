@@ -226,6 +226,18 @@ def try_find_key(user_id: int, section_id: str, layer: int) -> int | None:
     except Exception:
         pass
 
+    # Автодневник
+    try:
+        from services.diary import add_diary_auto
+        from core.i18n import t
+        from db.players import get_player
+        _p = get_player(user_id)
+        if _p:
+            add_diary_auto(user_id, "found_key",
+                           name=t(f"key.{key_num}.name", _p["language"]))
+    except Exception:
+        pass
+
     return key_num
 
 

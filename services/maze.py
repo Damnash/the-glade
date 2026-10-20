@@ -121,6 +121,13 @@ def enter_maze(user_id: int, gate: str) -> str:
     except Exception:
         pass
 
+    # Автодневник
+    try:
+        from services.diary import add_diary_auto
+        add_diary_auto(user_id, "enter_maze", section=section_id)
+    except Exception:
+        pass
+
     return section_id
 
 def exit_maze(user_id: int) -> str:
@@ -151,6 +158,13 @@ def exit_maze(user_id: int) -> str:
     gate = wing_to_gate.get(wing)
     if not gate:
         raise MazeError("maze.not_in_maze")
+
+    # Автодневник
+    try:
+        from services.diary import add_diary_auto
+        add_diary_auto(user_id, "exit_maze", gate=gate)
+    except Exception:
+        pass
 
     return gate
 

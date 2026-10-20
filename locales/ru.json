@@ -1359,5 +1359,13 @@
     "мой_дневник"
   ],
   "diary.btn": "📖 Дневник",
-  "keys.btn": "🔑 Ключи"
+  "keys.btn": "🔑 Ключи",
+  "diary.auto.date_prefix": "[{date}]",
+  "diary.auto.enter_maze": "Вошёл в Лабиринт. Секция {section}.",
+  "diary.auto.exit_maze": "Вернулся из Лабиринта через {gate}.",
+  "diary.auto.kill_griever": "Убил {monster}: {rewards}.",
+  "diary.auto.found_fragment": "Нашёл фрагмент карты в секции {section}.",
+  "diary.auto.found_key": "Нашёл {name}.",
+  "diary.auto.died": "Умер в секции {section}. Лабиринт забрал всё.",
+  "diary.auto.work_done": "Закончил {work}: {rewards}."
 }

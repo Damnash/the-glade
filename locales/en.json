@@ -1337,5 +1337,13 @@
     "my_diary"
   ],
   "diary.btn": "📖 Diary",
-  "keys.btn": "🔑 Keys"
+  "keys.btn": "🔑 Keys",
+  "diary.auto.date_prefix": "[{date}]",
+  "diary.auto.enter_maze": "Entered the Maze. Section {section}.",
+  "diary.auto.exit_maze": "Returned from the Maze through {gate}.",
+  "diary.auto.kill_griever": "Killed {monster}: {rewards}.",
+  "diary.auto.found_fragment": "Found a map fragment in section {section}.",
+  "diary.auto.found_key": "Found {name}.",
+  "diary.auto.died": "Died in section {section}. The Maze took everything.",
+  "diary.auto.work_done": "Finished {work}: {rewards}."
 }

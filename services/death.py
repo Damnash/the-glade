@@ -72,6 +72,13 @@ def die_in_maze(user_id: int, lang: str = "ru") -> dict:
     # Очки за смерть
     from services.achievements import award_points
     award_points(user_id, "death", field="deaths")
+
+    # Автодневник (до очистки — потом очистим)
+    try:
+        from services.diary import add_diary_auto
+        add_diary_auto(user_id, "died", section=section_id)
+    except Exception:
+        pass
     # Лог для главного меню
     try:
         from core.i18n import t

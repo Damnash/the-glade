@@ -55,6 +55,13 @@ def try_find_fragment(user_id: int, section_id: str, layer: int) -> bool:
     except Exception:
         pass
 
+    # Автодневник
+    try:
+        from services.diary import add_diary_auto
+        add_diary_auto(user_id, "found_fragment", section=section_id)
+    except Exception:
+        pass
+
     # Лог для главного меню
     try:
         from core.i18n import t

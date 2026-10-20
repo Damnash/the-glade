@@ -113,6 +113,15 @@ def collect_rewards(user_id: int) -> dict | None:
             severity="important",
         )
         cleanup_old_events(user_id)
+
+        # Автодневник
+        try:
+            from services.diary import add_diary_auto
+            add_diary_auto(user_id, "work_done",
+                           work=t(f"work.{work_type}", player["language"]),
+                           rewards=_fmt(rewards, player["language"]))
+        except Exception:
+            pass
     except Exception:
         pass
 
