@@ -37,3 +37,19 @@ def add_diary_auto(user_id: int, event: str, **kwargs):
     # Префикс с датой
     date_prefix = t("diary.auto.date_prefix", lang, date=now().strftime("%Y-%m-%d %H:%M"))
     add_diary_entry(user_id, f"{date_prefix} {text}")
+
+def get_player_autodiary_text(user_id: int) -> str:
+    """Собрать все автозаписи (начинаются с '[') в один текст."""
+    conn = get_conn()
+    try:
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT text FROM player_diary
+            WHERE user_id = ? AND text LIKE '[%]%'
+            ORDER BY id ASC
+        """, (user_id,))
+        rows = cur.fetchall()
+    finally:
+        conn.close()
+    return "\n".join(r[0] for r in rows)
+

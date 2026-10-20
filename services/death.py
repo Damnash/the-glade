@@ -73,12 +73,38 @@ def die_in_maze(user_id: int, lang: str = "ru") -> dict:
     from services.achievements import award_points
     award_points(user_id, "death", field="deaths")
 
-    # Автодневник (до очистки — потом очистим)
+    # Автодневник
     try:
         from services.diary import add_diary_auto
         add_diary_auto(user_id, "died", section=section_id)
     except Exception:
         pass
+
+    # Потеря дневника: копируем автозаписи в dropped_diaries, очищаем player_diary
+    try:
+        from db.connection import get_conn
+        from services.diary import get_player_autodiary_text
+
+        auto_text = get_player_autodiary_text(user_id)
+        if auto_text:
+            player = get_player(user_id)
+            display_name = player["display_name"] or player["username"] if player else "?"
+            conn = get_conn()
+            try:
+                cur = conn.cursor()
+                cur.execute("""
+                    INSERT INTO dropped_diaries
+                    (original_user_id, display_name, text, section_id, layer)
+                    VALUES (?, ?, ?, ?, ?)
+                """, (user_id, display_name, auto_text, section_id, layer))
+                # Очищаем автозаписи (ручные — оставляем)
+                cur.execute("DELETE FROM player_diary WHERE user_id = ? AND text LIKE '[%]%'", (user_id,))
+                conn.commit()
+            finally:
+                conn.close()
+    except Exception as e:
+        import logging
+        logging.warning(f"[DEATH] drop diary failed: {e}")
     # Лог для главного меню
     try:
         from core.i18n import t

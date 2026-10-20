@@ -537,6 +537,21 @@ def init_db():
     """)
     cur.execute("CREATE INDEX IF NOT EXISTS idx_diary_user ON player_diary(user_id, created_at DESC)")
 
+    # Выпавшие дневники (потеря при смерти)
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS dropped_diaries (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            original_user_id INTEGER,
+            display_name TEXT,
+            text TEXT,
+            section_id TEXT,
+            layer INTEGER,
+            dropped_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            found_by INTEGER,
+            found_at TIMESTAMP
+        )
+    """)
+
     # NPC visits (для first_visit диалогов)
     cur.execute("""
         CREATE TABLE IF NOT EXISTS npc_visits (
