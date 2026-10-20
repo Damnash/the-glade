@@ -1313,5 +1313,6 @@
   "log.new_messages": "Новые сообщения",
   "stats.profession_line": "🛠️ Профессия: {name}",
   "stats.perk_line": "🎯 Цель: {name}",
-  "stats.line_bonus": "❤️ {hp}/{max_hp}  ⚡ {energy}/{max_energy}  🧠 {sanity}/100\n🍞 {food}/{max_food}  💧 {water}/{max_water}  🪙 {tokens}"
+  "stats.line_bonus": "❤️ {hp}/{max_hp}  ⚡ {energy}/{max_energy}  🧠 {sanity}/100\n🍞 {food}/{max_food}  💧 {water}/{max_water}  🪙 {tokens}",
+  "log.daily_quest_done": "📋 Ежедневный квест выполнен: {title} → {reward}"
 }

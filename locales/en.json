@@ -1291,5 +1291,6 @@
   "log.new_messages": "New messages",
   "stats.profession_line": "🛠️ Profession: {name}",
   "stats.perk_line": "🎯 Goal: {name}",
-  "stats.line_bonus": "❤️ {hp}/{max_hp}  ⚡ {energy}/{max_energy}  🧠 {sanity}/100\n🍞 {food}/{max_food}  💧 {water}/{max_water}  🪙 {tokens}"
+  "stats.line_bonus": "❤️ {hp}/{max_hp}  ⚡ {energy}/{max_energy}  🧠 {sanity}/100\n🍞 {food}/{max_food}  💧 {water}/{max_water}  🪙 {tokens}",
+  "log.daily_quest_done": "📋 Daily quest done: {title} → {reward}"
 }

@@ -180,6 +180,25 @@ def try_complete(user_id: int) -> dict | None:
     finally:
         conn.close()
 
+    # Лог для главного меню
+    try:
+        from core.i18n import t
+        from services.event_log import add_event, cleanup_old_events
+        _player = get_player(user_id)
+        if _player:
+            _lang = _player["language"]
+            add_event(
+                user_id, "daily_quest_done",
+                t("log.daily_quest_done", _lang,
+                  title=t(quest["title_key"], _lang),
+                  reward=format_reward(reward, _lang)),
+                severity="important",
+            )
+            cleanup_old_events(user_id)
+    except Exception as e:
+        import logging
+        logging.warning(f"[DQ] log failed: {e}")
+
     logging.info(f"[DQ] user={user_id} rewarded for {quest_key}: {reward}")
     return {"quest": quest, "reward": reward}
 
