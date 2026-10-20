@@ -260,25 +260,6 @@ def give_victory_rewards(user_id: int, monster_type: str) -> dict:
     """Выдать награды за победу."""
     from services.achievements import award_points, check_hunter
     award_points(user_id, "kill_griever", field="griever_kills")
-    # Лог для главного меню (с типом Гривера и наградой)
-    try:
-        from core.i18n import t
-        from db.players import get_player
-        _p = get_player(user_id)
-        if _p:
-            lang = _p["language"]
-            monster = get_monster(monster_type)
-            monster_name = t(monster["name_key"], lang)
-            icons = {"tokens": "🪙", "meat": "🥩", "metal": "⚙️", "fragment": "🗺️"}
-            rewards_str = ", ".join(f"{icons.get(k, k)} +{v}" for k, v in rewards.items())
-            add_event(
-                user_id, "kill_griever",
-                t("log.kill_griever", lang, monster=monster_name, rewards=rewards_str),
-                severity="important",
-            )
-            cleanup_old_events(user_id)
-    except Exception:
-        pass
     check_hunter(user_id)
 
     # Daily quest progress
@@ -296,6 +277,24 @@ def give_victory_rewards(user_id: int, monster_type: str) -> dict:
         pass
     monster = get_monster(monster_type)
     rewards = monster["rewards"].copy()
+
+    # Лог для главного меню (с типом Гривера и наградой) — ПОСЛЕ rewards
+    try:
+        from core.i18n import t
+        from db.players import get_player
+        _p = get_player(user_id)
+        if _p:
+            lang = _p["language"]
+            icons = {"tokens": "🪙", "meat": "🥩", "metal": "⚙️", "fragment": "🗺️"}
+            rewards_str = ", ".join(f"{icons.get(k, k)} +{v}" for k, v in rewards.items())
+            add_event(
+                user_id, "kill_griever",
+                t("log.kill_griever", lang, monster=t(monster["name_key"], lang), rewards=rewards_str),
+                severity="important",
+            )
+            cleanup_old_events(user_id)
+    except Exception:
+        pass
 
     # Возможен фрагмент карты
     if random.random() < monster["fragment_chance"]:
