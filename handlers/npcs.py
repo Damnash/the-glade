@@ -93,6 +93,46 @@ async def on_talk_to_npc(callback: CallbackQuery):
     session = player.get("current_session", "")
     kb = npc_talk_keyboard(lang, npc_key, npc["actions"], session)
 
+    # Секрет Терезы — по одному при каждом разговоре (до 10)
+    if npc_key == "teresa":
+        try:
+            from content.teresa_secrets import TERESA_SECRETS
+            from db.connection import get_conn
+            _conn = get_conn()
+            try:
+                _cur = _conn.cursor()
+                _cur.execute("SELECT COUNT(*) FROM npc_visits WHERE user_id = ? AND npc_key = 'teresa'", (user_id,))
+                _visits = _cur.fetchone()[0]
+            finally:
+                _conn.close()
+
+            # Секрет показываем начиная со 2-го визита (1-й — приветствие)
+            _secret_idx = max(0, _visits - 1)
+            if _secret_idx < len(TERESA_SECRETS):
+                _secret_key = TERESA_SECRETS[_secret_idx]
+                _secret_text = t(_secret_key, lang)
+                if _secret_text and _secret_text != _secret_key:
+                    text += "\n\n🌙 <b>Секрет:</b> <i>" + _secret_text + "</i>"
+
+                    # В журнал (important) + автодневник
+                    try:
+                        from services.event_log import add_event, cleanup_old_events
+                        add_event(user_id, "teresa_secret",
+                                  f"🌙 Секрет Терезы ({_secret_idx + 1}/10): {_secret_text}",
+                                  severity="important")
+                        cleanup_old_events(user_id)
+                    except Exception:
+                        pass
+                    try:
+                        from services.diary import add_diary_auto
+                        add_diary_auto(user_id, "teresa_secret",
+                                       n=_secret_idx + 1, text=_secret_text)
+                    except Exception:
+                        pass
+        except Exception as e:
+            import logging
+            logging.warning(f"[teresa_secret] {e}")
+
     bot = make_bot()
     try:
         await edit_main(bot, user_id, text, kb)
