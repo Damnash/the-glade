@@ -64,6 +64,19 @@ async def on_talk_to_npc(callback: CallbackQuery):
     dialog = t(dialog_key, lang)
     text = "<b>" + t(npc['name_key'], lang) + "</b>\n\n" + dialog
 
+    # Слух (20% шанс)
+    try:
+        import random
+        from content.rumors import RUMORS, RUMOR_CHANCE
+        rumor_keys = RUMORS.get(npc_key, [])
+        if rumor_keys and random.random() < RUMOR_CHANCE:
+            rumor_key = random.choice(rumor_keys)
+            rumor_text = t(rumor_key, lang)
+            if rumor_text and rumor_text != rumor_key:
+                text += "\n\n💬 <i>" + rumor_text + "</i>"
+    except Exception:
+        pass
+
     # Пометить, что игрок уже говорил с NPC (для first_visit)
     try:
         from db.connection import get_conn

@@ -1363,5 +1363,18 @@
   "echo.bones": "💀 Bones in the corner. Not human — too long. But there's a strip of cloth tied around one of them. Someone marked this place. For what?",
   "echo.rope": "🪢 A piece of rope tied to a stone. Knots at even intervals. Someone was counting paces — or marking the way back. The rope ends abruptly.",
   "echo.whisper": "👂 A whisper on the edge of hearing. You turn — no one. The dust in the air is still. But you feel someone was just here. A moment ago.",
-  "echo.cold_spot": "🥶 A patch of cold air in the corner. Your breath turns to mist. The stone is too cold for this place. As if something drained the warmth. Recently."
+  "echo.cold_spot": "🥶 A patch of cold air in the corner. Your breath turns to mist. The stone is too cold for this place. As if something drained the warmth. Recently.",
+  "rumor.frypan_key": "Someone found a key in the west wing. I don't believe it. But I've seen stranger things since I got here.",
+  "rumor.frypan_griever": "A runner came back last night. Didn't say a word. Just sat by the fire and stared at the wall. His hands were shaking.",
+  "rumor.frypan_night": "Don't go out at night. I know the gates are closed. But I hear things. Steps. From inside the Glade. Not human steps.",
+  "rumor.chuck_teresa": "I saw Teresa last night. She was standing by the wall, looking at the ivy. I said hello. She didn't turn. Like she couldn't hear me.",
+  "rumor.chuck_maze": "I counted the walls once. From the tower. There are more than four. I know it sounds crazy. But I counted.",
+  "rumor.chuck_light": "Once I saw a light in the Maze. Not a torch. Something else. Blue. It moved. Then it was gone.",
+  "rumor.minho_center": "Don't go to the center alone. I've been there. Twice. The Griever there is old. Older than the Maze itself. Maybe.",
+  "rumor.minho_west": "The west wing is quieter. That's why I go there. Not because it's safe. Because it's quiet. There's a difference.",
+  "rumor.minho_keys": "I've seen four keys this season. Three of them were found by the same person. Coincidence? Maybe. Or maybe they know something we don't.",
+  "rumor.jeff_scratches": "I patch people up. But some scratches don't heal. They stay. Like the Maze wants to leave a mark. I have a few. I don't show them.",
+  "rumor.jeff_dead": "I was there when the first runner died. I couldn't save him. I still hear his breath. Sometimes. At night. When it's quiet.",
+  "rumor.winston_water": "The well is deeper than it looks. I drop a stone — I don't hear it hit. I used to. Now I don't.",
+  "rumor.winston_north": "The north wall grows ivy faster than the others. I trim it every week. It comes back in a day. I've stopped trimming."
 }
