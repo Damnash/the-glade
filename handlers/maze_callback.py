@@ -258,6 +258,15 @@ async def on_look(callback: CallbackQuery):
         logging.warning(f"[on_look] dropped_diaries error: {e}")
 
     # 2. Обычное событие
+    # Артефакты прошлого (10%) — приоритетнее события
+    from services.maze import roll_artifact, on_artifact_found
+    artifact = roll_artifact(section_id, user_id, lang)
+    if artifact:
+        on_artifact_found(user_id, artifact, lang)
+        await callback.answer(artifact, show_alert=True)
+        await _show_section(callback, user_id, layer, section_id)
+        return
+
     event = roll_event(section_id, user_id, lang)
 
     if event is None:

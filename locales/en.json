@@ -1421,5 +1421,15 @@
   "title.key_bearer.name": "Key Keeper",
   "title.key_bearer.desc": "Found 3 keys in one season",
   "title.unbroken.name": "Unbroken",
-  "title.unbroken.desc": "Died 5 times and kept going"
+  "title.unbroken.desc": "Died 5 times and kept going",
+  "artifact.photo": "📷 An old photograph. Faded, cracked. On it — people. Teenagers. They're smiling. One of them — a girl with dark hair — looks straight at the camera. She seems familiar. You don't know why.\n\nOn the back — a date. Twenty years ago. Before the Maze. Before the Glade. Before everything you remember.",
+  "artifact.diary_scrap": "📜 A scrap of diary. The handwriting is shaky, hurried. \"Day 42. I don't remember my name anymore. I remember I had a mother. I remember her hands. That's all.\" The rest is torn off. There's a dried drop of something dark on the paper. Blood? Ink?",
+  "artifact.flower": "🌹 A dried flower. Pressed between two stones. Someone kept it. Protected it. For what? For whom? There are no flowers in the Glade. Only ivy and weeds. This flower — from somewhere else. Somewhere before.",
+  "artifact.toy": "🧸 A child's toy. A small wooden horse. One leg is broken, the other three are worn smooth — someone held it a lot. Someone loved it. In the Glade, there are no children. There never were. So whose toy is this?",
+  "artifact.letter": "✉️ A letter. Folded three times, sealed with wax. The wax is broken. You read: \"If you're reading this — I didn't make it. Don't come looking. It's not worth it. None of it is worth it. Go back. Stay alive.\" No signature. No name.",
+  "artifact.watch": "⌚ A broken watch. The glass is cracked, the hands frozen at 3:47. You don't know if it's AM or PM. You don't know how long it's been here. Time in the Glade is different. But someone cared about time. Enough to wear a watch.",
+  "artifact.ring": "💍 A simple silver ring. No inscription. No stones. Just a band. It's cold to the touch, but there's a warmth when you hold it — or you imagine it. Someone wore this. Someone took it off. Or it was taken from them.",
+  "artifact.map_old": "🗺️ An old map. Not of the current Maze — the lines are different. The walls are in different places. At the bottom — a signature. You can't read it. But you can see the word \"EXIT\" — crossed out. Twice.",
+  "artifact.glasses": "👓 A pair of broken glasses. One lens is missing, the other is cracked. The frame is bent — as if someone stepped on them, or fell on them. You try them on. The world becomes blurry. You take them off. They weren't for you.",
+  "artifact.badge": "🎖️ A metal badge. No name — only a symbol. An eye inside a triangle. It's worn — someone rubbed it with their thumb. A lot. It was important. It meant something. To someone. Now it's just metal."
 }

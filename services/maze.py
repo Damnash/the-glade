@@ -260,3 +260,35 @@ def roll_echo(section_id: str, user_id: int, lang: str) -> str | None:
     key = _r.choice(ECHOES)
     return t(key, lang)
 
+# ============ Артефакты прошлого ============
+
+ARTIFACT_CHANCE = 0.10  # 10% при осмотре
+
+
+def roll_artifact(section_id: str, user_id: int, lang: str) -> str | None:
+    """Иногда при осмотре — артефакт с лором (10%)."""
+    import random as _r
+    from content.artifacts import ARTIFACTS
+    from core.i18n import t
+
+    if _r.random() > ARTIFACT_CHANCE:
+        return None
+    key = _r.choice(ARTIFACTS)
+    return t(key, lang)
+
+
+def on_artifact_found(user_id: int, artifact_text: str, lang: str):
+    """Записать артефакт в журнал (important) и автодневник."""
+    try:
+        from services.event_log import add_event, cleanup_old_events
+        add_event(user_id, "artifact", artifact_text, severity="important")
+        cleanup_old_events(user_id)
+    except Exception:
+        pass
+
+    try:
+        from services.diary import add_diary_auto
+        add_diary_auto(user_id, "artifact", text=artifact_text)
+    except Exception:
+        pass
+
