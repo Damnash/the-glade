@@ -48,10 +48,17 @@ async def start_evening_fire_async(bot):
     for user_id, lang in players:
         try:
             text = t("evening_fire.text", lang or "en")
-            # Записать в journal (important) — игрок увидит при заходе
             add_event(user_id, "evening_fire", text, severity="important")
             cleanup_old_events(user_id)
             sent += 1
+        except Exception:
+            pass
+
+        # Push оффлайн-игрокам
+        try:
+            from services.push import send_push
+            push_text = t("push.evening_fire", lang or "en")
+            await send_push(bot, user_id, push_text)
         except Exception:
             pass
 

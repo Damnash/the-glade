@@ -130,6 +130,94 @@ async def weather_task(bot):
             logging.error(f"weather_task error: {e}")
 
 
+async def work_reminder_task(bot):
+    """Раз в 5 минут: push «работа готова» тем, кто оффлайн."""
+    import asyncio
+    import logging
+    from core.time_utils import now
+    from db.connection import get_conn
+    from services.push import send_push
+
+    await asyncio.sleep(120)
+
+    while True:
+        try:
+            await asyncio.sleep(300)  # раз в 5 минут
+            conn = get_conn()
+            try:
+                cur = conn.cursor()
+                cur.execute("""
+                    SELECT user_id, work_type, work_ends_at, language
+                    FROM players
+                    WHERE status = 'working'
+                      AND work_ends_at <= ?
+                      AND work_type IS NOT NULL
+                """, (now(),))
+                rows = cur.fetchall()
+            finally:
+                conn.close()
+
+            for row in rows:
+                uid = row["user_id"]
+                lang = row["language"] or "en"
+                try:
+                    from core.i18n import t
+                    text = t("push.work_done", lang)
+                    await send_push(bot, uid, text)
+                except Exception as e:
+                    logging.warning(f"[WORK REMINDER] {uid}: {e}")
+        except asyncio.CancelledError:
+            raise
+        except Exception as e:
+            logging.error(f"work_reminder_task error: {e}")
+
+
+async def title_push_task(bot):
+    """Раз в 10 минут: push о новых титулах оффлайн-игрокам."""
+    import asyncio
+    import logging
+    from db.connection import get_conn
+    from services.push import send_push, is_online
+    from core.i18n import t
+
+    await asyncio.sleep(180)
+
+    while True:
+        try:
+            await asyncio.sleep(600)  # раз в 10 минут
+            conn = get_conn()
+            try:
+                cur = conn.cursor()
+                # Титулы, полученные за последние 15 минут
+                cur.execute("""
+                    SELECT pt.user_id, pt.title_key, p.language
+                    FROM player_titles pt
+                    JOIN players p ON p.user_id = pt.user_id
+                    WHERE pt.awarded_at >= datetime('now', '-15 minutes')
+                """)
+                rows = cur.fetchall()
+            finally:
+                conn.close()
+
+            for row in rows:
+                uid = row["user_id"]
+                title_key = row["title_key"]
+                lang = row["language"] or "en"
+                try:
+                    from content.titles import TITLES
+                    spec = TITLES.get(title_key)
+                    if not spec:
+                        continue
+                    text = t("push.new_title", lang, title=f"{spec['icon']} {t(spec['name_key'], lang)}")
+                    await send_push(bot, uid, text)
+                except Exception as e:
+                    logging.warning(f"[TITLE PUSH] {uid}: {e}")
+        except asyncio.CancelledError:
+            raise
+        except Exception as e:
+            logging.error(f"title_push_task error: {e}")
+
+
 async def cleanup_task():
     """Фоновая задача: очистка и проверка сезона."""
     import asyncio
@@ -344,6 +432,8 @@ async def main():
     dp.callback_query.register(maze_cb.on_diary_read, F.data.startswith("maze:diary:"))
 
     asyncio.create_task(cleanup_task())
+    asyncio.create_task(title_push_task(bot))
+    asyncio.create_task(work_reminder_task(bot))
     asyncio.create_task(weather_task(bot))
     asyncio.create_task(world_events_task(bot))
     asyncio.create_task(maze_cleanup_task())
