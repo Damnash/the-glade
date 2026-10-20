@@ -74,6 +74,18 @@ async def daycycle_events_task(bot):
                     _set_state("last_morning_notification", today)
 
             # ============ 22:00 — ВЕЧЕР ============
+            # Воскресенье, 20:00 — поминание павших
+            if hour == 20 and datetime.now(UTC).weekday() == 6:  # 6 = воскресенье
+                last = _get_state("last_memorial_date")
+                if last != today:
+                    logging.info("[DAYCYCLE] Sunday memorial")
+                    try:
+                        from services.weekly_memorial import broadcast_memorial
+                        await broadcast_memorial(bot)
+                        _set_state("last_memorial_date", today)
+                    except Exception as e:
+                        logging.error(f"[DAYCYCLE] memorial error: {e}")
+
             if hour == 22:
                 last = _get_state("last_evening_notification")
                 if last != today:

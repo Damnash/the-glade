@@ -127,6 +127,20 @@ def die_in_maze(user_id: int, lang: str = "ru") -> dict:
     # 4. Респавн
     die_and_respawn(user_id)
 
+    # 5. Записать в memorial (для поминания)
+    try:
+        from services.weekly_memorial import record_death
+        _player = get_player(user_id)
+        if _player:
+            _name = _player["display_name"] or _player["username"] or "?"
+            record_death(
+                user_id, _name,
+                f"Умер в секции {section_id} (слой {layer})",
+            )
+    except Exception as e:
+        import logging
+        logging.warning(f"[DEATH] memorial failed: {e}")
+
     # 5. Проклятие (50% при смерти)
     try:
         import random

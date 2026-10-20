@@ -560,6 +560,18 @@ def init_db():
     """)
     cur.execute("CREATE INDEX IF NOT EXISTS idx_buffs_user_exp ON player_buffs(user_id, expires_at)")
 
+    # Поминание павших
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS memorial (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER,
+            display_name TEXT,
+            message TEXT,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+    """)
+    cur.execute("CREATE INDEX IF NOT EXISTS idx_memorial_date ON memorial(created_at)")
+
     # Выпавшие дневники (потеря при смерти)
     cur.execute("""
         CREATE TABLE IF NOT EXISTS dropped_diaries (
