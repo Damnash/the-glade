@@ -1376,5 +1376,6 @@
   "rumor.jeff_scratches": "I patch people up. But some scratches don't heal. They stay. Like the Maze wants to leave a mark. I have a few. I don't show them.",
   "rumor.jeff_dead": "I was there when the first runner died. I couldn't save him. I still hear his breath. Sometimes. At night. When it's quiet.",
   "rumor.winston_water": "The well is deeper than it looks. I drop a stone — I don't hear it hit. I used to. Now I don't.",
-  "rumor.winston_north": "The north wall grows ivy faster than the others. I trim it every week. It comes back in a day. I've stopped trimming."
+  "rumor.winston_north": "The north wall grows ivy faster than the others. I trim it every week. It comes back in a day. I've stopped trimming.",
+  "evening_fire.text": "🔥 <b>The Evening Fire</b>\n\nNight has fallen. The gates are closed. Around the fire — faces. Some familiar, some new. No one speaks loudly. The fire crackles, and the shadows on the walls seem to move on their own.\n\nSomeone starts a story. Another laughs — quietly. For a moment, it feels almost like home. Almost.\n\n<i>The Maze is quiet tonight. But it is waiting.</i>"
 }
