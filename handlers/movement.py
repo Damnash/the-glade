@@ -25,9 +25,22 @@ def render_location(lang: str, loc_key: str, viewer_id: int) -> str:
     parts = [
         t("look.header", lang, name=name),
         desc,
+    ]
+
+    # Звуковое описание (атмосфера)
+    try:
+        import random
+        from content.loc_sounds import LOC_SOUNDS
+        sounds = LOC_SOUNDS.get(loc_key)
+        if sounds:
+            parts.append(f"<i>{random.choice(sounds)}</i>")
+    except Exception:
+        pass
+
+    parts.extend([
         t("look.exits", lang, exits=exits),
         t("look.players", lang, players=names),
-    ]
+    ])
 
     # Подсказка — добавляем ТОЛЬКО если есть ключ
     hint_key = HINTS.get(loc_key)
