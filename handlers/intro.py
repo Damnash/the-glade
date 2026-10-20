@@ -16,7 +16,7 @@ def intro_keyboard(lang: str, step: str) -> InlineKeyboardMarkup:
     if step == "step_dark":
         return InlineKeyboardMarkup(inline_keyboard=[[
             InlineKeyboardButton(text=t("intro.btn_open_eyes", lang),
-                                  callback_data="intro:next:step_wake")
+                                  callback_data="intro:next:step_choose_perk")
         ]])
 
     if step == "step_wake":
@@ -37,7 +37,7 @@ def intro_keyboard(lang: str, step: str) -> InlineKeyboardMarkup:
                                   callback_data="intro:next:step_q1")
         ]])
 
-    if step == "step_q1":
+    if step in ("step_choose", "step_choose_perk", "step_q1"):
         # Перки
         buttons = []
         for key, perk in PERKS.items():
@@ -49,7 +49,7 @@ def intro_keyboard(lang: str, step: str) -> InlineKeyboardMarkup:
             ])
         return InlineKeyboardMarkup(inline_keyboard=buttons)
 
-    if step == "step_q2":
+    if step in ("step_choose_prof", "step_q2"):
         # Профессии
         buttons = []
         for key, prof in PROFESSIONS.items():
@@ -84,11 +84,11 @@ def render_intro(lang: str, step: str, player: dict = None) -> str:
     if step == "step_arrive":
         return t("intro.step_arrive", lang)
 
-    if step == "step_q1":
-        return t("intro.step_q1", lang)
+    if step in ("step_choose", "step_choose_perk", "step_q1"):
+        return t("intro.step_choose", lang)
 
-    if step == "step_q2":
-        return t("intro.step_q2", lang)
+    if step in ("step_choose_prof", "step_q2"):
+        return t("intro.step_choose_prof", lang)
 
     if step == "step_gift":
         lines = [t("intro.step_gift", lang), ""]
@@ -166,8 +166,8 @@ async def on_intro_perk(callback: CallbackQuery, bot: Bot):
     )
 
     from core.bot_helpers import edit_main
-    text = render_intro(lang, "step_q2")
-    kb = intro_keyboard(lang, "step_q2")
+    text = render_intro(lang, "step_choose_prof")
+    kb = intro_keyboard(lang, "step_choose_prof")
     await edit_main(bot, user_id, text, kb)
 
 

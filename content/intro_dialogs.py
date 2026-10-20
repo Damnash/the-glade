@@ -2,12 +2,14 @@
 
 INTRO_STEPS = [
     "intro.step_dark",
-    "intro.step_wake",
-    "intro.step_cage",
-    "intro.step_arrive",
-    "intro.step_q1",       # Перк
-    "intro.step_q2",       # Профессия
-    "intro.step_gift",     # Инвентарь
+    "intro.step_choose",   # Перк + профессия на одном этапе
+    "intro.step_gift",
+]
+
+# Внутренние шаги (не в INTRO_STEPS, но нужны для логики)
+INTERNAL_STEPS = [
+    "step_choose_perk",    # выбор перка
+    "step_choose_prof",    # выбор профессии (после перка)
 ]
 
 
