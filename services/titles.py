@@ -102,7 +102,7 @@ def check_new_titles(user_id: int) -> list[str]:
                 if p:
                     lang = p["language"]
                     add_event(user_id, "new_title",
-                              t("title.new", lang, title=t(spec["name_key"], lang)),
+                              t("title.new", lang, title=f"{spec['icon']} {t(spec['name_key'], lang)}"),
                               severity="important")
                     cleanup_old_events(user_id)
             except Exception:
