@@ -1351,5 +1351,7 @@
   "maze.diary_of": "Diary of {name}",
   "maze.diary_not_found": "Diary not found.",
   "maze.diary_found": "📖 Diary read.",
-  "maze.diary_btn": "📖 Diary of {name}"
+  "maze.diary_btn": "📖 Diary of {name}",
+  "more.btn": "📋 More",
+  "more.title": "More"
 }

@@ -432,3 +432,30 @@ async def on_use(callback):
         await refresh_main(bot, user_id)
     finally:
         await bot.session.close()
+
+async def on_more(callback):
+    """nav:more:<session> — подменю «Ещё»."""
+    from core.bot_helpers import check_session, edit_main, make_bot
+    from keyboards.more import more_keyboard
+
+    user_id = callback.from_user.id
+    player = get_player(user_id)
+    if not player:
+        return
+    lang = player["language"]
+
+    if not check_session(user_id, callback.data):
+        await callback.answer(t("log.stale", lang), show_alert=True)
+        return
+
+    session = player.get("current_session", "")
+    text = f"📋 <b>{t('more.title', lang)}</b>"
+    kb = more_keyboard(lang, session)
+
+    bot = make_bot()
+    try:
+        await edit_main(bot, user_id, text, kb)
+    finally:
+        await bot.session.close()
+    await callback.answer()
+

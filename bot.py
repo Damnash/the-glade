@@ -252,6 +252,7 @@ async def main():
     dp.callback_query.register(nav_cb.on_actions,   F.data.startswith("nav:actions"))
     dp.callback_query.register(nav_cb.on_work,      F.data.startswith("nav:work"))
     dp.callback_query.register(nav_cb.on_back,      F.data.startswith("nav:back"))
+    dp.callback_query.register(nav_cb.on_more,      F.data.startswith("nav:more"))
 
     # Daily quest
     dp.callback_query.register(dq_h.show_daily_quest, F.data.startswith("daily_quest:show"))

@@ -57,26 +57,13 @@ def main_keyboard(lang: str, context: dict, session: str = "") -> InlineKeyboard
 
     # 3) Информация
     rows.append([
-        InlineKeyboardButton(text=t("btn.inventory", lang), callback_data=f"nav:inv{s}"),
-        InlineKeyboardButton(text=t("btn.stats", lang),     callback_data=f"nav:stats{s}"),
-    ])
-    rows.append([
         InlineKeyboardButton(text=t("map.btn_open", lang),   callback_data=f"map:list{s}"),
         InlineKeyboardButton(text=t("radio.btn_open", lang), callback_data=f"radio:menu{s}"),
     ])
 
-    # 4) Социалка / прогресс
+    # 4) Сервис (Ещё + Помощь)
     rows.append([
-        InlineKeyboardButton(text=t("journal.btn", lang), callback_data=f"journal:show:menu{s}"),
-        InlineKeyboardButton(text=t("diary.btn", lang),   callback_data=f"diary:show{s}"),
-    ])
-    rows.append([
-        InlineKeyboardButton(text=t("keys.btn", lang),    callback_data=f"keys:show{s}"),
-        InlineKeyboardButton(text="⚔️ PvP",              callback_data=f"pvp:flag{s}"),
-    ])
-
-    # 5) Сервис (помощь — одна, внизу)
-    rows.append([
+        InlineKeyboardButton(text=t("more.btn", lang),  callback_data=f"nav:more{s}"),
         InlineKeyboardButton(text=t("nav.help", lang), callback_data=f"help:main{s}"),
     ])
 
