@@ -6,7 +6,7 @@ NPCS = {
         "desc_key": "npc.frypan.desc",
         "location": "kitchen",
         "dialog_key": "npc.frypan.dialog",
-        "actions": ["trade_food", "bring_meat"],
+        "actions": ["trade_food", "bring_meat", "hint"],
     },
     "clint": {
         "name_key": "npc.clint.name",
@@ -20,14 +20,14 @@ NPCS = {
         "desc_key": "npc.jeff.desc",
         "location": "medbay",
         "dialog_key": "npc.jeff.dialog",
-        "actions": ["heal", "buy_bandage"],
+        "actions": ["heal", "buy_bandage", "hint"],
     },
     "minho": {
         "name_key": "npc.minho.name",
         "desc_key": "npc.minho.desc",
         "location": "watchtower",
         "dialog_key": "npc.minho.dialog",
-        "actions": ["story", "show_map"],
+        "actions": ["story", "show_map", "hint"],
     },
     "chuck": {
         "name_key": "npc.chuck.name",
@@ -41,14 +41,14 @@ NPCS = {
         "desc_key": "npc.alby.desc",
         "location": "council",
         "dialog_key": "npc.alby.dialog",
-        "actions": ["story", "talk"],
+        "actions": ["story", "talk", "hint"],
     },
     "winston": {
         "name_key": "npc.winston.name",
         "desc_key": "npc.winston.desc",
         "location": "farms",
         "dialog_key": "npc.winston.dialog",
-        "actions": ["trade", "bring_water"],
+        "actions": ["trade", "bring_water", "hint"],
     },
     "newt": {
         "name_key": "npc.newt.name",

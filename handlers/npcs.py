@@ -190,6 +190,16 @@ async def on_npc_action(callback: CallbackQuery):
         await _jeff_buy_bandage(callback, user_id, lang)
     elif npc_key == "chuck" and action == "hint":
         await _chuck_hint(callback, user_id, lang)
+    elif npc_key == "frypan" and action == "hint":
+        await _npc_hint(callback, user_id, lang, "frypan")
+    elif npc_key == "jeff" and action == "hint":
+        await _npc_hint(callback, user_id, lang, "jeff")
+    elif npc_key == "minho" and action == "hint":
+        await _npc_hint(callback, user_id, lang, "minho")
+    elif npc_key == "winston" and action == "hint":
+        await _npc_hint(callback, user_id, lang, "winston")
+    elif npc_key == "alby" and action == "hint":
+        await _npc_hint(callback, user_id, lang, "alby")
     elif npc_key == "minho" and action == "show_map":
         await _minho_map(callback, user_id, lang)
     elif npc_key == "clint" and action == "craft":
@@ -296,11 +306,54 @@ async def _jeff_heal(callback, user_id, lang):
         await bot.session.close()
 
 
+async def _npc_hint(callback, user_id, lang, npc_key):
+    """Подсказка от NPC.
+    - Чак: по очереди (5).
+    - Остальные: одна подсказка (потом «уже говорил»).
+    """
+    from content.npc_hints import NPC_HINTS
+    from db.connection import get_conn
+
+    hints = NPC_HINTS.get(npc_key, [])
+    if not hints:
+        await callback.answer(t("npc.not_implemented", lang), show_alert=True)
+        return
+
+    # Сколько раз игрок уже говорил с NPC
+    conn = get_conn()
+    try:
+        cur = conn.cursor()
+        cur.execute(
+            "SELECT COUNT(*) FROM npc_visits WHERE user_id = ? AND npc_key = ?",
+            (user_id, npc_key),
+        )
+        visits = cur.fetchone()[0]
+    finally:
+        conn.close()
+
+    # Индекс подсказки: для Чака — visits-1 (первый визит → 0)
+    # Для остальных — 0 всегда, но проверяем, говорил ли уже
+    if npc_key == "chuck":
+        idx = max(0, visits - 1)
+    else:
+        idx = 0
+
+    if idx >= len(hints):
+        # Все подсказки кончились
+        await callback.answer(t("npc.hint.all_done", lang), show_alert=True)
+        return
+
+    # Для не-Чака: если уже говорил (visits > 1) — «уже говорил»
+    if npc_key != "chuck" and visits > 1:
+        await callback.answer(t("npc.hint.already", lang), show_alert=True)
+        return
+
+    hint_key = hints[idx]
+    await callback.answer(t(hint_key, lang), show_alert=True)
+
+
 async def _chuck_hint(callback, user_id, lang):
-    import random
-    hints = ["npc.chuck.hint.1", "npc.chuck.hint.2", "npc.chuck.hint.3",
-             "npc.chuck.hint.4", "npc.chuck.hint.5"]
-    await callback.answer(t(random.choice(hints), lang), show_alert=True)
+    await _npc_hint(callback, user_id, lang, "chuck")
 
 
 async def _minho_map(callback, user_id, lang):

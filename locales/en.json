@@ -1452,5 +1452,12 @@
   "npc.winston.dialog_first": "\"Here to work? Good. Or just to talk? The earth doesn't care. It just is. Sit if you want. The garden is quiet today.\"",
   "npc.winston.dialog_hungry": "\"You look hungry. Take this. Don't argue. The earth provides — we just have to share. That's the only way we survive.\"",
   "npc.gally.dialog_first": "\"Another newcomer. Great. Just what we need. Don't expect me to be nice. I've seen too many newcomers die. You'll probably die too. Prove me wrong.\"",
-  "npc.gally.dialog_hurt": "\"You're bleeding. Good. Maybe you'll learn. Pain is the only teacher here. The Maze doesn't care about your feelings. Neither do I.\""
+  "npc.gally.dialog_hurt": "\"You're bleeding. Good. Maybe you'll learn. Pain is the only teacher here. The Maze doesn't care about your feelings. Neither do I.\"",
+  "npc.hint.all_done": "💡 I've told you everything I know.",
+  "npc.hint.already": "💡 I already told you. Think.",
+  "npc.frypan.hint.1": "💡 Farm work gives food. Food gives life. Don't skip meals — the Maze doesn't forgive hunger.",
+  "npc.jeff.hint.1": "💡 Bandage heals 20+ HP. Use it in the Maze — not in the Glade. In the Glade, sleep.",
+  "npc.minho.hint.1": "💡 The center of the Maze — the Griever there is ancient. Don't go alone. Don't go without a plan.",
+  "npc.winston.hint.1": "💡 Water is more valuable than food. Trade with me — or find flasks in the Maze. Dehydration kills faster.",
+  "npc.alby.hint.1": "💡 Talk to everyone. Listen more than you speak. The Glade survives on trust — and trust is built slowly."
 }
