@@ -385,15 +385,43 @@ def bring_to_npc(user_id: int, npc_key: str, item_key: str, qty: int = 1) -> dic
     if not player:
         raise NPCActionError("start.need_start")
 
-    if not has_item(user_id, item_key, qty):
-        raise NPCActionError("npc.no_item", item=item_key, need=qty)
-
-    # Списание
-    if not remove_item(user_id, item_key, qty):
-        raise NPCActionError("npc.no_item", item=item_key, need=qty)
-
-    # Проверка ежедневного квеста
+    # 1. Проверка активного ежедневного квеста ДО списания
     quest_rec = get_today_quest(user_id)
+    if not quest_rec:
+        raise NPCActionError("npc.no_quest")
+
+    if quest_rec["status"] == "complete":
+        raise NPCActionError("npc.quest_full")
+
+    if quest_rec["status"] != "active":
+        raise NPCActionError("npc.no_quest")
+
+    quest = get_quest(quest_rec["quest_key"])
+    if not quest:
+        raise NPCActionError("npc.no_quest")
+
+    # Маппинг: npc + item → type
+    expected_type = None
+    if npc_key == "frypan" and item_key == "meat":
+        expected_type = "bring_meat"
+    elif npc_key == "winston" and item_key == "water_flask":
+        expected_type = "find_water"
+
+    if not expected_type or quest["type"] != expected_type:
+        raise NPCActionError("npc.wrong_quest")
+
+    # 2. Имя предмета (для сообщений)
+    from core.i18n import t as _t
+    _lang = player["language"]
+    _item_name = _t(f"item.{item_key}.name", _lang)
+
+    # 3. Проверка наличия
+    if not has_item(user_id, item_key, qty):
+        raise NPCActionError("npc.no_item", item=_item_name, need=qty)
+
+    # 4. Списание
+    if not remove_item(user_id, item_key, qty):
+        raise NPCActionError("npc.no_item", item=_item_name, need=qty)
     progress_updated = False
     quest_completed = False
 
