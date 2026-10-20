@@ -1350,5 +1350,6 @@
   "maze.dropped_diaries_text": "📖 There are {n} dropped diaries here. Read them:",
   "maze.diary_of": "Diary of {name}",
   "maze.diary_not_found": "Diary not found.",
-  "maze.diary_found": "📖 Diary read."
+  "maze.diary_found": "📖 Diary read.",
+  "maze.diary_btn": "📖 Diary of {name}"
 }

@@ -1372,5 +1372,6 @@
   "maze.dropped_diaries_text": "📖 Здесь {n} выпавших дневников. Прочитай:",
   "maze.diary_of": "Дневник {name}",
   "maze.diary_not_found": "Дневник не найден.",
-  "maze.diary_found": "📖 Дневник прочитан."
+  "maze.diary_found": "📖 Дневник прочитан.",
+  "maze.diary_btn": "📖 Дневник {name}"
 }
