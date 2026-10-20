@@ -81,6 +81,13 @@ async def daycycle_events_task(bot):
                     await _broadcast(bot, "daycycle.evening")
                     _set_state("last_evening_notification", today)
 
+                    # Вечерний костёр — всем игрокам
+                    try:
+                        from services.evening_fire import start_evening_fire_async
+                        await start_evening_fire_async(bot)
+                    except Exception as e:
+                        logging.error(f"[DAYCYCLE] evening fire error: {e}")
+
         except asyncio.CancelledError:
             raise
         except Exception as e:
