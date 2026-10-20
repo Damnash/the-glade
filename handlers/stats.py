@@ -50,10 +50,22 @@ async def cmd_stats(message: Message):
     from services.bonuses import get_player_bonus
     bonus = get_player_bonus(player)
 
+    # Титул (если есть)
+    title_line = ""
+    try:
+        from services.titles import get_player_title_display
+        t_disp = get_player_title_display(user_id, lang)
+        if t_disp:
+            title_line = t_disp
+    except Exception:
+        pass
+
     lines = [
         f"{t('stats.header_name', lang, name=name)}",
-        "",
     ]
+    if title_line:
+        lines.append(f"<i>{title_line}</i>")
+    lines.append("")
 
     if prof_line:
         lines.append(prof_line)

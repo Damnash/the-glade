@@ -24,6 +24,14 @@ async def cmd_who(message: Message):
     for p in others:
         status = t(f"status.{p['status']}", lang)
         name = p["display_name"] or p["username"]
+        # Титул (если есть)
+        try:
+            from services.titles import get_player_title_display
+            t_disp = get_player_title_display(p["user_id"], lang)
+            if t_disp:
+                name = f"{name} {t_disp}"
+        except Exception:
+            pass
         lines.append(t("who.line", lang, name=name, status=status))
     await message.answer("\n".join(lines))
 

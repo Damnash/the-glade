@@ -537,6 +537,17 @@ def init_db():
     """)
     cur.execute("CREATE INDEX IF NOT EXISTS idx_diary_user ON player_diary(user_id, created_at DESC)")
 
+    # Титулы игрока
+    cur.execute("""
+        CREATE TABLE IF NOT EXISTS player_titles (
+            user_id INTEGER,
+            title_key TEXT,
+            awarded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (user_id, title_key)
+        )
+    """)
+    cur.execute("CREATE INDEX IF NOT EXISTS idx_titles_user ON player_titles(user_id)")
+
     # Выпавшие дневники (потеря при смерти)
     cur.execute("""
         CREATE TABLE IF NOT EXISTS dropped_diaries (

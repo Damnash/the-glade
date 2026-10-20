@@ -139,6 +139,14 @@ async def refresh_main(bot: Bot, user_id: int, new_session_flag: bool = True):
             import logging
             logging.error(f"[refresh_main] daily quest error: {e}")
 
+    # Проверка новых титулов
+    try:
+        from services.titles import check_new_titles
+        check_new_titles(user_id)
+    except Exception as e:
+        import logging
+        logging.error(f"[refresh_main] titles error: {e}")
+
     # Новый session
     session = new_session()
     update_player_fields(user_id, {"current_session": session})
