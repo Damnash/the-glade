@@ -2,7 +2,6 @@
 #
 # Логика ежедневных личных квестов.
 # Один квест на игрока в сутки (UTC).
-
 import logging
 from datetime import datetime
 from zoneinfo import ZoneInfo
@@ -213,7 +212,6 @@ def try_complete(user_id: int) -> dict | None:
             )
             cleanup_old_events(user_id)
     except Exception as e:
-        import logging
         logging.warning(f"[DQ] log failed: {e}")
 
     logging.info(f"[DQ] user={user_id} rewarded for {quest_key}: {reward}")
