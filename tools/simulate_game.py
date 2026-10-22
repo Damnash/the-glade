@@ -473,6 +473,258 @@ def step_20_clan_open():
     log("20. clan open + join", ok, f"clan={clan['name'] if clan else '?'}, members={members}, is_open={clan['is_open'] if clan else '?'}")
 
 
+
+
+def step_21_pvp_flag():
+    """PvP-флаг: set, has, clear."""
+    from db.pvp import set_pvp_flag, has_pvp_flag, clear_pvp_flag, get_pvp_flag_time_left
+
+    set_pvp_flag(TEST_USER_ID)
+    has = has_pvp_flag(TEST_USER_ID)
+    left = get_pvp_flag_time_left(TEST_USER_ID)
+    clear_pvp_flag(TEST_USER_ID)
+    has_after = has_pvp_flag(TEST_USER_ID)
+
+    ok = has and left > 0 and not has_after
+    log("21. pvp flag (set/has/clear)", ok, f"has={has}, left={left}s, after_clear={has_after}")
+
+
+def step_22_pvp_attack():
+    """PvP-атака: attack_player (урон по жертве)."""
+    from db.pvp import set_pvp_flag
+    from services.pvp import attack_player, PvPError
+    from db.players import get_player as gp, update_player_fields as upf
+
+    # Оба в центре, оба с PvP-флагом
+    upf(TEST_USER_ID, {"location": "center", "hp": 100})
+    upf(999999998, {"location": "center", "hp": 100})
+    set_pvp_flag(TEST_USER_ID)
+    set_pvp_flag(999999998)
+
+    victim = gp(999999998)
+    victim_name = victim["username"] or victim["display_name"]
+
+    # Симулировать: игрок должен быть в PvP-зоне (центр лабиринта, а не Глэйда)
+    # is_pvp_zone проверяет maze_layer > 0 → надо обоих в лабиринт
+    upf(TEST_USER_ID, {"maze_layer": 1, "maze_section": "L1_N1"})
+    upf(999999998, {"maze_layer": 1, "maze_section": "L1_N1"})
+
+    try:
+        result = attack_player(TEST_USER_ID, victim_name)
+        ok = result["damage"] > 0 and result["victim_id"] == 999999998
+        log("22. pvp attack", ok, f"dmg={result['damage']}, victim_hp={result['victim_hp']}")
+    except PvPError as e:
+        log("22. pvp attack", False, f"{e.key} {e.kwargs}")
+
+
+def step_23_pvp_duel():
+    """PvP-дуэль: challenge + accept (через services)."""
+    from services.pvp import challenge_duel, resolve_duel, PvPError
+    from db.players import get_player as gp, update_player_fields as upf
+    import random
+
+    # Ставка 0
+    victim = gp(999999998)
+    victim_name = victim["username"] or victim["display_name"]
+
+    try:
+        result = challenge_duel(TEST_USER_ID, victim_name, stake=0)
+        duel_id = result["duel_id"]
+
+        # Случайный победитель (как в handler)
+        winner_id = random.choice([TEST_USER_ID, 999999998])
+        resolve = resolve_duel(duel_id, winner_id)
+
+        ok = resolve["stake"] == 0
+        log("23. duel (challenge+resolve)", ok, f"winner={resolve['winner_name']}, stake={resolve['stake']}")
+    except PvPError as e:
+        log("23. duel", False, f"{e.key} {e.kwargs}")
+
+
+def step_24_clan_chat():
+    """Клан-чат: send_clan_message (2 участника)."""
+    from services.clans import send_clan_message, ClanError
+    from db.clans import get_player_clan
+
+    clan = get_player_clan(TEST_USER_ID)
+    if not clan:
+        log("24. clan chat", False, "no clan")
+        return
+
+    try:
+        result = send_clan_message(TEST_USER_ID, "Привет, клан!")
+        ok = len(result["recipients"]) >= 1 and result["text"] == "Привет, клан!"
+        log("24. clan chat", ok, f"recipients={result['recipients']}, text={result['text'][:20]}")
+    except ClanError as e:
+        log("24. clan chat", False, f"{e.key}")
+
+
+def step_25_npc_bring_meat():
+    """NPC сдать мясо: bring_to_npc (с активным квестом)."""
+    from services.daily_quests import ensure_today_quest, get_today_quest
+    from db.connection import get_conn
+    from services.npc_actions import bring_to_npc, NPCActionError
+    from db.inventory import add_item
+    from db.players import update_player_fields as upf
+
+    # Принудительно взять квест bring_meat_3
+    today = __import__("datetime").datetime.utcnow().date().isoformat()
+    conn = get_conn()
+    try:
+        cur = conn.cursor()
+        cur.execute("DELETE FROM daily_quests WHERE user_id = ? AND quest_date = ?", (TEST_USER_ID, today))
+        cur.execute("""
+            INSERT INTO daily_quests (user_id, quest_date, quest_key, progress, need, status)
+            VALUES (?, ?, 'bring_meat_3', 0, 3, 'active')
+        """, (TEST_USER_ID, today))
+        conn.commit()
+    finally:
+        conn.close()
+
+    # Дать 1 мясо
+    add_item(TEST_USER_ID, "meat", 1)
+
+    try:
+        result = bring_to_npc(TEST_USER_ID, "frypan", "meat", 1)
+        ok = result["ok"] and result["progress_updated"]
+        log("25. npc bring meat", ok, f"progress_updated={result['progress_updated']}, completed={result['quest_completed']}")
+    except NPCActionError as e:
+        log("25. npc bring meat", False, f"{e.key} {e.kwargs}")
+
+
+def step_26_daily_quest_complete():
+    """Daily quest: complete через try_complete (награда)."""
+    from services.daily_quests import get_today_quest, try_complete, add_progress
+    from db.connection import get_conn
+    from datetime import datetime
+
+    today = datetime.utcnow().date().isoformat()
+
+    # Установить квест complete
+    conn = get_conn()
+    try:
+        cur = conn.cursor()
+        cur.execute("DELETE FROM daily_quests WHERE user_id = ? AND quest_date = ?", (TEST_USER_ID, today))
+        cur.execute("""
+            INSERT INTO daily_quests (user_id, quest_date, quest_key, progress, need, status)
+            VALUES (?, ?, 'kill_griever_1', 1, 1, 'complete')
+        """, (TEST_USER_ID, today))
+        conn.commit()
+    finally:
+        conn.close()
+
+    from db.players import get_player, update_player_fields as upf
+    p = get_player(TEST_USER_ID)
+    tokens_before = p["tokens"]
+
+    result = try_complete(TEST_USER_ID)
+    p = get_player(TEST_USER_ID)
+    ok = result is not None and p["tokens"] > tokens_before
+
+    log("26. daily quest complete", ok,
+        f"reward={result['reward'] if result else None}, tokens {tokens_before} → {p['tokens']}")
+
+
+def step_27_radio():
+    """Радио: send_on_frequency + get_freq_history."""
+    from services.radio import get_radio, send_on_frequency, get_freq_history
+    from db.players import update_player_fields as upf
+
+    upf(TEST_USER_ID, {"location": "center"})
+    radio = get_radio(TEST_USER_ID)
+    if not radio["is_on"]:
+        from services.radio import toggle_radio
+        toggle_radio(TEST_USER_ID)
+
+    result = send_on_frequency(TEST_USER_ID, "Тест радио")
+    history = get_freq_history(result["frequency"], limit=5)
+    ok = any(m["text"] == "Тест радио" for m in history)
+
+    log("27. radio (send + history)", ok,
+        f"freq={result['frequency']}, listeners={len(result['listeners'])}, history_len={len(history)}")
+
+
+def step_28_whisper():
+    """Шёпот: send_whisper (оба в центре)."""
+    from services.whisper import send_whisper, get_unread_whispers, mark_whispers_read
+    from db.players import get_player as gp, update_player_fields as upf
+
+    upf(TEST_USER_ID, {"location": "center"})
+    upf(999999998, {"location": "center"})
+
+    target = gp(999999998)
+    target_name = target["username"] or target["display_name"]
+
+    try:
+        result = send_whisper(TEST_USER_ID, target_name, "Тайное сообщение")
+        unread = get_unread_whispers(999999998)
+        ok = len(unread) >= 1
+        log("28. whisper", ok,
+            f"to={result['to_name']}, unread={len(unread)}")
+        mark_whispers_read(999999998)
+    except Exception as e:
+        log("28. whisper", False, str(e))
+
+
+def step_29_say():
+    """Say: add_event в локации (2 участника)."""
+    from services.event_log import add_event, get_recent_events
+    from db.players import get_player as gp, update_player_fields as upf
+
+    upf(TEST_USER_ID, {"location": "center"})
+    upf(999999998, {"location": "center"})
+
+    # Симулировать: add_event для получателя
+    add_event(999999998, "say_received", "💬 SimUser: Привет", severity="chat")
+    events = get_recent_events(999999998, limit=5, severity="chat")
+    ok = any("Привет" in e["text"] for e in events)
+
+    log("29. say (event_log)", ok, f"events={[e['text'][:30] for e in events]}")
+
+
+def step_30_gates_final():
+    """Финал: 5 ключей → try_open_gates (в центре)."""
+    from services.achievements import try_open_gates
+    from db.players import get_player as gp, update_player_fields as upf
+    from db.keys import has_player_key
+    from core.maze_current import get_current_season
+
+    season = get_current_season()
+
+    # Оба в центре лабиринта
+    upf(TEST_USER_ID, {"maze_layer": 1, "maze_section": "L1_C"})
+    upf(999999998, {"maze_layer": 1, "maze_section": "L1_C"})
+
+    # Выдать 5 ключей обоим через season_keys
+    from db.connection import get_conn
+    conn = get_conn()
+    try:
+        cur = conn.cursor()
+        for uid in (TEST_USER_ID, 999999998):
+            for num in (1, 2, 3, 4, 5):
+                cur.execute("""
+                    INSERT OR IGNORE INTO season_keys
+                    (season_id, key_number, layer, section_id, wing, found_by)
+                    VALUES (?, ?, 1, 'L1_C', 'C', ?)
+                """, (season, num, uid))
+        conn.commit()
+    finally:
+        conn.close()
+
+    # try_open_gates: need tier players_at_gates. Пока 2 игрока, tier tiny → 1
+    result = try_open_gates(TEST_USER_ID)
+    # Может быть None, если gates уже открыты, или если не хватает игроков
+    if result:
+        ok = len(result["winners"]) >= 1
+        log("30. gates open (final)", ok, f"winners={result['winners']}")
+    else:
+        # Проверить, что gates открыты или уже открывались
+        from services.achievements import get_gates_info
+        info = get_gates_info()
+        ok = info["is_open"]
+        log("30. gates (already open or no winners)", ok, f"is_open={info['is_open']}")
+
+
 def main():
     print("=== SIMULATE GAME ===\n")
     cleanup_test_user()
@@ -497,7 +749,17 @@ def main():
         step_18_npc_dialog_variants()
         step_19_npc_hint()
         step_20_clan_open()
-        print("\n=== RESULT: ALL 20 STEPS OK ===")
+        step_21_pvp_flag()
+        step_22_pvp_attack()
+        step_23_pvp_duel()
+        step_24_clan_chat()
+        step_25_npc_bring_meat()
+        step_26_daily_quest_complete()
+        step_27_radio()
+        step_28_whisper()
+        step_29_say()
+        step_30_gates_final()
+        print("\n=== RESULT: ALL 30 STEPS OK ===")
     except SystemExit as e:
         print(f"\n=== RESULT: FAIL — {e} ===")
         raise
