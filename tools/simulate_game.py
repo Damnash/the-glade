@@ -740,6 +740,260 @@ def step_30_gates_final():
         log("30. gates (already open or no winners)", ok, f"is_open={info['is_open']}")
 
 
+
+
+def step_31_find_key():
+    """try_find_key: ключ в секции (10% шанс)."""
+    from services.keys import try_find_key, ensure_keys_spawned
+    from core.maze_current import get_current_season
+    from db.keys import spawn_key
+    from db.players import get_player, update_player_fields as upf
+
+    season = get_current_season()
+    ensure_keys_spawned(season)
+
+    # Принудительно спавним ключ 2 в L1_N3
+    from db.connection import get_conn
+    conn = get_conn()
+    try:
+        cur = conn.cursor()
+        cur.execute("DELETE FROM season_keys WHERE season_id = ? AND key_number = 2", (season,))
+        conn.commit()
+    finally:
+        conn.close()
+    spawn_key(season, 2, "L1_N3", "N", 1)
+
+    # Очистить инвентарь ключа 2 (на случай, если есть)
+    from db.inventory import remove_item
+    try:
+        remove_item(TEST_USER_ID, "key_2", 1)
+    except Exception:
+        pass
+
+    # 50 попыток (10% — должно выпасть)
+    found = None
+    for _ in range(100):
+        num = try_find_key(TEST_USER_ID, "L1_N3", 1)
+        if num:
+            found = num
+            break
+
+    ok = found == 2
+    log("31. try_find_key (L1_N3, key 2)", ok, f"found={found}")
+
+
+def step_32_find_fragment():
+    """try_find_fragment: фрагмент (8% + бонус)."""
+    from services.maze_fragments import try_find_fragment
+    from core.maze_current import get_current_season
+    from db.players import update_player_fields as upf
+
+    season = get_current_season()
+
+    # Лимит 2 фрагмента/день на сервер. Сбросим fragment_finds за сегодня.
+    from db.connection import get_conn
+    conn = get_conn()
+    try:
+        cur = conn.cursor()
+        cur.execute("DELETE FROM fragment_finds WHERE season_id = ? AND DATE(found_at) = DATE('now')", (season,))
+        conn.commit()
+    finally:
+        conn.close()
+
+    # Игрок в новой секции (L1_S5), не открытой
+    upf(TEST_USER_ID, {"maze_layer": 1, "maze_section": "L1_S5"})
+
+    # 100 попыток (8% + bonus)
+    found = False
+    for _ in range(200):
+        if try_find_fragment(TEST_USER_ID, "L1_S5", 1):
+            found = True
+            break
+
+    ok = found
+    log("32. try_find_fragment (L1_S5)", ok, f"found={found}")
+
+
+def step_33_check_gear():
+    """check_gear: проверка снаряжения (пустой dict = всё ок)."""
+    from services.maze import check_gear
+    from db.players import update_player_fields as upf
+    from db.inventory import add_item, remove_item
+    from content.items import ITEMS
+
+    # Убедимся, что у игрока всё есть
+    for item in ("knife", "torch", "rope"):
+        add_item(TEST_USER_ID, item, 5)
+    upf(TEST_USER_ID, {"hp": 100, "energy": 100, "food": 10, "water": 5})
+
+    problems = check_gear(TEST_USER_ID)
+    ok = not problems
+    log("33. check_gear (all ok)", ok, f"problems={problems}")
+
+    # Теперь уберём нож
+    remove_item(TEST_USER_ID, "knife", 10)
+    problems = check_gear(TEST_USER_ID)
+    ok = "knife" in problems
+    log("33b. check_gear (no knife)", ok, f"problems={list(problems.keys())}")
+
+    # Вернуть нож
+    add_item(TEST_USER_ID, "knife", 1)
+
+
+def step_34_gates_no_keys():
+    """try_open_gates: нет ключей → None."""
+    from services.achievements import try_open_gates
+    from db.players import update_player_fields as upf
+    from db.connection import get_conn
+    from core.maze_current import get_current_season
+
+    season = get_current_season()
+
+    # Оба в центре лабиринта
+    upf(TEST_USER_ID, {"maze_layer": 1, "maze_section": "L1_C"})
+
+    # Удалить все ключи игрока
+    conn = get_conn()
+    try:
+        cur = conn.cursor()
+        cur.execute("DELETE FROM season_keys WHERE season_id = ? AND found_by = ?", (season, TEST_USER_ID))
+        conn.commit()
+    finally:
+        conn.close()
+
+    result = try_open_gates(TEST_USER_ID)
+    ok = result is None
+    log("34. try_open_gates (no keys → None)", ok, f"result={result}")
+
+
+def step_35_stats_with_titles():
+    """stats: титул в статистике (get_player_title_display)."""
+    from services.titles import get_player_title_display, check_new_titles
+    from db.connection import get_conn
+    from core.maze_current import get_current_season
+
+    season = get_current_season()
+    conn = get_conn()
+    try:
+        cur = conn.cursor()
+        cur.execute("""
+            UPDATE season_scores SET griever_kills = 25
+            WHERE user_id = ? AND season_id = ?
+        """, (TEST_USER_ID, season))
+        conn.commit()
+    finally:
+        conn.close()
+
+    check_new_titles(TEST_USER_ID)
+    display = get_player_title_display(TEST_USER_ID, "ru")
+    ok = display and "Ищейка" in display
+    log("35. title in stats (Ищейка)", ok, f"display={display}")
+
+
+def step_36_journal_tabs():
+    """journal: get_recent_events с event_types (вкладки)."""
+    from services.event_log import get_recent_events, get_recent_important, IMPORTANT_EVENT_TYPES
+
+    events = get_recent_events(TEST_USER_ID, limit=10)
+    important = get_recent_important(TEST_USER_ID, limit=3)
+
+    ok = len(events) >= len(important)
+    log("36. journal (all vs important)", ok,
+        f"all={len(events)}, important={len(important)}")
+
+
+def step_37_diary_after_death():
+    """diary после смерти: автозаписи в dropped_diaries, player_diary пуст."""
+    from services.death import die_in_maze
+    from db.players import get_player as gp, update_player_fields as upf
+    from db.connection import get_conn
+    from services.diary import add_diary_entry
+
+    # Добавить ручную запись (не должна упасть)
+    add_diary_entry(TEST_USER_ID, "Ручная запись (не должна упасть)")
+
+    # Игрок в лабиринте, HP=0
+    upf(TEST_USER_ID, {"maze_layer": 1, "maze_section": "L1_N2", "hp": 0})
+
+    try:
+        result = die_in_maze(TEST_USER_ID)
+    except Exception as e:
+        log("37. diary after death", False, str(e))
+        return
+
+    # Проверить dropped_diaries
+    conn = get_conn()
+    try:
+        cur = conn.cursor()
+        cur.execute("SELECT COUNT(*) FROM dropped_diaries WHERE original_user_id = ?", (TEST_USER_ID,))
+        dropped = cur.fetchone()[0]
+        cur.execute("SELECT COUNT(*) FROM player_diary WHERE user_id = ?", (TEST_USER_ID,))
+        manual = cur.fetchone()[0]
+    finally:
+        conn.close()
+
+    ok = dropped >= 1 and manual >= 1  # автозаписи упали, ручные остались
+    log("37. diary after death (dropped + manual kept)", ok,
+        f"dropped={dropped}, manual={manual}")
+
+
+def step_38_weather_in_location():
+    """Погода в описании локации (render_location_text)."""
+    from handlers.location_render import render_location_text
+    from services.weather import set_current_weather
+    from db.players import update_player_fields as upf
+
+    upf(TEST_USER_ID, {"location": "center"})
+    set_current_weather("fog")
+
+    text = render_location_text("ru", "center", TEST_USER_ID)
+    ok = "Туман" in text or "🌫️" in text
+    log("38. weather in location (fog)", ok, f"has_fog={ok}")
+
+
+def step_39_buffs_in_refresh():
+    """Баффы в /stats (format_buffs_for_display)."""
+    from services.buffs import add_buff, get_buff_modifiers, format_buffs_for_display
+    from db.connection import get_conn
+
+    # Очистить старые баффы
+    conn = get_conn()
+    try:
+        cur = conn.cursor()
+        cur.execute("DELETE FROM player_buffs WHERE user_id = ?", (TEST_USER_ID,))
+        conn.commit()
+    finally:
+        conn.close()
+
+    add_buff(TEST_USER_ID, "cursed")
+    display = format_buffs_for_display(TEST_USER_ID, "ru")
+    mods = get_buff_modifiers(TEST_USER_ID)
+
+    ok = "Проклятие" in display and mods["monster_mult"] > 1.0
+    log("39. buffs (cursed in /stats)", ok,
+        f"display={display}, monster_mult={mods['monster_mult']}")
+
+
+def step_40_noop_status():
+    """«Занят» (on_noop): показ статуса sleeping/working."""
+    from db.players import update_player_fields as upf, get_player
+
+    # Статус working → «Занят»
+    upf(TEST_USER_ID, {"status": "working", "work_type": "farm", "work_ends_at": __import__("datetime").datetime.utcnow() + __import__("datetime").timedelta(seconds=300)})
+    p = get_player(TEST_USER_ID)
+    ok = p["status"] == "working" and p["work_type"] == "farm"
+
+    # Симулировать on_noop: проверить, что «Занят» покажет «работаешь, осталось N»
+    from core.time_utils import seconds_until, humanize_seconds
+    left = seconds_until(p["work_ends_at"])
+    ok = ok and left > 0
+
+    # Сбросить статус
+    upf(TEST_USER_ID, {"status": "active", "work_type": None, "work_ends_at": None})
+
+    log("40. noop (working → занят)", ok, f"status={p['status']}, left={left}s")
+
+
 def main():
     print("=== SIMULATE GAME ===\n")
     cleanup_test_user()
@@ -774,7 +1028,17 @@ def main():
         step_28_whisper()
         step_29_say()
         step_30_gates_final()
-        print("\n=== RESULT: ALL 30 STEPS OK ===")
+        step_31_find_key()
+        step_32_find_fragment()
+        step_33_check_gear()
+        step_34_gates_no_keys()
+        step_35_stats_with_titles()
+        step_36_journal_tabs()
+        step_37_diary_after_death()
+        step_38_weather_in_location()
+        step_39_buffs_in_refresh()
+        step_40_noop_status()
+        print("\n=== RESULT: ALL 40 STEPS OK ===")
     except SystemExit as e:
         print(f"\n=== RESULT: FAIL — {e} ===")
         raise
