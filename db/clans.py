@@ -446,3 +446,48 @@ def cleanup_clan_upgrades(clan_id: int):
     cur.execute("DELETE FROM clan_upgrades WHERE clan_id = ?", (clan_id,))
     conn.commit()
     conn.close()
+
+def get_open_clans(limit: int = 20) -> list[dict]:
+    """Открытые кланы (is_open=1) с числом участников."""
+    conn = get_conn()
+    try:
+        cur = conn.cursor()
+        cur.execute("""
+            SELECT c.clan_id, c.name, c.leader_id, c.motto, c.treasury,
+                   c.created_at, c.is_open,
+                   (SELECT COUNT(*) FROM clan_members m WHERE m.clan_id = c.clan_id) AS members
+            FROM clans c
+            WHERE c.is_open = 1
+            ORDER BY members DESC, c.created_at ASC
+            LIMIT ?
+        """, (limit,))
+        rows = cur.fetchall()
+    finally:
+        conn.close()
+    return [dict(r) for r in rows]
+
+
+def join_clan(clan_id: int, user_id: int, role: str = "recruit"):
+    """Добавить игрока в клан."""
+    conn = get_conn()
+    try:
+        cur = conn.cursor()
+        cur.execute("""
+            INSERT INTO clan_members (clan_id, user_id, role)
+            VALUES (?, ?, ?)
+        """, (clan_id, user_id, role))
+        conn.commit()
+    finally:
+        conn.close()
+
+
+def set_clan_open(clan_id: int, is_open: int):
+    """Включить/выключить открытость клана."""
+    conn = get_conn()
+    try:
+        cur = conn.cursor()
+        cur.execute("UPDATE clans SET is_open = ? WHERE clan_id = ?", (is_open, clan_id))
+        conn.commit()
+    finally:
+        conn.close()
+

@@ -363,3 +363,60 @@ def get_clan_bonuses(clan_id: int) -> dict:
                 bonuses[bkey] = bvalue
 
     return bonuses
+
+def join_open_clan(user_id: int, clan_id: int) -> dict:
+    """Вступить в открытый клан без приглашения."""
+    from db.clans import (
+        get_clan, get_player_clan, count_clan_members, join_clan,
+        set_clan_open,
+    )
+    # MAX_MEMBERS в db/clans нет — он в services
+    from services.clans import MAX_MEMBERS
+
+    if get_player_clan(user_id):
+        raise ClanError("clan.err.already_in_clan")
+
+    clan = get_clan(clan_id)
+    if not clan:
+        raise ClanError("clan.err.clan_not_found")
+
+    if not clan.get("is_open"):
+        raise ClanError("clan.err.not_open")
+
+    if count_clan_members(clan_id) >= MAX_MEMBERS:
+        raise ClanError("clan.err.max_members", max=MAX_MEMBERS)
+
+    join_clan(clan_id, user_id, role="recruit")
+
+    # Записать в журнал нового участника
+    try:
+        from core.i18n import t
+        from services.event_log import add_event, cleanup_old_events
+        from db.players import get_player
+        p = get_player(user_id)
+        if p:
+            add_event(user_id, "clan_joined",
+                      t("clan.joined", p["language"], name=clan["name"]),
+                      severity="important")
+            cleanup_old_events(user_id)
+    except Exception:
+        pass
+
+    return {"clan_id": clan_id, "clan_name": clan["name"]}
+
+
+def set_open(user_id: int, is_open: bool) -> bool:
+    """Лидер включает/выключает открытость клана."""
+    from db.clans import get_player_clan, get_player_role, set_clan_open
+
+    clan = get_player_clan(user_id)
+    if not clan:
+        raise ClanError("clan.err.not_in_clan")
+
+    role = get_player_role(user_id)
+    if role != "leader":
+        raise ClanError("clan.err.only_leader")
+
+    set_clan_open(clan["clan_id"], 1 if is_open else 0)
+    return is_open
+

@@ -1480,5 +1480,17 @@
   "npc.alby.action.hint": "💡 Hint",
   "npc.no_quest": "📋 You have no active daily quest. Check /daily_quest.",
   "npc.quest_full": "📋 Quest complete — claim the reward first (📋 Daily Quest).",
-  "npc.wrong_quest": "📋 This NPC doesn't need that for your current quest."
+  "npc.wrong_quest": "📋 This NPC doesn't need that for your current quest.",
+  "clan.open.title": "Open Clans",
+  "clan.open.pick": "Choose a clan to view:",
+  "clan.open.row": "👥 {name} ({n})",
+  "clan.open.members_line": "Members: {n}/{max}",
+  "clan.open.join": "✅ Join",
+  "clan.open.empty": "No open clans right now. Create your own or wait for invites.",
+  "clan.open.opened": "🔓 Clan is now open for joining.",
+  "clan.open.closed": "🔒 Clan is now closed (invite only).",
+  "clan.open.btn_list": "👥 Open clans",
+  "clan.open.btn_toggle_on": "🔓 Open",
+  "clan.open.btn_toggle_off": "🔒 Close",
+  "clan.err.not_open": "This clan is not open for joining."
 }

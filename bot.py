@@ -402,6 +402,10 @@ async def main():
     dp.callback_query.register(pvp_h.on_duel_accept, F.data.startswith("duel:accept:"))
     dp.callback_query.register(pvp_h.on_duel_decline, F.data.startswith("duel:decline:"))
     dp.callback_query.register(clans_h.on_clan_main, F.data.startswith("clan:main"))
+    dp.callback_query.register(clans_h.on_clan_open_list, F.data.startswith("clan:open_list"))
+    dp.callback_query.register(clans_h.on_clan_open_detail, F.data.startswith("clan:open:"))
+    dp.callback_query.register(clans_h.on_clan_join, F.data.startswith("clan:join:"))
+    dp.callback_query.register(clans_h.on_clan_toggle_open, F.data.startswith("clan:toggle_open"))
 
     # Clan upgrades + storage
     dp.callback_query.register(cu_h.show_clan_upgrades, F.data.startswith("clan_upgrades:show"))

@@ -588,3 +588,163 @@ async def on_clan_create_help(callback: CallbackQuery):
     finally:
         await bot.session.close()
     await callback.answer()
+
+# ============ Открытые кланы ============
+
+async def on_clan_open_list(callback):
+    """Список открытых кланов."""
+    from core.bot_helpers import check_session, edit_main, make_bot
+    from db.clans import get_open_clans
+    from keyboards.clans import clan_open_list_keyboard
+
+    user_id = callback.from_user.id
+    player = get_player(user_id)
+    if not player:
+        return
+    lang = player["language"]
+
+    if not check_session(user_id, callback.data):
+        await callback.answer(t("log.stale", lang), show_alert=True)
+        return
+
+    clans = get_open_clans(limit=10)
+    if not clans:
+        await callback.answer(t("clan.open.empty", lang), show_alert=True)
+        return
+
+    session = player.get("current_session", "")
+    text = f"👥 <b>{t('clan.open.title', lang)}</b>\n\n{t('clan.open.pick', lang)}"
+    kb = clan_open_list_keyboard(lang, clans, session)
+
+    bot = make_bot()
+    try:
+        await edit_main(bot, user_id, text, kb)
+    finally:
+        await bot.session.close()
+    await callback.answer()
+
+
+async def on_clan_open_detail(callback):
+    """Детали открытого клана (clan:open:<id>)."""
+    from core.bot_helpers import check_session, edit_main, make_bot
+    from db.clans import get_clan, count_clan_members
+    from keyboards.clans import clan_open_detail_keyboard
+    from services.clans import MAX_MEMBERS
+
+    user_id = callback.from_user.id
+    player = get_player(user_id)
+    if not player:
+        return
+    lang = player["language"]
+
+    if not check_session(user_id, callback.data):
+        await callback.answer(t("log.stale", lang), show_alert=True)
+        return
+
+    # clan:open:<id>:session
+    parts = callback.data.split(":")
+    if len(parts) < 3:
+        return
+    try:
+        clan_id = int(parts[2])
+    except ValueError:
+        return
+
+    clan = get_clan(clan_id)
+    if not clan:
+        await callback.answer(t("clan.err.clan_not_found", lang), show_alert=True)
+        return
+
+    if not clan.get("is_open"):
+        await callback.answer(t("clan.err.not_open", lang), show_alert=True)
+        return
+
+    members = count_clan_members(clan_id)
+    text = (
+        f"👥 <b>{clan['name']}</b>\n\n"
+        + t("clan.open.members_line", lang, n=members, max=MAX_MEMBERS) + "\n"
+        + (f"💬 <i>{clan['motto']}</i>\n" if clan.get("motto") else "")
+    )
+    session = player.get("current_session", "")
+    kb = clan_open_detail_keyboard(lang, clan_id, session)
+
+    bot = make_bot()
+    try:
+        await edit_main(bot, user_id, text, kb)
+    finally:
+        await bot.session.close()
+    await callback.answer()
+
+
+async def on_clan_join(callback):
+    """Вступить в открытый клан (clan:join:<id>)."""
+    from core.bot_helpers import check_session, refresh_main, make_bot
+    from services.clans import join_open_clan, ClanError
+
+    user_id = callback.from_user.id
+    player = get_player(user_id)
+    if not player:
+        return
+    lang = player["language"]
+
+    if not check_session(user_id, callback.data):
+        await callback.answer(t("log.stale", lang), show_alert=True)
+        return
+
+    parts = callback.data.split(":")
+    if len(parts) < 3:
+        return
+    try:
+        clan_id = int(parts[2])
+    except ValueError:
+        return
+
+    try:
+        result = join_open_clan(user_id, clan_id)
+    except ClanError as e:
+        await callback.answer(t(e.key, lang, **e.kwargs), show_alert=True)
+        return
+
+    await callback.answer(t("clan.joined", lang, name=result["clan_name"]), show_alert=True)
+
+    bot = make_bot()
+    try:
+        await refresh_main(bot, user_id)
+    finally:
+        await bot.session.close()
+
+
+async def on_clan_toggle_open(callback):
+    """Лидер открывает/закрывает клан."""
+    from core.bot_helpers import check_session, refresh_main, make_bot
+    from services.clans import set_open, ClanError
+
+    user_id = callback.from_user.id
+    player = get_player(user_id)
+    if not player:
+        return
+    lang = player["language"]
+
+    if not check_session(user_id, callback.data):
+        await callback.answer(t("log.stale", lang), show_alert=True)
+        return
+
+    # clan:toggle_open:on / clan:toggle_open:off
+    is_open = "on" in callback.data
+    try:
+        new_state = set_open(user_id, is_open)
+    except ClanError as e:
+        await callback.answer(t(e.key, lang, **e.kwargs), show_alert=True)
+        return
+
+    if new_state:
+        await callback.answer(t("clan.open.opened", lang))
+    else:
+        await callback.answer(t("clan.open.closed", lang))
+
+    bot = make_bot()
+    try:
+        await refresh_main(bot, user_id)
+    finally:
+        await bot.session.close()
+
