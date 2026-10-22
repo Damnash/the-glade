@@ -18,6 +18,7 @@ def more_keyboard(lang: str, session: str = "") -> InlineKeyboardMarkup:
             InlineKeyboardButton(text="⚔️ PvP",              callback_data=f"pvp:flag{s}"),
         ],
         [
+            InlineKeyboardButton(text=t("clan.title", lang),  callback_data=f"clan:main{s}"),
             InlineKeyboardButton(text=t("nav.back", lang),    callback_data=f"nav:back{s}"),
         ],
     ]
