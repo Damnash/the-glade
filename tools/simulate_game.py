@@ -368,23 +368,30 @@ def step_17_fragment_goal():
 
 
 def step_18_npc_dialog_variants():
-    """NPC диалоги: first_visit, low_hp, learned_truth."""
+    """NPC диалоги: first_visit, low_hp."""
     from content.npcs import get_npc_dialog_key
+    from db.players import update_player_fields
+
+    # ВАЖНО: HP должен быть > 30, иначе low_hp всегда срабатывает первым
+    update_player_fields(TEST_USER_ID, {"hp": 100, "food": 5, "water": 3})
     p = get_player(TEST_USER_ID)
 
-    # Обычный игрок
+    # Обычный игрок (hp=100, food=5) → npc.newt.dialog
     key_normal = get_npc_dialog_key("newt", p, is_first_visit=False)
 
-    # Низкое HP
+    # Низкое HP (hp=10) → npc.newt.dialog_hurt
     p_low = dict(p)
     p_low["hp"] = 10
     key_low = get_npc_dialog_key("newt", p_low, is_first_visit=False)
 
-    # first_visit
+    # first_visit (hp=100, food=5) → npc.newt.dialog_first
     key_first = get_npc_dialog_key("newt", p, is_first_visit=True)
 
-    ok = key_normal != key_low and key_first != key_normal
-    log("18. npc dialog variants", ok, f"normal={key_normal}, low={key_low}, first={key_first}")
+    ok = (key_normal == "npc.newt.dialog"
+          and key_low == "npc.newt.dialog_hurt"
+          and key_first == "npc.newt.dialog_first")
+    log("18. npc dialog variants", ok,
+        f"normal={key_normal}, low={key_low}, first={key_first}")
 
 
 def step_19_npc_hint():
