@@ -108,7 +108,6 @@ def try_open_gates(user_id: int) -> dict | None:
     open_gates(season_id, user_id, winners)
 
     # Выдаём звания
-    from db.players import get_player
     for wid in winners:
         w = get_player(wid)
         if not w:
@@ -186,7 +185,6 @@ def end_season(season_id: int) -> dict:
 
     # Утешительные звания
     if top:
-        from db.players import get_player
         for i, entry in enumerate(top):
             uid = entry["user_id"]
             p = get_player(uid)

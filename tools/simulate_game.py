@@ -490,24 +490,31 @@ def step_21_pvp_flag():
 
 
 def step_22_pvp_attack():
-    """PvP-атака: attack_player (урон по жертве)."""
+    """PvP-атака: attack_player (урон по жертве) — оба в центре лабиринта."""
     from db.pvp import set_pvp_flag
-    from services.pvp import attack_player, PvPError
+    from services.pvp import attack_player, PvPError, is_pvp_zone
     from db.players import get_player as gp, update_player_fields as upf
 
-    # Оба в центре, оба с PvP-флагом
-    upf(TEST_USER_ID, {"location": "center", "hp": 100})
-    upf(999999998, {"location": "center", "hp": 100})
+    # is_pvp_zone: maze_layer > 0 + section в центре ИЛИ день 70+ ИЛИ ключ 5
+    # Проще: оба в L1_C (центр)
+    upf(TEST_USER_ID, {"location": "center", "hp": 100, "maze_layer": 1, "maze_section": "L1_C"})
+    upf(999999998, {"location": "center", "hp": 100, "maze_layer": 1, "maze_section": "L1_C"})
+    # ВАЖНО: убрать жертву из клана (иначе pvp.err.same_clan)
+    from db.clans import remove_from_clan
+    try:
+        remove_from_clan(999999998)
+    except Exception:
+        pass
     set_pvp_flag(TEST_USER_ID)
     set_pvp_flag(999999998)
 
     victim = gp(999999998)
     victim_name = victim["username"] or victim["display_name"]
 
-    # Симулировать: игрок должен быть в PvP-зоне (центр лабиринта, а не Глэйда)
-    # is_pvp_zone проверяет maze_layer > 0 → надо обоих в лабиринт
-    upf(TEST_USER_ID, {"maze_layer": 1, "maze_section": "L1_N1"})
-    upf(999999998, {"maze_layer": 1, "maze_section": "L1_N1"})
+    attacker = gp(TEST_USER_ID)
+    if not is_pvp_zone(attacker):
+        log("22. pvp attack", False, "is_pvp_zone=False — не в центре лабиринта?")
+        return
 
     try:
         result = attack_player(TEST_USER_ID, victim_name)
@@ -544,12 +551,20 @@ def step_23_pvp_duel():
 def step_24_clan_chat():
     """Клан-чат: send_clan_message (2 участника)."""
     from services.clans import send_clan_message, ClanError
-    from db.clans import get_player_clan
+    from db.clans import get_player_clan, join_clan
 
     clan = get_player_clan(TEST_USER_ID)
     if not clan:
         log("24. clan chat", False, "no clan")
         return
+
+    # Вернуть жертву в клан (если step_22 её убрал)
+    from db.clans import get_player_clan as gpc
+    if not gpc(999999998):
+        try:
+            join_clan(clan["clan_id"], 999999998, role="recruit")
+        except Exception:
+            pass
 
     try:
         result = send_clan_message(TEST_USER_ID, "Привет, клан!")
