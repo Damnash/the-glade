@@ -32,3 +32,4 @@ env/
 
 # Бэкапы патчей
 *.bak.*
+listing.txt
