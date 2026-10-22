@@ -56,6 +56,12 @@ def main_keyboard(lang: str, context: dict, session: str = "") -> InlineKeyboard
             InlineKeyboardButton(text=t("nav.todo", lang), callback_data=f"nav:todo{s}"),
         ])
 
+    # 2.5) Инвентарь / Статы
+    rows.append([
+        InlineKeyboardButton(text=t("btn.inventory", lang), callback_data=f"nav:inv{s}"),
+        InlineKeyboardButton(text=t("btn.stats", lang),     callback_data=f"nav:stats{s}"),
+    ])
+
     # 3) Информация
     rows.append([
         InlineKeyboardButton(text=t("map.btn_open", lang),   callback_data=f"map:list{s}"),
