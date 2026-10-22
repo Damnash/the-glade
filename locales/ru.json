@@ -1514,5 +1514,6 @@
   "clan.open.btn_list": "👥 Открытые кланы",
   "clan.open.btn_toggle_on": "🔓 Открыть",
   "clan.open.btn_toggle_off": "🔒 Закрыть",
-  "clan.err.not_open": "Этот клан не открыт для вступления."
+  "clan.err.not_open": "Этот клан не открыт для вступления.",
+  "maze.btn_continue": "➡️ Продолжить"
 }

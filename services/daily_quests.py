@@ -48,10 +48,27 @@ def ensure_today_quest(user_id: int) -> dict:
     """
     Гарантирует, что у игрока есть квест на сегодня.
     Если нет — создаёт. Возвращает запись.
+    Старые квесты (active/complete) — помечаются как expired.
     """
     existing = get_today_quest(user_id)
     if existing:
         return existing
+
+    # Закрыть старые квесты (active/complete за прошлые дни)
+    today = _today_utc()
+    try:
+        conn = _get_conn()
+        try:
+            cur = conn.cursor()
+            cur.execute("""
+                UPDATE daily_quests SET status = 'expired'
+                WHERE user_id = ? AND quest_date < ? AND status IN ('active', 'complete')
+            """, (user_id, today))
+            conn.commit()
+        finally:
+            conn.close()
+    except Exception:
+        pass
 
     # Создать новый
     quest_key = pick_daily_quest()

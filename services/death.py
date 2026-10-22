@@ -108,7 +108,6 @@ def die_in_maze(user_id: int, lang: str = "ru") -> dict:
     # Лог для главного меню
     try:
         from core.i18n import t
-        from db.players import get_player
         _p = get_player(user_id)
         if _p:
             add_event(user_id, "died", t("log.died", _p["language"]), severity="important")

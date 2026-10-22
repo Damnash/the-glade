@@ -1492,5 +1492,6 @@
   "clan.open.btn_list": "👥 Open clans",
   "clan.open.btn_toggle_on": "🔓 Open",
   "clan.open.btn_toggle_off": "🔒 Close",
-  "clan.err.not_open": "This clan is not open for joining."
+  "clan.err.not_open": "This clan is not open for joining.",
+  "maze.btn_continue": "➡️ Continue"
 }
