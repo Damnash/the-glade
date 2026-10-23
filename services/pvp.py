@@ -42,10 +42,11 @@ def is_pvp_zone(player: dict) -> bool:
     if section["type"] == "center":
         return True
 
-    # Финал сезона (день 70+)
+    # Финал сезона (день 80+). Синхронизировано с check_pvp_possible:
+    # до 80 дня нужен флаг, с 80 — PvP обязателен.
     from core.maze_current import get_season_day
     day = get_season_day(season)
-    if day >= 70:
+    if day >= 80:
         return True
 
     # Носитель ключа 5 — всегда PvP
