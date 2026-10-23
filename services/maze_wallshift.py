@@ -135,13 +135,14 @@ def wallshift(season_id: int, layer: int = 1) -> dict:
         new_exits[b].append(a)
         added += 1
 
-    # 3. Проверка связности (все секции достижимы до центра)
+    # 3. Проверка связности: все секции достижимы от центра И каждый вход
+    #    (entrances) достижим от центра. Иначе игрок не сможет выйти.
     from collections import deque
     reachable = {center}
     queue = deque([center])
     while queue:
         node = queue.popleft()
-        for nxt in new_exits[node]:
+        for nxt in new_exits.get(node, []):
             if nxt not in reachable:
                 reachable.add(nxt)
                 queue.append(nxt)
@@ -149,6 +150,12 @@ def wallshift(season_id: int, layer: int = 1) -> dict:
     if len(reachable) < len(sections):
         logging.warning(f"[WALLSHIFT] not all sections reachable: {len(reachable)}/{len(sections)}")
         return {"ok": False, "reason": "disconnected", "reachable": len(reachable), "total": len(sections)}
+
+    entrances = layer_data.get("entrances") or {}
+    for wing, sid in entrances.items():
+        if sid and sid not in reachable:
+            logging.warning(f"[WALLSHIFT] entrance {wing}={sid} not reachable from center")
+            return {"ok": False, "reason": "entrance_unreachable", "wing": wing, "section": sid}
 
     # 4. Обновляем БД
     conn = get_conn()
