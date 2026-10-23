@@ -45,7 +45,7 @@ async def cmd_work(message: Message):
             reward = format_rewards(spec["rewards"], lang)
             lines.append(
                 t("work.list_line", lang,
-                  key=key,
+                  work_key=key,
                   duration=humanize_seconds(spec["duration_sec"], lang),
                   energy=spec["energy_cost"],
                   reward=reward)

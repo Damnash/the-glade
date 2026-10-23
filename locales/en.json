@@ -123,7 +123,7 @@
   "work.not_done": "Work is not finished yet. {time} left.",
   "work.nothing": "You are not working.",
   "work.list_header": "Available work here:",
-  "work.list_line": "• /work {key} — {duration}, −{energy}⚡, +{reward}",
+  "work.list_line": "• /work {work_key} — {duration}, −{energy}⚡, +{reward}",
   "work.no_work_here": "No work available here.",
   "work.farm": "Farm work",
   "work.forge": "Forge work",

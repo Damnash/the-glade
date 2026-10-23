@@ -120,7 +120,7 @@
   "work.not_done": "Работа ещё не закончена. Осталось {time}.",
   "work.nothing": "Ты не работаешь.",
   "work.list_header": "Доступная работа здесь:",
-  "work.list_line": "• /работать {key} — {duration}, −{energy}⚡, +{reward}",
+  "work.list_line": "• /работать {work_key} — {duration}, −{energy}⚡, +{reward}",
   "work.no_work_here": "Здесь нет работы.",
   "work.farm": "Работа на ферме",
   "work.forge": "Работа в кузнице",
