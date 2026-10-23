@@ -143,8 +143,7 @@ async def on_intro_perk(callback: CallbackQuery, bot: Bot):
         await callback.answer("Unknown perk.", show_alert=True)
         return
 
-    # Применяем бонусы перка сразу
-    from services.bonuses import get_player_bonus
+    # Применяем бонусы перка сразу (с клипом до max_hp/max_energy)
     from content.professions import PERKS as PERKS_DATA
 
     perk_spec = PERKS_DATA[perk_key]
@@ -156,6 +155,16 @@ async def on_intro_perk(callback: CallbackQuery, bot: Bot):
         updates["hp"] = player["hp"] + hp_bonus
     if energy_bonus:
         updates["energy"] = player["energy"] + energy_bonus
+
+    # Клип по новым максимумам (с учётом уже выбранной профессии, если есть)
+    from services.bonuses import get_player_bonus
+    tmp = dict(player)
+    tmp["perk"] = perk_key
+    bonus = get_player_bonus(tmp)
+    if "hp" in updates:
+        updates["hp"] = min(updates["hp"], bonus["max_hp"])
+    if "energy" in updates:
+        updates["energy"] = min(updates["energy"], bonus["max_energy"])
 
     update_player_fields(user_id, updates)
 
@@ -187,7 +196,7 @@ async def on_intro_prof(callback: CallbackQuery, bot: Bot):
         await callback.answer("Unknown profession.", show_alert=True)
         return
 
-    # Применяем бонусы профессии
+    # Применяем бонусы профессии (с клипом до max_hp/max_energy)
     prof = PROFESSIONS[prof_key]
     hp_bonus = prof["bonus"].get("max_hp", 0)
     energy_bonus = prof["bonus"].get("max_energy", 0)
@@ -197,6 +206,16 @@ async def on_intro_prof(callback: CallbackQuery, bot: Bot):
         updates["hp"] = player["hp"] + hp_bonus
     if energy_bonus:
         updates["energy"] = player["energy"] + energy_bonus
+
+    # Клип по новым максимумам (с учётом уже выбранного перка, если есть)
+    from services.bonuses import get_player_bonus
+    tmp = dict(player)
+    tmp["profession"] = prof_key
+    bonus = get_player_bonus(tmp)
+    if "hp" in updates:
+        updates["hp"] = min(updates["hp"], bonus["max_hp"])
+    if "energy" in updates:
+        updates["energy"] = min(updates["energy"], bonus["max_energy"])
 
     update_player_fields(user_id, updates)
 
