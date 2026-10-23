@@ -37,6 +37,28 @@ def _set_state(key: str, value: str):
         conn.close()
 
 
+def _try_acquire_state(key: str, value: str) -> bool:
+    """Атомарно: если key != value — записать value и вернуть True. Иначе False.
+
+    Защита от гонки между несколькими инстансами бота и от повторного
+    broadcast, если _broadcast упал после успешной записи.
+    """
+    conn = get_conn()
+    try:
+        cur = conn.cursor()
+        cur.execute("""
+            INSERT INTO system_state (key, value, updated_at)
+            VALUES (?, ?, ?)
+            ON CONFLICT(key) DO UPDATE SET
+                value = excluded.value,
+                updated_at = excluded.updated_at
+            WHERE system_state.value != excluded.value
+        """, (key, value, datetime.utcnow()))
+        conn.commit()
+        return cur.rowcount > 0
+    finally:
+        conn.close()
+
 def _today_utc() -> str:
     return datetime.now(UTC).date().isoformat()
 
@@ -67,31 +89,31 @@ async def daycycle_events_task(bot):
 
             # ============ 06:00 — УТРО ============
             if hour == 6:
-                last = _get_state("last_morning_notification")
-                if last != today:
+                if _try_acquire_state("last_morning_notification", today):
                     logging.info("[DAYCYCLE] morning: gates open")
-                    await _broadcast(bot, "daycycle.morning", with_advice=True)
-                    _set_state("last_morning_notification", today)
+                    try:
+                        await _broadcast(bot, "daycycle.morning", with_advice=True)
+                    except Exception as e:
+                        logging.error(f"[DAYCYCLE] morning broadcast failed: {e}")
 
             # ============ 22:00 — ВЕЧЕР ============
             # Воскресенье, 20:00 — поминание павших
             if hour == 20 and datetime.now(UTC).weekday() == 6:  # 6 = воскресенье
-                last = _get_state("last_memorial_date")
-                if last != today:
+                if _try_acquire_state("last_memorial_date", today):
                     logging.info("[DAYCYCLE] Sunday memorial")
                     try:
                         from services.weekly_memorial import broadcast_memorial
                         await broadcast_memorial(bot)
-                        _set_state("last_memorial_date", today)
                     except Exception as e:
                         logging.error(f"[DAYCYCLE] memorial error: {e}")
 
             if hour == 22:
-                last = _get_state("last_evening_notification")
-                if last != today:
+                if _try_acquire_state("last_evening_notification", today):
                     logging.info("[DAYCYCLE] evening: gates closed")
-                    await _broadcast(bot, "daycycle.evening")
-                    _set_state("last_evening_notification", today)
+                    try:
+                        await _broadcast(bot, "daycycle.evening")
+                    except Exception as e:
+                        logging.error(f"[DAYCYCLE] evening broadcast failed: {e}")
 
                     # Вечерний костёр — всем игрокам
                     try:
