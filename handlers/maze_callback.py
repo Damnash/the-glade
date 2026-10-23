@@ -221,42 +221,6 @@ async def on_look(callback: CallbackQuery):
         import logging
         logging.warning(f"[on_look] dropped_diaries error: {e}")
 
-    # 1.5 Выпавшие дневники — если есть, показать кнопки «Прочитать»
-    try:
-        from services.diary import get_dropped_diaries
-        from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-
-        dropped = get_dropped_diaries(section_id, layer)
-        if dropped:
-            session = player.get("current_session", "")
-            s = f":{session}" if session else ""
-            rows = []
-            for d in dropped:
-                rows.append([InlineKeyboardButton(
-                    text=t("maze.diary_btn", lang, name=d["display_name"]),
-                    callback_data=f"maze:diary:{d['id']}{s}",
-                )])
-            rows.append([InlineKeyboardButton(
-                text=t("maze.btn_exit_to_glade", lang),
-                callback_data=f"maze:exit{s}",
-            )])
-            kb = InlineKeyboardMarkup(inline_keyboard=rows)
-            from core.bot_helpers import edit_main, make_bot
-            bot = make_bot()
-            try:
-                await edit_main(
-                    bot, user_id,
-                    t("maze.dropped_diaries_text", lang, n=len(dropped)),
-                    kb,
-                )
-            finally:
-                await bot.session.close()
-            await callback.answer()
-            return
-    except Exception as e:
-        import logging
-        logging.warning(f"[on_look] dropped_diaries error: {e}")
-
     # 2. Обычное событие
     # Артефакты прошлого (10%) — приоритетнее события
     from services.maze import roll_artifact, on_artifact_found
