@@ -204,6 +204,17 @@ def move_in_run(user_id: int, to_section: str) -> dict:
     # Списываем ресурсы
     survival_report = consume_on_move(user_id, is_night=is_night())
 
+    # Если игрок умер от голода/жажды при переходе — не двигаем его
+    # и не начисляем visit_sections. Вызывающий код должен убить.
+    if survival_report.get("death"):
+        return {
+            "ok": True,
+            "current_section": current,
+            "depth": run["depth"],
+            "survival": survival_report,
+            "death": True,
+        }
+
     # Баффы (проклятие: -HP при переходе, благословение: +HP)
     try:
         from services.buffs import get_buff_modifiers
