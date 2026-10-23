@@ -108,15 +108,32 @@ async def _edit_main_impl(bot: Bot, user_id: int, text: str, kb=None):
     player = get_player(user_id)
     msg_id = player.get("main_message_id") if player else None
 
-    # Удаляем старое, если есть
+    # 1) Пытаемся удалить старое, чтобы новое было внизу
     if msg_id:
         try:
             await bot.delete_message(chat_id=user_id, message_id=msg_id)
             logging.info(f"[edit_main] deleted old msg={msg_id}")
+            msg_id = None
         except Exception as e:
             logging.warning(f"[edit_main] delete FAILED msg={msg_id}: {type(e).__name__}: {e}")
+            # 2) delete не удался — пробуем отредактировать тот же message_id
+            try:
+                await bot.edit_message_text(
+                    chat_id=user_id,
+                    message_id=msg_id,
+                    text=text,
+                    reply_markup=kb,
+                )
+                logging.info(f"[edit_main] edited msg={msg_id}")
+                return
+            except Exception as e2:
+                if "message is not modified" in str(e2):
+                    logging.info(f"[edit_main] msg={msg_id} unchanged")
+                    return
+                logging.warning(f"[edit_main] edit FAILED msg={msg_id}: {type(e2).__name__}: {e2}")
+                # 3) и edit не удался — падаем в send
 
-    # Создаём новое
+    # 4) Отправляем новое
     try:
         msg = await bot.send_message(user_id, text, reply_markup=kb)
         update_player_fields(user_id, {"main_message_id": msg.message_id})
