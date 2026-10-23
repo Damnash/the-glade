@@ -105,6 +105,9 @@ async def edit_main(bot: Bot, user_id: int, text: str, kb=None):
 
 
 async def _edit_main_impl(bot: Bot, user_id: int, text: str, kb=None):
+    from core.i18n import escape_html_entities
+    text = escape_html_entities(text)
+    
     player = get_player(user_id)
     msg_id = player.get("main_message_id") if player else None
 
@@ -117,7 +120,6 @@ async def _edit_main_impl(bot: Bot, user_id: int, text: str, kb=None):
                 text=text,
                 reply_markup=kb,
                 disable_web_page_preview=True,
-                parse_mode=None, # убираем HTML на время теста
             )
             logging.info(f"[edit_main] edited msg={msg_id}")
             return
