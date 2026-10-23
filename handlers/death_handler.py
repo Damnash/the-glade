@@ -9,6 +9,8 @@ from core.bot_helpers import make_bot
 
 async def show_death_message(callback: CallbackQuery, user_id: int, lang: str):
     """Показать сообщение о смерти."""
+    from db.players import get_player
+    player = get_player(user_id) or {}
     personal_msg = random_death_message(lang)
 
     text = (
