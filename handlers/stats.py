@@ -31,7 +31,7 @@ async def cmd_stats(message: Message):
     buffs_line = ""
     try:
         from services.buffs import format_buffs_for_display
-        b_disp = format_buffs_for_display(user_id, lang)
+        b_disp = format_buffs_for_display(message.from_user.id, lang)
         if b_disp:
             buffs_line = b_disp
     except Exception:
