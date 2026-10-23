@@ -8,28 +8,6 @@ from datetime import datetime, timedelta
 from db.connection import get_conn
 
 
-def start_evening_fire(bot):
-    """Broadcast всем игрокам (intro_done=1) + пометить NPC в центре."""
-    from core.i18n import t
-
-    conn = get_conn()
-    try:
-        cur = conn.cursor()
-        cur.execute("SELECT user_id, language FROM players WHERE intro_done = 1")
-        players = cur.fetchall()
-    finally:
-        conn.close()
-
-    sent = 0
-    for user_id, lang in players:
-        try:
-            text = t("evening_fire.text", lang or "en")
-            # Не await здесь — start_evening_fire вызывается из sync-контекста?
-            # Ок, это async-функция
-        except Exception:
-            continue
-    return sent
-
 
 async def start_evening_fire_async(bot):
     """Async: broadcast всем игрокам."""
