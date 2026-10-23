@@ -194,25 +194,32 @@ async def _broadcast(bot, text_key: str, with_advice: bool = False):
         except Exception as e:
             logging.error(f"[DAYCYCLE] rumor error: {e}")
 
-    sent = 0
-    for user_id, lang in players:
-        try:
-            text = t(text_key, lang or "en")
-            if advice_key:
-                advice_text = t(advice_key, lang or "en")
-                advice_title = t("advice.title", lang or "en")
-                text = text + "\n\n" + advice_title + "\n" + advice_text
+    import asyncio
+    sem = asyncio.Semaphore(20)
 
-            if rumor:
-                rumor_title = t("keys.rumor_title", lang or "en")
-                wing = t(rumor["wing_name_key"], lang or "en")
-                rumor_body = t("keys.rumor_body", lang or "en", num=rumor["key_num"], wing=wing)
-                rumor_hint = t("keys.rumor_hint", lang or "en")
-                text = text + "\n\n" + rumor_title + "\n" + rumor_body + "\n<i>" + rumor_hint + "</i>"
+    async def _one(user_id, lang):
+        async with sem:
+            try:
+                text = t(text_key, lang or "en")
+                if advice_key:
+                    advice_text = t(advice_key, lang or "en")
+                    advice_title = t("advice.title", lang or "en")
+                    text = text + "\n\n" + advice_title + "\n" + advice_text
 
-            await bot.send_message(chat_id=user_id, text=text)
-            sent += 1
-        except Exception as e:
-            logging.debug(f"[DAYCYCLE] send to {user_id} failed: {e}")
+                if rumor:
+                    rumor_title = t("keys.rumor_title", lang or "en")
+                    wing = t(rumor["wing_name_key"], lang or "en")
+                    rumor_body = t("keys.rumor_body", lang or "en", num=rumor["key_num"], wing=wing)
+                    rumor_hint = t("keys.rumor_hint", lang or "en")
+                    text = text + "\n\n" + rumor_title + "\n" + rumor_body + "\n<i>" + rumor_hint + "</i>"
+
+                await bot.send_message(chat_id=user_id, text=text)
+                return 1
+            except Exception as e:
+                logging.debug(f"[DAYCYCLE] send to {user_id} failed: {e}")
+                return 0
+
+    results = await asyncio.gather(*[_one(uid, lang) for uid, lang in players])
+    sent = sum(results)
 
     logging.info(f"[DAYCYCLE] broadcast '{text_key}': {sent}/{len(players)} (advice={advice_key}, rumor={rumor})")

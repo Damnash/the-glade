@@ -57,20 +57,27 @@ async def broadcast_memorial(bot):
     finally:
         conn.close()
 
-    sent = 0
-    for user_id, lang in players:
-        try:
-            if deaths:
-                names = [d["display_name"] for d in deaths[:20]]
-                names_str = "\\n".join(f"  • {n}" for n in names)
-                text = t("memorial.text", lang or "en", n=len(deaths), names=names_str)
-            else:
-                text = t("memorial.text_empty", lang or "en")
-            add_event(user_id, "memorial", text, severity="chat")
-            cleanup_old_events(user_id)
-            sent += 1
-        except Exception as e:
-            logging.warning(f"[MEMORIAL] send to {user_id} failed: {e}")
+    import asyncio
+    sem = asyncio.Semaphore(20)
+
+    async def _one(user_id, lang):
+        async with sem:
+            try:
+                if deaths:
+                    names = [d["display_name"] for d in deaths[:20]]
+                    names_str = "\\n".join(f"  • {n}" for n in names)
+                    text = t("memorial.text", lang or "en", n=len(deaths), names=names_str)
+                else:
+                    text = t("memorial.text_empty", lang or "en")
+                add_event(user_id, "memorial", text, severity="chat")
+                cleanup_old_events(user_id)
+                return 1
+            except Exception as e:
+                logging.warning(f"[MEMORIAL] send to {user_id} failed: {e}")
+                return 0
+
+    results = await asyncio.gather(*[_one(uid, lang) for uid, lang in players])
+    sent = sum(results)
 
     logging.info(f"[MEMORIAL] sent to {sent}/{len(players)}")
     return sent

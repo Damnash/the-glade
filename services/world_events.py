@@ -55,15 +55,21 @@ async def broadcast_world_event(bot, event_key: str):
     finally:
         conn.close()
 
-    sent = 0
-    for user_id, lang in players:
-        try:
-            text = t(f"world_events.{event_key}", lang or "en")
-            add_event(user_id, "world_event", text, severity="chat")
-            cleanup_old_events(user_id)
-            sent += 1
-        except Exception:
-            pass
+    import asyncio
+    sem = asyncio.Semaphore(20)
+
+    async def _one(user_id, lang):
+        async with sem:
+            try:
+                text = t(f"world_events.{event_key}", lang or "en")
+                add_event(user_id, "world_event", text, severity="chat")
+                cleanup_old_events(user_id)
+                return 1
+            except Exception:
+                return 0
+
+    results = await asyncio.gather(*[_one(uid, lang) for uid, lang in players])
+    sent = sum(results)
 
     _set_last_event_key(event_key)
     return sent

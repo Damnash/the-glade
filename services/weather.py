@@ -94,15 +94,21 @@ async def change_weather(bot):
     finally:
         conn.close()
 
-    sent = 0
-    for user_id, lang in players:
-        try:
-            text = t(f"weather.{new}.change", lang or "en")
-            add_event(user_id, "weather_change", text, severity="chat")
-            cleanup_old_events(user_id)
-            sent += 1
-        except Exception:
-            pass
+    import asyncio
+    sem = asyncio.Semaphore(20)
+
+    async def _one(user_id, lang):
+        async with sem:
+            try:
+                text = t(f"weather.{new}.change", lang or "en")
+                add_event(user_id, "weather_change", text, severity="chat")
+                cleanup_old_events(user_id)
+                return 1
+            except Exception:
+                return 0
+
+    results = await asyncio.gather(*[_one(uid, lang) for uid, lang in players])
+    sent = sum(results)
 
     logging.info(f"[WEATHER] {current} → {new}, sent to {sent}/{len(players)}")
     return new
