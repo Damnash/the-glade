@@ -435,16 +435,17 @@ async def main():
     dp.callback_query.register(maze_cb.on_look,     F.data.startswith("maze:look:"))
     dp.callback_query.register(maze_cb.on_diary_read, F.data.startswith("maze:diary:"))
 
-    asyncio.create_task(cleanup_task())
-    asyncio.create_task(title_push_task(bot))
-    asyncio.create_task(work_reminder_task(bot))
-    asyncio.create_task(weather_task(bot))
-    asyncio.create_task(world_events_task(bot))
-    asyncio.create_task(maze_cleanup_task())
+    background_tasks = []
 
+    background_tasks.append(asyncio.create_task(cleanup_task()))
+    background_tasks.append(asyncio.create_task(title_push_task(bot)))
+    background_tasks.append(asyncio.create_task(work_reminder_task(bot)))
+    background_tasks.append(asyncio.create_task(weather_task(bot)))
+    background_tasks.append(asyncio.create_task(world_events_task(bot)))
+    background_tasks.append(asyncio.create_task(maze_cleanup_task()))
     # Уведомления утро/вечер
     from services.daycycle_events import daycycle_events_task
-    asyncio.create_task(daycycle_events_task(bot))
+    background_tasks.append(asyncio.create_task(daycycle_events_task(bot)))
     # FSM: приём текста в рацию (в самом конце, чтобы не перехватить команды)
     dp.message.register(
         radio_h.process_radio_message,
@@ -476,8 +477,28 @@ async def main():
             logging.error(f"[MSG ERROR] {type(e).__name__}: {e}", exc_info=True)
             raise
 
-    await dp.start_polling(bot)
+    try:
+        await dp.start_polling(bot)
+    finally:
+        logging.info("Stopping background tasks...")
+        for task in background_tasks:
+            task.cancel()
+        try:
+            await asyncio.wait_for(
+                asyncio.gather(*background_tasks, return_exceptions=True),
+                timeout=5.0,
+            )
+        except asyncio.TimeoutError:
+            logging.warning("Some background tasks did not stop in 5s")
+        try:
+            await bot.session.close()
+        except Exception:
+            pass
+        logging.info("The Glade stopped.")
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except (KeyboardInterrupt, SystemExit):
+        pass
