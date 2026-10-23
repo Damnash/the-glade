@@ -27,7 +27,8 @@ async def cmd_start(message: Message, bot: Bot):
 
         # Intro завершён — показать главный экран
         await refresh_main(bot, user.id)
-
+        
+        # Убедимся, что команда пользователя удалена
         try:
             await message.delete()
         except Exception:

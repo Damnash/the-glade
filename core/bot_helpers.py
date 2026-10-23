@@ -111,26 +111,7 @@ async def _edit_main_impl(bot: Bot, user_id: int, text: str, kb=None):
     player = get_player(user_id)
     msg_id = player.get("main_message_id") if player else None
 
-    # 1) Сначала пробуем ОТРЕДАКТИРОВАТЬ существующее сообщение
-    if msg_id:
-        try:
-            await bot.edit_message_text(
-                chat_id=user_id,
-                message_id=msg_id,
-                text=text,
-                reply_markup=kb,
-                disable_web_page_preview=True,
-            )
-            logging.info(f"[edit_main] edited msg={msg_id}")
-            return
-        except Exception as e:
-            err_str = str(e).lower()
-            if "message is not modified" in err_str:
-                logging.info(f"[edit_main] msg={msg_id} unchanged")
-                return
-            logging.warning(f"[edit_main] edit FAILED msg={msg_id}: {type(e).__name__}: {e}")
-
-    # 2) Если отредактировать не удалось — удаляем старое (если было) и шлём новое
+    # 1) Удаляем старое меню
     if msg_id:
         try:
             await bot.delete_message(chat_id=user_id, message_id=msg_id)
@@ -138,11 +119,12 @@ async def _edit_main_impl(bot: Bot, user_id: int, text: str, kb=None):
         except Exception as e:
             logging.warning(f"[edit_main] delete FAILED msg={msg_id}: {e}")
 
+    # 2) Отправляем новое меню внизу
     try:
         msg = await bot.send_message(
             user_id, 
             text, 
-            reply_markup=kb, 
+            reply_markup=kb,
             disable_web_page_preview=True
         )
         update_player_fields(user_id, {"main_message_id": msg.message_id})
@@ -151,7 +133,6 @@ async def _edit_main_impl(bot: Bot, user_id: int, text: str, kb=None):
     except Exception as e:
         logging.error(f"[edit_main] send failed: {e}")
         return None
-
 async def refresh_main(bot: Bot, user_id: int, new_session_flag: bool = True):
     """
     Обновить главное сообщение.

@@ -19,6 +19,12 @@ def format_rewards(rewards: dict, lang: str) -> str:
 
 async def cmd_work(message: Message):
     lang = get_lang(message.from_user.id)
+    
+    try:
+        await message.delete()
+    except Exception:
+        pass
+        
     player = get_player(message.from_user.id)
     if not player:
         await message.answer(t("start.need_start", lang))

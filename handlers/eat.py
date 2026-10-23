@@ -9,6 +9,11 @@ from services.eat import eat, EatError
 
 async def cmd_eat(message: Message):
     lang = get_lang(message.from_user.id)
+    
+    try:
+        await message.delete()
+    except Exception:
+        pass
 
     try:
         result = eat(message.from_user.id)
