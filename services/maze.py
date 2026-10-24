@@ -99,10 +99,21 @@ def enter_maze(user_id: int, gate: str) -> str:
                 remove_item(user_id, item, to_remove)
 
     # === Секция в НОВОМ формате ===
+    from core.season import get_current_tier
+    from core.maze_sizes import get_maze_size
+    
+    tier = get_current_tier()
+    size_cfg = get_maze_size(tier)
+    
     season = get_current_season()
     layer_data = load_layer(season, 1)
     if not layer_data:
-        layer_data = generate_layer(1, seed=season)
+        layer_data = generate_layer(
+            1, 
+            seed=season,
+            wing_size=size_cfg["wing_size"],
+            center_size=size_cfg["center_size"]
+        )
         save_layer(season, 1, layer_data)
 
     wing_map = {

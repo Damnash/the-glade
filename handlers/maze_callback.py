@@ -461,3 +461,66 @@ async def on_diary_read(callback):
         await bot.session.close()
     await callback.answer(t("maze.diary_found", lang))
 
+
+
+async def on_go_down(callback: CallbackQuery):
+    """Переход на следующий слой (maze:down:2)."""
+    from core.bot_helpers import check_session, refresh_main
+    from db.players import get_player, update_player_fields
+    from core.maze_current import get_current_season
+    from db.maze_map import load_layer, save_layer
+    from core.maze_generator import generate_layer
+    from core.season import get_current_tier
+    from core.maze_sizes import get_maze_size
+    from services.maze_runs import end_run, start_run
+
+    user_id = callback.from_user.id
+    player = get_player(user_id)
+    if not player:
+        return
+    lang = player["language"]
+
+    if not check_session(user_id, callback.data):
+        await callback.answer(t("log.stale", lang), show_alert=True)
+        return
+
+    # maze:down:2:session
+    parts = callback.data.split(":")
+    if len(parts) < 3:
+        return
+    layer = int(parts[2])
+
+    # Проверка, что мы в центре
+    if player.get("maze_section") != "L1_C" and player.get("maze_section") != "L2_C":
+        await callback.answer("Ты не в центре Лабиринта.", show_alert=True)
+        return
+
+    # Генерация слоя
+    season = get_current_season()
+    layer_data = load_layer(season, layer)
+    if not layer_data:
+        tier = get_current_tier()
+        size_cfg = get_maze_size(tier)
+        layer_data = generate_layer(
+            layer, 
+            seed=season + layer,
+            wing_size=size_cfg["wing_size"],
+            center_size=size_cfg["center_size"]
+        )
+        save_layer(season, layer, layer_data)
+
+    # Перемещаем в центр нового слоя
+    center_section = layer_data["center"]
+    update_player_fields(user_id, {
+        "maze_layer": layer,
+        "maze_section": center_section,
+    })
+    
+    # Пересоздаем run для нового слоя
+    end_run(user_id)
+    start_run(user_id, layer=layer, entry_section=center_section)
+
+    await callback.answer(f"🌀 Ты спустился на слой {layer}.")
+    
+    from handlers.maze_section import show_section
+    await show_section(callback, user_id, layer, center_section)

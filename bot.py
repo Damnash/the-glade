@@ -431,6 +431,7 @@ async def main():
     dp.callback_query.register(combat_cb.on_defend, F.data.startswith("combat:defend"))
     dp.callback_query.register(combat_cb.on_flee, F.data.startswith("combat:flee"))
     dp.callback_query.register(maze_cb.on_compass,  F.data.startswith("maze:compass:"))
+    dp.callback_query.register(maze_cb.on_go_down,  F.data.startswith("maze:down:"))
     dp.callback_query.register(maze_cb.on_heal,     F.data.startswith("maze:heal:"))
     dp.callback_query.register(maze_cb.on_look,     F.data.startswith("maze:look:"))
     dp.callback_query.register(maze_cb.on_diary_read, F.data.startswith("maze:diary:"))
